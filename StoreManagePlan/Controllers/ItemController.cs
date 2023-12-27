@@ -34,7 +34,7 @@ namespace StoreManagePlan.Controllers
             }
 
             var itemModel = await _context.Item
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.id == id);
             if (itemModel == null)
             {
                 return NotFound();
@@ -88,7 +88,7 @@ namespace StoreManagePlan.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,SKU_CODE,SKU_NAME")] Item itemModel)
         {
-            if (id != itemModel.ID)
+            if (id != itemModel.id)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace StoreManagePlan.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ItemModelExists(itemModel.ID))
+                    if (!ItemModelExists(itemModel.id))
                     {
                         return NotFound();
                     }
@@ -125,7 +125,7 @@ namespace StoreManagePlan.Controllers
             }
 
             var itemModel = await _context.Item
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.id == id);
             if (itemModel == null)
             {
                 return NotFound();
@@ -151,7 +151,7 @@ namespace StoreManagePlan.Controllers
 
         private bool ItemModelExists(int id)
         {
-            return _context.Item.Any(e => e.ID == id);
+            return _context.Item.Any(e => e.id == id);
         }
     }
 }

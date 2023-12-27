@@ -11,20 +11,20 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SKU_CODE)
+            @Html.DisplayNameFor(model => model.sku_code)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SKU_CODE)
+            @Html.DisplayFor(model => model.sku_code)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SKU_NAME)
+            @Html.DisplayNameFor(model => model.sku_name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SKU_NAME)
+            @Html.DisplayFor(model => model.sku_name)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

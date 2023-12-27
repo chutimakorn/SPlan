@@ -5,9 +5,12 @@ namespace StoreManagePlan.Models
     public class Item
     {
         [Key]
-        public Int32 ID { get; set; }
+        public Int32 id { get; set; }
 
-        public String SKU_CODE { get; set; }
-        public String SKU_NAME { get; set; }
+        public String sku_code { get; set; }
+        public String sku_name { get; set; }
+        public String create_date { get; set; }
+        public String update_date { get; set; }
+        public String effective_date { get; set; }
     }
 }

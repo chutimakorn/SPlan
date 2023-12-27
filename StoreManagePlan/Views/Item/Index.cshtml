@@ -50,7 +50,7 @@
     </div>
    
     <div class="card">
-        <h5 class="card-header">Responsive Table</h5>
+        <h5 class="card-header">New Items</h5>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead style="background-color:#80808038">
@@ -64,30 +64,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1"></th>
-                        <td>Table cell</td>
-                        <td>Table cell</td>
-                        <td>Table cell</td>
-                      
-                        
-                    </tr>
-                    <tr>
-                        <th scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1"></th>
-                        <td>Table cell</td>
-                        <td>Table cell</td>
-                        <td>Table cell</td>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <th scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1"></th>
+                            <td>@item.sku_code</td>
+                            <td>@item.sku_name</td>
+                            <td>@item.effective_date</td>
 
-                        
-                    </tr>
-                    <tr>
-                        <th scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1"></th>
-                        <td>Table cell</td>
-                        <td>Table cell</td>
-                        <td>Table cell</td>
-                      
+
+                        </tr>
+                    }
                    
-                    </tr>
                 </tbody>
             </table>
         </div>
