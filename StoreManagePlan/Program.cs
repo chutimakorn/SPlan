@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using StoreManagePlan.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<StoreManagePlanContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("StoreManagePlanContext") ?? throw new InvalidOperationException("Connection string 'StoreManagePlanContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
