@@ -5,13 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using StoreManagePlan.Context;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
+using OfficeOpenXml;
+using System.Collections.Generic;
+using System.IO;
 
 namespace StoreManagePlan.Controllers
 {
     public class ItemController : Controller
     {
+        ItemContext db = new ItemContext();
         private readonly StoreManagePlanContext _context;
 
         public ItemController(StoreManagePlanContext context)
@@ -152,6 +157,53 @@ namespace StoreManagePlan.Controllers
         private bool ItemModelExists(int id)
         {
             return _context.Item.Any(e => e.id == id);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Upload(IFormFile file)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            if (file != null && file.Length > 0)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    file.CopyTo(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[0];
+                        var rowCount = worksheet.Dimension.Rows;
+
+                        var excelDataList = new List<Item>();
+
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            excelDataList.Add(new Item
+                            {
+                                id = int.Parse(worksheet.Cells[row, 1].Value.ToString()),
+                                sku_code = worksheet.Cells[row, 2].Value.ToString(),
+                                sku_name = worksheet.Cells[row, 3].Value.ToString(),
+                                create_date = worksheet.Cells[row, 4].Value.ToString(),
+                                effective_date = worksheet.Cells[row, 5].Value.ToString(),
+                                // Add other properties as needed
+                            });
+                        }
+
+                        // Process the imported data (you can save it to a database, etc.)
+                        // Example: SaveToDatabase(excelDataList);
+                        if (ModelState.IsValid)
+                        {
+                            foreach (var item in excelDataList)
+                            {
+                                _context.Add(item);
+                            }
+                            await _context.SaveChangesAsync();
+                            return RedirectToAction(nameof(Index));
+                        }
+                    }
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

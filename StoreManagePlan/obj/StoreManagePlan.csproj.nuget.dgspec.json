@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\tae_b\\OneDrive\\เดสก์ท็อป\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj": {}
+    "C:\\Data\\Work\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj": {}
   },
   "projects": {
-    "C:\\Users\\tae_b\\OneDrive\\เดสก์ท็อป\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj": {
+    "C:\\Data\\Work\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\tae_b\\OneDrive\\เดสก์ท็อป\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj",
+        "projectUniqueName": "C:\\Data\\Work\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj",
         "projectName": "StoreManagePlan",
-        "projectPath": "C:\\Users\\tae_b\\OneDrive\\เดสก์ท็อป\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj",
-        "packagesPath": "C:\\Users\\tae_b\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\tae_b\\OneDrive\\เดสก์ท็อป\\SPlan\\StoreManagePlan\\obj\\",
+        "projectPath": "C:\\Data\\Work\\SPlan\\StoreManagePlan\\StoreManagePlan.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Data\\Work\\SPlan\\StoreManagePlan\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tae_b\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -40,6 +40,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.0.5, )"
+            },
             "Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter": {
               "target": "Package",
               "version": "[8.0.0, )"
