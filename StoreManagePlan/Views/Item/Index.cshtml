@@ -58,7 +58,7 @@
                         <th><input class="form-check-input" type="checkbox" value="" id="defaultCheck1"></th>
                         <th>SKU</th>
                         <th>Item Name</th>
-                        <th>Effective date</th>
+                        <th>Created date</th>
                       
                        
                     </tr>
@@ -70,7 +70,7 @@
                             <th scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck1"></th>
                             <td>@item.sku_code</td>
                             <td>@item.sku_name</td>
-                            <td>@item.effective_date</td>
+                            <td>@item.create_date</td>
 
 
                         </tr>
@@ -80,28 +80,54 @@
             </table>
         </div>
     </div>
-</div>
 
-<div class="modal" id="import-modal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Import</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="formFile" class="form-label">import here</label>
-                    <input class="form-control" type="file" id="formFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+    <div class="modal fade" id="import-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Import</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="save-import">Save</button>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">import here</label>
+                        <input class="form-control" type="file" id="formFile" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="save-import">Save</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="bs-toast toast fade bg-success top-0 end-0" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <small>11 mins ago</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกสำเร็จ.
+        </div>
+    </div>
+
+    <div class="bs-toast toast fade bg-danger" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">แจ้งเตือน</div>
+            <small>11 mins ago</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกไม่สำเร็จ.
+        </div>
+    </div>
 </div>
+
+
 
 @* <script src="@Url.Content("~/Scripts/jquery.min.js")"></script> *@
 

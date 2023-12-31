@@ -10,7 +10,7 @@ namespace StoreManagePlan.Models
         public String sku_code { get; set; }
         public String sku_name { get; set; }
         public String create_date { get; set; }
-        public String update_date { get; set; }
-        public String effective_date { get; set; }
+        public String? update_date { get; set; }
+        public String? effective_date { get; set; }
     }
 }

@@ -184,6 +184,7 @@ namespace StoreManagePlan.Controllers
                                 sku_name = worksheet.Cells[row, 3].Value.ToString(),
                                 create_date = worksheet.Cells[row, 4].Value.ToString(),
                                 effective_date = worksheet.Cells[row, 5].Value.ToString(),
+                                update_date = worksheet.Cells[row, 6].Value.ToString(),
                                 // Add other properties as needed
                             });
                         }
@@ -197,7 +198,7 @@ namespace StoreManagePlan.Controllers
                                 _context.Add(item);
                             }
                             await _context.SaveChangesAsync();
-                            return RedirectToAction(nameof(Index));
+                            return RedirectToAction("index");
                         }
                     }
                 }

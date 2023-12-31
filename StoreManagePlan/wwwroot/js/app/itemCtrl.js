@@ -17,8 +17,13 @@ $(function () {
             contentType: false, // Important: Set content type to false as FormData will take care of it
             success: function (data) {
                 //alert(data);
+                $('#import-modal').modal('hide');
+                $('#import-success').toast('show');
+                window.location.reload();
             },
             error: function (error) {
+                $('#import-modal').modal('hide');
+                $('#import-not-success').toast('show');
                 console.log(error);
             }
         });
