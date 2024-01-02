@@ -11,6 +11,7 @@ using StoreManagePlan.Models;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
+using OfficeOpenXml;
 
 namespace StoreManagePlan.Controllers
 {
@@ -205,6 +206,45 @@ namespace StoreManagePlan.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult ExportToExcel()
+        {
+            var data = _context.Item.ToList();
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                // Header
+                worksheet.Cells[1, 1].Value = "Id";
+                worksheet.Cells[1, 2].Value = "sku code";
+                worksheet.Cells[1, 3].Value = "sku name";
+                worksheet.Cells[1, 4].Value = "Create date";
+                worksheet.Cells[1, 5].Value = "Update date";
+                worksheet.Cells[1, 6].Value = "Effective date";
+                // Add more columns as needed
+
+                // Data
+                for (var i = 0; i < data.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = data[i].id;
+                    worksheet.Cells[i + 2, 2].Value = data[i].sku_code;
+                    worksheet.Cells[i + 2, 3].Value = data[i].sku_name;
+                    worksheet.Cells[i + 2, 4].Value = data[i].create_date;
+                    worksheet.Cells[i + 2, 5].Value = data[i].update_date;
+                    worksheet.Cells[i + 2, 6].Value = data[i].effective_date;
+                    // Add more columns as needed
+                }
+
+                package.Save(); // Save the Excel package
+            }
+
+            stream.Position = 0;
+
+            // Set the content type and file name
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Item_List.xlsx");
         }
     }
 }
