@@ -67,4 +67,6 @@ fastlane/test_output
 
 iOSInjectionProject/
 .vs/
-.obj/
+StoreManagePlan/obj/
+StoreManagePlan/bin/
+StoreManagePlan/bin/Debug/net8.0/appsettings.json
