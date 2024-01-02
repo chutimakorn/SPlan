@@ -28,6 +28,7 @@ namespace StoreManagePlan.Controllers
         // GET: ItemModels
         public async Task<IActionResult> Index()
         {
+            ResourceController resource = new ResourceController();
             return View(await _context.Item.ToListAsync());
         }
 
@@ -141,15 +142,27 @@ namespace StoreManagePlan.Controllers
         }
 
         // POST: ItemModels/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(string selectedSkus)
         {
-            var itemModel = await _context.Item.FindAsync(id);
-            if (itemModel != null)
+            if(selectedSkus == "")
             {
-                _context.Item.Remove(itemModel);
+                return View(await _context.Item.ToListAsync());
             }
+
+            var idSku = selectedSkus.Split(',');
+           
+            foreach (var skus in idSku)
+            {
+
+                var itemModel = _context.Item.Where(m => m.sku_code == skus).SingleOrDefault();
+                if (itemModel != null)
+                {
+                    _context.Item.Remove(itemModel);
+                }
+
+            }
+
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
