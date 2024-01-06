@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using StoreManagePlan.Context;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
 using OfficeOpenXml;
@@ -17,7 +16,7 @@ namespace StoreManagePlan.Controllers
 {
     public class ItemController : Controller
     {
-        ItemContext db = new ItemContext();
+
         private readonly StoreManagePlanContext _context;
 
         public ItemController(StoreManagePlanContext context)

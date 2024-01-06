@@ -14,11 +14,18 @@ namespace StoreManagePlan.Data
         {
         }
 
-        public DbSet<StoreManagePlan.Models.Item> Item { get; set; } = default!;
+        public DbSet<Item> Item { get; set; } 
+        public DbSet<ItemFeature> ItemFeature { get; set; } 
+        public DbSet<Store> Store { get; set; }
+        public DbSet<StoreType> StoreType { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Item>().ToTable("Item");
+            modelBuilder.Entity<ItemFeature>().ToTable("ItemFeature").HasKey(pf => new { pf.store_id, pf.item_id });
+            ;
+            modelBuilder.Entity<Store>().ToTable("Store");
+            modelBuilder.Entity<StoreType>().ToTable("StoreType");
 
         }
     }
