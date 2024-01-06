@@ -160,7 +160,7 @@
                         {
                           
                             <tr>
-                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>                               
                                 <td>@item.Store.store_code</td>
                                 <td>@item.Store.store_name</td>
                                 <td>@item.Item.sku_code</td>
@@ -177,7 +177,7 @@
         </div>
     </div>
     <form asp-action="Delete" method="post">
-        <input type="hidden" id="hiddenInputId" name="selectedSkus" />
+        <input type="hidden" id="hiddenInputId" name="selected" />
         <div class="mt-3 mb-3">
             <div class="d-flex justify-content-start">
                 <div class="btn-group">
@@ -241,7 +241,7 @@
 @* <script src="@Url.Content("~/Scripts/jquery.min.js")"></script> *@
 
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
-<script src="~/js/app/itemctrl.js"></script>
+<script src="~/js/app/itemFeature.js"></script>
 
 <script>
     $(document).ready(function () {

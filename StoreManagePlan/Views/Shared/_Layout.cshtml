@@ -6,6 +6,45 @@
         role = Context.Session.GetInt32("Role");
     }
 
+    var menuHome = "";
+    var menuBom = "";
+    var menuitem = "";
+    var menuitemFeature = "";
+    var menuStore = "";
+    var menuStoreType = "";
+    var menuMasterOpen = "";
+
+    //ตัว active menu
+    if(ViewBag.menu == "home")
+    {
+        menuHome = "active";
+    }
+    else if (ViewBag.menu == "bom")
+    {
+        menuBom = "active";
+        menuMasterOpen = "open";
+    }
+    else if (ViewBag.menu == "item")
+    {
+        menuitem = "active";
+        menuMasterOpen = "open";
+    }
+    else if (ViewBag.menu == "itemFeature")
+    {
+        menuitemFeature = "active";
+        menuMasterOpen = "open";
+    }
+    else if (ViewBag.menu == "store")
+    {
+        menuStore = "active";
+        menuMasterOpen = "open";
+    }
+    else
+    {
+        menuStoreType = "active";
+        menuMasterOpen = "open";
+    }
+
    
 }
 <html lang="en"
@@ -123,7 +162,7 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboard -->
-                    <li class="menu-item active">
+                    <li class="menu-item @menuHome">
                         <a asp-controller="Home" asp-action="Index" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-home-circle"></i>
                             <div data-i18n="Analytics">Dashboard</div>
@@ -133,33 +172,33 @@
                     <li class="menu-header small text-uppercase">
                         <span class="menu-header-text">General</span>
                     </li>
-                    <li class="menu-item">
+                    <li class="menu-item @menuMasterOpen">
                         <a href="javascript:void(0);" class="menu-link menu-toggle">
                             <i class="menu-icon tf-icons bx bx-dock-top"></i>
                             <div data-i18n="Account Settings">Master Data</div>
                         </a>
                         <ul class="menu-sub">
-                            <li class="menu-item">
+                            <li class="menu-item @menuBom">
                                 <a asp-controller="Item" asp-action="Index" class="menu-link">
                                     <div data-i18n="Account">BOM</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
+                            <li class="menu-item @menuitemFeature">
                                 <a asp-controller="ItemFeatures" asp-action="Index" class="menu-link">
                                     <div data-i18n="Notifications">Item Feature</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
+                            <li class="menu-item @menuitem">
                                 <a asp-controller="Item" asp-action="Index" class="menu-link">
                                     <div data-i18n="Connections">New Item</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
+                            <li class="menu-item @menuStore">
                                 <a asp-controller="Stores" asp-action="Index" class="menu-link">
                                     <div data-i18n="Connections">Store</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
+                            <li class="menu-item @menuStoreType">
                                 <a asp-controller="StoreTypes" asp-action="Index" class="menu-link">
                                     <div data-i18n="Connections">Type</div>                                 
                                 </a>
@@ -170,7 +209,7 @@
                         <a href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
                            target="_blank"
                            class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-support"></i>
+                            <i class="menu-icon tf-icons bx bx-collection"></i>
                             <div data-i18n="Support">Production Plan Review</div>
                         </a>
                     </li>
@@ -178,7 +217,7 @@
                         <a href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
                            target="_blank"
                            class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-support"></i>
+                            <i class="menu-icon tf-icons bx bx-collection"></i>
                             <div data-i18n="Support">Plan Approve</div>
                         </a>
                     </li>
@@ -186,7 +225,7 @@
                         <a href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
                            target="_blank"
                            class="menu-link">
-                            <i class="menu-icon tf-icons bx bx-support"></i>
+                            <i class="menu-icon tf-icons bx bx-collection"></i>
                             <div data-i18n="Support">Store Relation</div>
                         </a>
                     </li>

@@ -21,5 +21,12 @@ namespace StoreManagePlan.Controllers
 
             return fulldate;
         }
+
+        public string CreateDate()
+        {
+            DateTime now = DateTime.Now;
+            string formattedDate = now.ToString("yyyyMMdd");
+            return formattedDate;
+        }
     }
 }

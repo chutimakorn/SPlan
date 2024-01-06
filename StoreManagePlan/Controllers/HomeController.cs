@@ -16,6 +16,7 @@ namespace StoreManagePlan.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.menu = "home";
             return View();
         }
 

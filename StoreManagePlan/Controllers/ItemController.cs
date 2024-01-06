@@ -27,7 +27,7 @@ namespace StoreManagePlan.Controllers
         // GET: ItemModels
         public async Task<IActionResult> Index()
         {
-            ResourceController resource = new ResourceController();
+            ViewBag.menu = "item";
             return View(await _context.Item.ToListAsync());
         }
 
