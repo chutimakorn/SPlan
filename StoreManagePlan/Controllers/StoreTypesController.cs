@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
+using static StoreManagePlan.Controllers.ItemFeaturesController;
 
 namespace StoreManagePlan.Controllers
 {
@@ -136,20 +138,33 @@ namespace StoreManagePlan.Controllers
             return View(storeType);
         }
 
-        // POST: StoreTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(string selected)
         {
-            var storeType = await _context.StoreType.FindAsync(id);
-            if (storeType != null)
+            if (selected == null || selected == "")
             {
-                _context.StoreType.Remove(storeType);
+                return RedirectToAction(nameof(Index));
             }
+
+
+            var idSku = selected.Split(',');
+
+            foreach (var code in idSku)
+            {
+
+                var itemModel = _context.StoreType.Where(m => m.store_type_code == code).SingleOrDefault();
+                if (itemModel != null)
+                {
+                    _context.StoreType.Remove(itemModel);
+                }
+
+            }
+
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool StoreTypeExists(int id)
         {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
@@ -153,20 +154,36 @@ namespace StoreManagePlan.Controllers
         }
 
         // POST: ItemModels/Delete/5
+
+        public class ItemSelect
+        {
+            public string store_code { get; set; }
+            public string sku_code { get; set; }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Delete(string selected)
         {
-            if (selected == "")
+            if (selected == null || selected == "")
             {
-                return View(await _context.Item.ToListAsync());
+                return RedirectToAction(nameof(Index));
             }
 
-            var id = selected.Split(',');
+            List<ItemSelect> itemList = JsonConvert.DeserializeObject<List<ItemSelect>>(selected);
 
-            foreach (var skus in id)
+
+
+         
+            foreach (var item in itemList)
             {
+                //get store id
+                var storeID = _context.Store.Where(m => m.store_code == item.store_code).Select(m => m.id).SingleOrDefault();
 
-                var itemFeatureModel = _context.ItemFeature.Where(m => m.store_id == Convert.ToInt32(skus)).SingleOrDefault();
+                //get item id
+                var itemID = _context.Item.Where(m => m.sku_code == item.sku_code).Select(m => m.id).SingleOrDefault();
+
+
+                var itemFeatureModel = _context.ItemFeature.Where(m => m.store_id == Convert.ToInt32(storeID) && m.item_id == Convert.ToInt32(itemID)).SingleOrDefault();
                 if (itemFeatureModel != null)
                 {
                     _context.ItemFeature.Remove(itemFeatureModel);

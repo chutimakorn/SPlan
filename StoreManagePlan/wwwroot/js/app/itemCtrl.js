@@ -61,11 +61,11 @@
     });
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#deleteButton").on("click", function () {
+    $("#delete-btn").on("click", function () {
         // รวม SKU ที่ถูก check ใน checkbox
         var selectedSkus = [];
-        $("input[type=checkbox]:checked").each(function () {
-            var sku = $(this).closest("tr").find("td:eq(0)").text(); // แก้ตำแหน่ง column ตามต้องการ
+        $("input#defaultCheck:checked").each(function () {
+            var sku = $(this).closest("tr").find("td:eq(1)").text(); // แก้ตำแหน่ง column ตามต้องการ
             selectedSkus.push(sku);
         });
 

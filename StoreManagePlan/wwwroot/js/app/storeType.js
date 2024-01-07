@@ -56,21 +56,22 @@
     // เมื่อคลิกที่ Checkbox ใน tbody
     $("tbody input[type=checkbox]").on("change", function () {
         // ตรวจสอบว่า Checkbox ทั้งหมดควรติ๊กหรือไม่
+        var checkboxes = $("tbody input[type=checkbox]");
         var checkAllCheckbox = $("#checkAll");
         checkAllCheckbox.prop("checked", $("tbody input[type=checkbox]:checked").length === checkboxes.length);
     });
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#deleteButton").on("click", function () {
+    $("#delete-btn").on("click", function () {
         // รวม SKU ที่ถูก check ใน checkbox
-        var selectedSkus = [];
-        $("input[type=checkbox]:checked").each(function () {
-            var sku = $(this).closest("tr").find("td:eq(0)").text(); // แก้ตำแหน่ง column ตามต้องการ
-            selectedSkus.push(sku);
+        var selected = [];
+        $("input#defaultCheck:checked").each(function () {
+            var sku = $(this).closest("tr").find("td:eq(1)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            selected.push(sku);
         });
 
         // นำรายการ SKU มาใส่ใน hidden input
-        $("#hiddenInputId").val(selectedSkus.join(','));
+        $("#hiddenInputId").val(selected.join(','));
 
         // แสดง alert เพื่อตรวจสอบผลลัพธ์
         alert("Selected SKUs: " + $("#hiddenInputId").val());

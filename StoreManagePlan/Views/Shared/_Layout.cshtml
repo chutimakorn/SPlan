@@ -13,6 +13,7 @@
     var menuStore = "";
     var menuStoreType = "";
     var menuMasterOpen = "";
+    var menuPPR = "";
 
     //ตัว active menu
     if(ViewBag.menu == "home")
@@ -38,6 +39,11 @@
     {
         menuStore = "active";
         menuMasterOpen = "open";
+    }
+    else if (ViewBag.menu == "ppr")
+    {
+        menuPPR = "active";
+      
     }
     else
     {
@@ -205,10 +211,8 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="menu-item">
-                        <a href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
-                           target="_blank"
-                           class="menu-link">
+                    <li class="menu-item @menuPPR">
+                        <a asp-controller="ProductPlanReview" asp-action="Index" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-collection"></i>
                             <div data-i18n="Support">Production Plan Review</div>
                         </a>

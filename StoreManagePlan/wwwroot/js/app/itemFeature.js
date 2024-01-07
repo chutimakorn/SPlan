@@ -55,24 +55,36 @@
 
     // เมื่อคลิกที่ Checkbox ใน tbody
     $("tbody input[type=checkbox]").on("change", function () {
+        var checkboxes = $("tbody input[type=checkbox]");
         // ตรวจสอบว่า Checkbox ทั้งหมดควรติ๊กหรือไม่
         var checkAllCheckbox = $("#checkAll");
         checkAllCheckbox.prop("checked", $("tbody input[type=checkbox]:checked").length === checkboxes.length);
     });
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#deleteButton").on("click", function () {
-        // รวม SKU ที่ถูก check ใน checkbox
-        var selectedSkus = [];
-        $("input[type=checkbox]:checked").each(function () {
-            var sku = $(this).closest("tr").find("td:eq(0)").text(); // แก้ตำแหน่ง column ตามต้องการ
-            selectedSkus.push(sku);
+    $("#delete-btn").on("click", function () {
+        var selectedItems = [];
+        $("input#defaultCheck:checked").each(function () {
+            var storeCode = $(this).closest("tr").find("td:nth-child(2)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            var skuCode = $(this).closest("tr").find("td:nth-child(4)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            var selectedItem = {
+                store_code: storeCode,
+                sku_code: skuCode
+            };
+            selectedItems.push(selectedItem);
         });
 
         // นำรายการ SKU มาใส่ใน hidden input
-        $("#hiddenInputId").val(selectedSkus.join(','));
+        $("#hiddenInputId").val(JSON.stringify(selectedItems));
 
         // แสดง alert เพื่อตรวจสอบผลลัพธ์
         alert("Selected SKUs: " + $("#hiddenInputId").val());
+
+   
+
     });
+
+  
+
+   
 });
