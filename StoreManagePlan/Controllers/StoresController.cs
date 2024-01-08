@@ -25,7 +25,7 @@ namespace StoreManagePlan.Controllers
         IUtility _utility;
         private readonly StoreManagePlanContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public static string _menu = "Store";
+        public static string _menu = "store";
         public StoresController(StoreManagePlanContext context, IWebHostEnvironment hostingEnvironment, IUtility utility)
         {
             _context = context;
@@ -39,7 +39,7 @@ namespace StoreManagePlan.Controllers
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 
             ViewBag.historyLog = history;
-            ViewBag.menu = "store";
+            ViewBag.menu = _menu;
             var storeManagePlanContext = _context.Store.Include(s => s.store_type);
             return View(await storeManagePlanContext.ToListAsync());
         }
@@ -184,7 +184,7 @@ namespace StoreManagePlan.Controllers
         {
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
-            log.menu = "Store";
+            log.menu = _menu;
             log.create_date = _utility.CreateDate();
             log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -231,12 +231,30 @@ namespace StoreManagePlan.Controllers
                             {
                                 var effDate = worksheet.Cells[row, 3];
                                 var itemOld = await _context.Store.Where(i => i.store_code == worksheet.Cells[row, 2].Value.ToString()).FirstOrDefaultAsync();
-                                var typeId = _utility.GetInt(worksheet.Cells[row, 1]);
+
+                                var type = _context.StoreType.Where(i => i.store_type_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefaultAsync();
+
+
                                 var storeName = worksheet.Cells[row, 3].Value.ToString();
+
+
+                                if (type == null)
+                                {
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = "sku id is null";
+
+                                    log.status = jsonData.status;
+                                    log.message = jsonData.message;
+
+                                    _context.Add(log);
+                                    _context.SaveChanges();
+
+                                    return Json(jsonData);
+                                }
 
                                 if (itemOld != null)
                                 {
-                                    itemOld.type_id = typeId.Value;
+                                    itemOld.type_id = type.Id;
                                     itemOld.store_name = storeName;
                                     itemOld.update_date = _utility.CreateDate();
                                     excelUpdateList.Add(itemOld);
@@ -246,7 +264,7 @@ namespace StoreManagePlan.Controllers
                                     excelDataList.Add(new Store
                                     {
 
-                                        type_id = typeId.Value,
+                                        type_id = type.Id,
                                         store_name = storeName,
                                         create_date = _utility.CreateDate(),
                                     });
