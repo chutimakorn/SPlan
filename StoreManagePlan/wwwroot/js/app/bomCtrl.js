@@ -6,13 +6,13 @@
 
     $('#export-btn').click(function () {
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/Item/ExportToExcel", true);
+        xhr.open("POST", "/Bom/ExportToExcel", true);
         xhr.responseType = "blob"; // Expecting a binary response
         xhr.onload = function () {
             var blob = new Blob([xhr.response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             var link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
-            link.download = "ItemList.xlsx";
+            link.download = "BomList.xlsx";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -22,12 +22,12 @@
 
     $('#save-import').click(function () {
         $('#import-modal').modal('hide');
-        var form = $('#formFile')[0].files[0];; 
+        var form = $('#formFile')[0].files[0];;
         var formData = new FormData();
         formData.append('file', form);
 
         $.ajax({
-            url: '/Item/Upload', // Update the URL based on your actual URL structure
+            url: '/Bom/Upload', // Update the URL based on your actual URL structure
             type: 'POST',
             data: formData,
             processData: false, // Important: Don't process the data (already done by FormData)
@@ -43,7 +43,7 @@
                     $('#import-success').toast('show');
                 }
 
-                       
+
             },
             error: function (error) {
                 $('#import-not-success').toast('show');

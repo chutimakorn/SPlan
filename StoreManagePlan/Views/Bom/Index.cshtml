@@ -1,4 +1,4 @@
-﻿@model IEnumerable<StoreManagePlan.Models.Item>
+﻿@model IEnumerable<StoreManagePlan.Models.BomModel>
 @using StoreManagePlan.Controllers
 
 @{
@@ -81,12 +81,19 @@
             <table class="table">
                 <thead style="background-color:#80808038">
                     <tr class="text-nowrap">
+                        
+                        <th>SKU Code</th>
+                        <th>SKU Name</th>
+                        <th>Min batch hub</th>
+                        <th>Min batch non hub</th>
+                        <th>Batch UOM</th>
                         <th><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
-                        <th>SKU</th>
-                        <th>Item Name</th>
+                        <th>Ingredient Sku</th>
+                        <th>Ingredient Name</th>
+                        <th>Weight HUB</th>
+                        <th>Weight UOM</th>
                         <th>Created date</th>
-                        <th>update date</th>
-                      
+                        <th>Update date</th>
                        
                     </tr>
                 </thead>
@@ -105,9 +112,17 @@
                             var date = resource.ConvertDate(item.create_date);
                             var updateDate = resource.ConvertDate(item.update_date);
                             <tr>
-                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+                                
                                 <td>@item.sku_code</td>
                                 <td>@item.sku_name</td>
+                                <td>@item.min_batch_hub</td>
+                                <td>@item.min_batch_non_hub</td>
+                                <td>@item.batch_uom</td>
+                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+                                <td>@item.ingredient_sku</td>
+                                <td>@item.ingredient_name</td>
+                                <td>@item.weight_hub</td>
+                                <td>@item.weight_uom</td>
                                 <td>@date</td>
                                 <td>@updateDate</td>
                             </tr>
@@ -158,7 +173,7 @@
 @* <script src="@Url.Content("~/Scripts/jquery.min.js")"></script> *@
 
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
-<script src="~/js/app/itemctrl.js"></script>
+<script src="~/js/app/bomctrl.js"></script>
 
 @* <script>
     $(document).ready(function () {

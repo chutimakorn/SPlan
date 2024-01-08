@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using StoreManagePlan.Data;
+using StoreManagePlan.Repository;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<StoreManagePlanContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StoreManagePlanContext") ?? throw new InvalidOperationException("Connection string 'StoreManagePlanContext' not found.")));
@@ -16,7 +17,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+builder.Services.AddScoped<IUtility, Utility>();
 
 var app = builder.Build();
 

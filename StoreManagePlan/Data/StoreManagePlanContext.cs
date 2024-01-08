@@ -18,15 +18,17 @@ namespace StoreManagePlan.Data
         public DbSet<ItemFeature> ItemFeature { get; set; } 
         public DbSet<Store> Store { get; set; }
         public DbSet<StoreType> StoreType { get; set; }
+        public DbSet<ImportLog> ImportLog { get; set; }
+        public DbSet<Bom> Bom { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Item>().ToTable("Item");
             modelBuilder.Entity<ItemFeature>().ToTable("ItemFeature").HasKey(pf => new { pf.store_id, pf.item_id });
-            ;
             modelBuilder.Entity<Store>().ToTable("Store");
             modelBuilder.Entity<StoreType>().ToTable("StoreType");
-
+            modelBuilder.Entity<ImportLog>().ToTable("ImportLog");
+            modelBuilder.Entity<Bom>().ToTable("Bom").HasKey(pf => new { pf.sku_code, pf.ingredient_sku });
         }
     }
 }
