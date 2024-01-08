@@ -49,8 +49,8 @@ namespace StoreManagePlan.Controllers
             HttpContext.Session.SetInt32("Role", role);
 
 
-            return RedirectToAction("Index");
-          
+            return RedirectToAction("Index", "Bom");
+
         }
 
         public IActionResult Privacy()
