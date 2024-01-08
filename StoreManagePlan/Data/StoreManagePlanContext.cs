@@ -28,7 +28,7 @@ namespace StoreManagePlan.Data
             modelBuilder.Entity<Store>().ToTable("Store");
             modelBuilder.Entity<StoreType>().ToTable("StoreType");
             modelBuilder.Entity<ImportLog>().ToTable("ImportLog");
-            modelBuilder.Entity<Bom>().ToTable("Bom").HasKey(pf => new { pf.sku_code, pf.ingredient_sku });
+            modelBuilder.Entity<Bom>().ToTable("Bom").HasKey(pf => new { pf.sku_id, pf.ingredient_sku });
         }
     }
 }

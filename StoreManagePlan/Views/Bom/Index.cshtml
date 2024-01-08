@@ -1,9 +1,10 @@
-﻿@model IEnumerable<StoreManagePlan.Models.BomModel>
+﻿@model IEnumerable<StoreManagePlan.Models.Bom>
 @using StoreManagePlan.Controllers
 
 @{
     ViewData["Title"] = "Index";
     ResourceController resource = new ResourceController();
+    List<ImportLog> importLogs = new List<ImportLog>(ViewBag.historyLog);
 }
 @*
 <h1>Index</h1>
@@ -65,87 +66,159 @@
             บันทึกไม่สำเร็จ.
         </div>
     </div>
+    <div class="nav-align-top ">
+        <ul class="nav nav-pills mb-3" role="tablist">
+            <li class="nav-item">
+                <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="true">
+                    Bom
+                </button>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="false">
+                    History
+                </button>
+            </li>
 
-    <div class="mt-3 mb-3">
-        <div class="d-flex justify-content-start">
-            <div class="btn-group">
-                <button type="button" id="import-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-upload"></span>&nbsp; Import</button>
-                <button type="submit" id="export-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-download"></span>&nbsp; Export</button>
-            </div>
-        </div>
-    </div>
-   
-    <div class="card">
-        <h5 class="card-header">New Items</h5>
-        <div class="table-responsive text-nowrap">
-            <table class="table">
-                <thead style="background-color:#80808038">
-                    <tr class="text-nowrap">
-                        
-                        <th>SKU Code</th>
-                        <th>SKU Name</th>
-                        <th>Min batch hub</th>
-                        <th>Min batch non hub</th>
-                        <th>Batch UOM</th>
-                        <th><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
-                        <th>Ingredient Sku</th>
-                        <th>Ingredient Name</th>
-                        <th>Weight HUB</th>
-                        <th>Weight UOM</th>
-                        <th>Created date</th>
-                        <th>Update date</th>
-                       
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model == null || !Model.Any())
-                    {
-                        <!-- ถ้า Model เท่ากับ null หรือไม่มีข้อมูล -->
-                        <tr>
-                            <td colspan="4" class="text-center">No data</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        @foreach (var item in Model)
-                        {
-                            var date = resource.ConvertDate(item.create_date);
-                            var updateDate = resource.ConvertDate(item.update_date);
-                            <tr>
-                                
-                                <td>@item.sku_code</td>
-                                <td>@item.sku_name</td>
-                                <td>@item.min_batch_hub</td>
-                                <td>@item.min_batch_non_hub</td>
-                                <td>@item.batch_uom</td>
-                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
-                                <td>@item.ingredient_sku</td>
-                                <td>@item.ingredient_name</td>
-                                <td>@item.weight_hub</td>
-                                <td>@item.weight_uom</td>
-                                <td>@date</td>
-                                <td>@updateDate</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <form asp-action="Delete" method="post">
-        <input type="hidden" id="hiddenInputId" name="selectedSkus" />
-        <div class="mt-3 mb-3">
-            <div class="d-flex justify-content-start">
-                <div class="btn-group">
-                    <button type="submit" id="delete-btn" class="btn btn-outline-danger"><span class="tf-icons bx bx-trash"></span>&nbsp; Delete</button>
-
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                <div class="mt-3 mb-3">
+                    <div class="d-flex justify-content-start">
+                        <div class="btn-group">
+                            <button type="button" id="import-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-upload"></span>&nbsp; Import</button>
+                            <button type="submit" id="export-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-download"></span>&nbsp; Export</button>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="card">
+                    <h5 class="card-header">New Items</h5>
+                    <div class="table-responsive text-nowrap">
+                        <table class="table">
+                            <thead style="background-color:#80808038">
+                                <tr class="text-nowrap">
+
+                                  
+                                    <th>SKU Code</th>
+                                    <th>SKU Name</th>
+                                    <th>Min batch hub</th>
+                                    <th>Min batch non hub</th>
+                                    <th>Batch UOM</th>
+                                    <th></th>
+                                    <th>Ingredient Sku</th>
+                                    <th>Ingredient Name</th>
+                                    <th>Weight HUB</th>
+                                    <th>Weight UOM</th>
+                                
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model == null || !Model.Any())
+                                {
+                                    <!-- ถ้า Model เท่ากับ null หรือไม่มีข้อมูล -->
+                                    <tr>
+                                        <td colspan="13" class="text-center">No data</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var group in Model.GroupBy(m => m.sku_id))
+                                    {
+                                        foreach (var item in group)
+                                        {
+                                        
+                                             <tr>
+                                                @if (item == group.First())
+                                                {
+                                                 
+                                                    <td rowspan="@group.Count()">@item.Item.sku_code</td>
+                                                    <td rowspan="@group.Count()">@item.Item.sku_name</td>
+                                                    <td rowspan="@group.Count()">@item.min_batch_hub</td>
+                                                    <td rowspan="@group.Count()">@item.min_batch_non_hub</td>
+                                                    <td rowspan="@group.Count()">@item.batch_uom</td>
+                                                }
+                                                
+                                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+                                                <td hidden>@item.Item.sku_code</td>
+                                                <td>@item.ingredient_sku</td>
+                                                <td>@item.ingredient_name</td>                                                                                            
+                                                <td>@item.weight_hub</td>
+                                                <td>@item.weight_uom</td>
+                                             
+                                            </tr>
+                                        }
+
+                                      
+                                      
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" id="hiddenInputId" name="selected" />
+                    <div class="mt-3 mb-3">
+                        <div class="d-flex justify-content-start">
+                            <div class="btn-group">
+                                <button type="submit" id="delete-btn" class="btn btn-outline-danger"><span class="tf-icons bx bx-trash"></span>&nbsp; Delete</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
+                <div class="card">
+                    <h5 class="card-header">New Items</h5>
+                    <div class="table-responsive text-nowrap">
+
+                        <table class="table">
+                            <thead style="background-color:#80808038">
+                                <tr class="text-nowrap">
+
+                                    <th>File Name</th>
+                                    <th>Error Message</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                   
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (importLogs.Count() == 0)
+                                {
+                                    <!-- ถ้า Model เท่ากับ null หรือไม่มีข้อมูล -->
+                                    <tr>
+                                        <td colspan="4" class="text-center">No data</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                  
+                                    @foreach (var item in importLogs)
+                                    {
+                                      
+                                        <tr>
+
+                                            <td>@item.old_name</td>
+                                            <td>@item.message</td>
+                                            <td>@item.status</td>
+                                            <td><a asp-action="DownloadImportFile" asp-route-id="@item.id">View</a> </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
-
-    </form>
-  
-
+    </div>
     <div class="modal fade" id="import-modal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">

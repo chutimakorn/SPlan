@@ -17,6 +17,8 @@ using Elfie.Serialization;
 using StoreManagePlan.Repository;
 using System.Globalization;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+
 
 namespace StoreManagePlan.Controllers
 {
@@ -24,6 +26,7 @@ namespace StoreManagePlan.Controllers
     {
         IUtility _utility;
         private readonly StoreManagePlanContext _context;
+        private readonly String _menu = "Bom";
 
         public BomController(StoreManagePlanContext context, IUtility utility)
         {
@@ -33,36 +36,64 @@ namespace StoreManagePlan.Controllers
 
         public async Task<IActionResult> Index()
         {
-
-            var data = (from b in _context.Bom
-                        join i in _context.Item on b.sku_code equals i.sku_code into bomitems
-                        from i in bomitems.DefaultIfEmpty()
-                        select new BomModel
-                        {
-                            sku_code = b.sku_code,
-                            sku_name = i.sku_name,
-                            min_batch_hub = b.min_batch_hub,
-                            min_batch_non_hub = b.min_batch_non_hub,
-                            batch_uom = b.batch_uom,
-                            ingredient_sku = b.ingredient_sku,
-                            ingredient_name = b.ingredient_name,
-                            weight_hub = b.weight_hub,
-                            weight_uom = b.weight_uom,
-                            create_date = b.create_date,
-                            update_date = b.update_date,
-                        }
-                 )
-                .ToListAsync();
             ViewBag.menu = "bom";
-            return View(await data);
+
+            var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
+
+            ViewBag.historyLog = history;
+
+            return View(await _context.Bom.Include(m => m.Item).ToListAsync());
+
+
         }
+
+        public class ItemSelect
+        {
+            public string ingredient_sku { get; set; }
+            public string sku_id { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(string selected)
+        {
+            if (selected == null || selected == "")
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            List<ItemSelect> itemList = JsonConvert.DeserializeObject<List<ItemSelect>>(selected);
+
+
+
+
+            foreach (var item in itemList)
+            {
+
+
+                //get item id
+                var itemID = _context.Item.Where(m => m.sku_code == item.sku_id).Select(m => m.id).SingleOrDefault();
+
+                var itemFeatureModel = _context.Bom.Include(m => m.Item).Where(m => m.sku_id == itemID && m.ingredient_sku == item.ingredient_sku).SingleOrDefault();
+                if (itemFeatureModel != null)
+                {
+                    _context.Bom.Remove(itemFeatureModel);
+                }
+
+            }
+
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             CultureInfo culture = new CultureInfo("en-US");
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
-            log.menu = "Bom";
+            log.menu = _menu;
             log.create_date = _utility.CreateDate();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try
@@ -98,8 +129,11 @@ namespace StoreManagePlan.Controllers
                             for (int row = 3; row <= rowCount; row++)
                             {
                                 var effDate = worksheet.Cells[row, 3];
-                                var itemOld = await _context.Bom.Where(i => i.sku_code == worksheet.Cells[row, 1].Value.ToString() && i.ingredient_sku == worksheet.Cells[row, 5].Value.ToString()).FirstOrDefaultAsync();
-                                
+                                var itemOld = await _context.Bom.Include(m => m.Item).Where(i => i.Item.sku_code == worksheet.Cells[row, 1].Value.ToString() && i.ingredient_sku == worksheet.Cells[row, 5].Value.ToString()).FirstOrDefaultAsync();
+
+                                //get item id
+                                var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 1].Value.ToString()).Select(m => m.id).SingleOrDefault();
+
                                 if (itemOld != null)
                                 {
                                     itemOld.min_batch_hub = _utility.GetInt(worksheet.Cells[row, 2]);
@@ -116,7 +150,8 @@ namespace StoreManagePlan.Controllers
                                     excelDataList.Add(new Bom
                                     {
 
-                                        sku_code = worksheet.Cells[row, 1].Value.ToString(),
+
+                                        sku_id = itemID,
                                         min_batch_hub = _utility.GetInt(worksheet.Cells[row, 2]),
                                         create_date = _utility.CreateDate(),
                                         min_batch_non_hub = _utility.GetInt(worksheet.Cells[row, 3]),
@@ -142,7 +177,7 @@ namespace StoreManagePlan.Controllers
                                 await _context.SaveChangesAsync();
 
                                 jsonData.status = "success";
-                                jsonData.message = JsonSerializer.Serialize(_context.Item.ToList());
+                                jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
 
                             }
                         }
@@ -173,25 +208,27 @@ namespace StoreManagePlan.Controllers
 
         public IActionResult ExportToExcel()
         {
-            var data = (from b in _context.Bom
-                        join i in _context.Item on b.sku_code equals i.sku_code into bomitems
-                        from i in bomitems.DefaultIfEmpty()  
-                        select new
-                        { 
-                            sku_code = b.sku_code,
-                            sku_name = i.sku_name,
-                            min_batch_hub = b.min_batch_hub,
-                            min_batch_non_hub = b.min_batch_non_hub,
-                            batch_uom = b.batch_uom,
-                            ingredient_sku = b.ingredient_sku,
-                            ingredient_name = b.ingredient_name,
-                            weight_hub = b.weight_hub,
-                            weight_uom = b.weight_uom,
-                            create_date = b.create_date,
-                            update_date = b.update_date,
-                        }
-                 )
-                .ToList();
+            //var data = (from b in _context.Bom
+            //            join i in _context.Item on b.sku_code equals i.sku_code into bomitems
+            //            from i in bomitems.DefaultIfEmpty()  
+            //            select new
+            //            { 
+            //                sku_code = b.sku_code,
+            //                sku_name = i.sku_name,
+            //                min_batch_hub = b.min_batch_hub,
+            //                min_batch_non_hub = b.min_batch_non_hub,
+            //                batch_uom = b.batch_uom,
+            //                ingredient_sku = b.ingredient_sku,
+            //                ingredient_name = b.ingredient_name,
+            //                weight_hub = b.weight_hub,
+            //                weight_uom = b.weight_uom,
+            //                create_date = b.create_date,
+            //                update_date = b.update_date,
+            //            }
+            //     )
+            //    .ToList();
+
+            var data = _context.Bom.Include(m => m.Item).ToList();
                 
             var stream = new MemoryStream();
 
@@ -216,8 +253,8 @@ namespace StoreManagePlan.Controllers
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].sku_code;
-                    worksheet.Cells[i + 2, 2].Value = data[i].sku_name;
+                    worksheet.Cells[i + 2, 1].Value = data[i].Item.sku_code;
+                    worksheet.Cells[i + 2, 2].Value = data[i].Item.sku_name;
                     worksheet.Cells[i + 2, 3].Value = data[i].min_batch_hub;
                     worksheet.Cells[i + 2, 4].Value = data[i].min_batch_non_hub;
                     worksheet.Cells[i + 2, 5].Value = data[i].batch_uom;
@@ -237,6 +274,12 @@ namespace StoreManagePlan.Controllers
 
             // Set the content type and file name
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Bom_List.xlsx");
+        }
+
+
+        public IActionResult DownloadImportFile(int id)
+        {
+            return RedirectToAction(nameof(Index));
         }
     }
 }
