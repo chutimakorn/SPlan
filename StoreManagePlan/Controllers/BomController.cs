@@ -27,11 +27,13 @@ namespace StoreManagePlan.Controllers
         IUtility _utility;
         private readonly StoreManagePlanContext _context;
         private readonly String _menu = "Bom";
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public BomController(StoreManagePlanContext context, IUtility utility)
+        public BomController(StoreManagePlanContext context, IUtility utility, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             this._utility = utility;
+            _hostingEnvironment = hostingEnvironment;   
         }
 
         public async Task<IActionResult> Index()
@@ -106,6 +108,20 @@ namespace StoreManagePlan.Controllers
                         using (var package = new ExcelPackage(stream))
                         {
                             var worksheet = package.Workbook.Worksheets[0];
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            if (rowCount < 3)
+                            {
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "data is 0 row";
+
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
+                            }
 
                             if (worksheet.Cells[1, 1].Value.ToString() != "bom")
                             {
@@ -121,7 +137,6 @@ namespace StoreManagePlan.Controllers
                                 return Json(jsonData);
                             }
 
-                            var rowCount = worksheet.Dimension.Rows;
 
                             var excelDataList = new List<Bom>();
                             var excelUpdateList = new List<Bom>();
@@ -132,7 +147,21 @@ namespace StoreManagePlan.Controllers
                                 var itemOld = await _context.Bom.Include(m => m.Item).Where(i => i.Item.sku_code == worksheet.Cells[row, 1].Value.ToString() && i.ingredient_sku == worksheet.Cells[row, 5].Value.ToString()).FirstOrDefaultAsync();
 
                                 //get item id
-                                var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 1].Value.ToString()).Select(m => m.id).SingleOrDefault();
+                                var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefault();
+
+                                if (itemID == null)
+                                {
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = "sku id is null";
+
+                                    log.status = jsonData.status;
+                                    log.message = jsonData.message;
+
+                                    _context.Add(log);
+                                    _context.SaveChanges();
+
+                                    return Json(jsonData);
+                                }
 
                                 if (itemOld != null)
                                 {
@@ -151,7 +180,7 @@ namespace StoreManagePlan.Controllers
                                     {
 
 
-                                        sku_id = itemID,
+                                        sku_id = itemID.id,
                                         min_batch_hub = _utility.GetInt(worksheet.Cells[row, 2]),
                                         create_date = _utility.CreateDate(),
                                         min_batch_non_hub = _utility.GetInt(worksheet.Cells[row, 3]),
@@ -177,7 +206,7 @@ namespace StoreManagePlan.Controllers
                                 await _context.SaveChangesAsync();
 
                                 jsonData.status = "success";
-                                jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
+                                //jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
 
                             }
                         }
@@ -279,7 +308,25 @@ namespace StoreManagePlan.Controllers
 
         public IActionResult DownloadImportFile(int id)
         {
-            return RedirectToAction(nameof(Index));
+
+            var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
+
+            if (log == null || log.current_name == null)
+            {
+                return NotFound();
+            }
+
+            string contentRootPath = _hostingEnvironment.ContentRootPath;
+            string yourFilePath = Path.Combine(contentRootPath, "Shared", log.current_name);
+
+            if (!System.IO.File.Exists(yourFilePath))
+            {
+                return NotFound();
+            }
+
+            byte[] fileContents = System.IO.File.ReadAllBytes(yourFilePath);
+
+            return File(fileContents, "application/octet-stream", log.old_name);
         }
     }
 }

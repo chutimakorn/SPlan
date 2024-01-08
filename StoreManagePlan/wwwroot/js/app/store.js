@@ -21,6 +21,7 @@
     });
 
     $('#save-import').click(function () {
+        $('#import-modal').modal('hide');
         var form = $('#formFile')[0].files[0];; 
         var formData = new FormData();
         formData.append('file', form);
@@ -32,10 +33,14 @@
             processData: false, // Important: Don't process the data (already done by FormData)
             contentType: false, // Important: Set content type to false as FormData will take care of it
             success: function (data) {
-                //alert(data);
-                $('#import-modal').modal('hide');
-                $('#import-success').toast('show');
-                window.location.reload();
+                if (data.status !== 'success') {
+                    $("#import-not-success .toast-body").text(data.message);
+                    $('#import-not-success').toast('show');
+                }
+                else {
+                    window.location.reload();
+                    $('#import-success').toast('show');
+                }
             },
             error: function (error) {
                 $('#import-modal').modal('hide');

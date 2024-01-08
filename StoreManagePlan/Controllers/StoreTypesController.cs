@@ -190,7 +190,7 @@ namespace StoreManagePlan.Controllers
         {
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
-            log.menu = "StoreType";
+            log.menu = _menu;
             log.create_date = _utility.CreateDate();
             log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -204,6 +204,20 @@ namespace StoreManagePlan.Controllers
                         using (var package = new ExcelPackage(stream))
                         {
                             var worksheet = package.Workbook.Worksheets[0];
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            if (rowCount < 3)
+                            {
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "data is 0 row";
+
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
+                            }
 
                             if (worksheet.Cells[1, 1].Value.ToString() != "store type")
                             {
@@ -229,7 +243,6 @@ namespace StoreManagePlan.Controllers
                             log.current_name = newName;
                             _utility.SaveExcelFile(package, yourFilePath);
 
-                            var rowCount = worksheet.Dimension.Rows;
 
                             var excelDataList = new List<StoreType>();
                             var excelUpdateList = new List<StoreType>();
@@ -263,7 +276,7 @@ namespace StoreManagePlan.Controllers
                                 await _context.SaveChangesAsync();
 
                                 jsonData.status = "success";
-                                jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
+                                //jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
 
                             }
                         }
@@ -328,6 +341,28 @@ namespace StoreManagePlan.Controllers
 
             // Set the content type and file name
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "StoreType_List.xlsx");
+        }
+        public IActionResult DownloadImportFile(int id)
+        {
+
+            var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
+
+            if (log == null || log.current_name == null)
+            {
+                return NotFound();
+            }
+
+            string contentRootPath = _hostingEnvironment.ContentRootPath;
+            string yourFilePath = Path.Combine(contentRootPath, "Shared", log.current_name);
+
+            if (!System.IO.File.Exists(yourFilePath))
+            {
+                return NotFound();
+            }
+
+            byte[] fileContents = System.IO.File.ReadAllBytes(yourFilePath);
+
+            return File(fileContents, "application/octet-stream", log.old_name);
         }
 
     }

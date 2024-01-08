@@ -184,7 +184,7 @@ namespace StoreManagePlan.Controllers
         {
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
-            log.menu = "Store";
+            log.menu = _menu;
             log.create_date = _utility.CreateDate();
             log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -198,6 +198,20 @@ namespace StoreManagePlan.Controllers
                         using (var package = new ExcelPackage(stream))
                         {
                             var worksheet = package.Workbook.Worksheets[0];
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            if (rowCount < 3)
+                            {
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "data is 0 row";
+
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
+                            }
 
                             if (worksheet.Cells[1, 1].Value.ToString() != "store")
                             {
@@ -223,7 +237,6 @@ namespace StoreManagePlan.Controllers
                             log.current_name = newName;
                             _utility.SaveExcelFile(package, yourFilePath);
 
-                            var rowCount = worksheet.Dimension.Rows;
 
                             var excelDataList = new List<Store>();
                             var excelUpdateList = new List<Store>();
@@ -265,7 +278,7 @@ namespace StoreManagePlan.Controllers
                                 await _context.SaveChangesAsync();
 
                                 jsonData.status = "success";
-                                jsonData.message = JsonSerializer.Serialize(_context.Item.ToList());
+                                //jsonData.message = JsonSerializer.Serialize(_context.Item.ToList());
 
                             }
                         }
@@ -339,7 +352,7 @@ namespace StoreManagePlan.Controllers
 
             var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
 
-            if (log == null)
+            if (log == null || log.current_name == null)
             {
                 return NotFound();
             }

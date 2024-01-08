@@ -218,7 +218,7 @@ namespace StoreManagePlan.Controllers
         {
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
-            log.menu = "ItemFeature";
+            log.menu = _menu;
             log.create_date = _utility.CreateDate();
             log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -232,6 +232,20 @@ namespace StoreManagePlan.Controllers
                         using (var package = new ExcelPackage(stream))
                         {
                             var worksheet = package.Workbook.Worksheets[0];
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            if (rowCount < 3)
+                            {
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "data is 0 row";
+
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
+                            }
 
                             if (worksheet.Cells[1, 1].Value.ToString() != "item feature")
                             {
@@ -257,16 +271,43 @@ namespace StoreManagePlan.Controllers
                             log.current_name = newName;
                             _utility.SaveExcelFile(package, yourFilePath);
 
-                            var rowCount = worksheet.Dimension.Rows;
-
                             var excelDataList = new List<ItemFeature>();
                             var excelUpdateList = new List<ItemFeature>();
                             for (int row = 3; row <= rowCount; row++)
                             {
-                                var storeId = _utility.GetInt(worksheet.Cells[row, 1]);
-                                var itemId = _utility.GetInt(worksheet.Cells[row, 2]);
+                                
 
-                                var itemOld = await _context.ItemFeature.Where(i => i.store_id == storeId && i.item_id == itemId).FirstOrDefaultAsync();
+                                var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 2].Value.ToString()).FirstOrDefault();
+
+                                var storeID = _context.Store.Where(m => m.store_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefault();
+
+                                if (itemID == null)
+                                {
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = "item not found";
+                                    log.status = jsonData.status;
+                                    log.message = jsonData.message;
+
+                                    _context.Add(log);
+                                    _context.SaveChanges();
+
+                                    return Json(jsonData);
+                                }
+
+                                if (storeID == null)
+                                {
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = "store not found";
+                                    log.status = jsonData.status;
+                                    log.message = jsonData.message;
+
+                                    _context.Add(log);
+                                    _context.SaveChanges();
+
+                                    return Json(jsonData);
+                                }
+
+                                var itemOld = await _context.ItemFeature.Where(i => i.store_id == storeID.id && i.item_id == itemID.id).FirstOrDefaultAsync();
 
                                 if (itemOld != null)
                                 {
@@ -280,8 +321,8 @@ namespace StoreManagePlan.Controllers
                                     excelDataList.Add(new ItemFeature
                                     {
 
-                                        store_id = storeId.Value,
-                                        item_id = itemId.Value,
+                                        store_id = storeID.id,
+                                        item_id = itemID.id,
                                         minimum_feature = _utility.GetInt(worksheet.Cells[row, 3]).Value,
                                         maximum_feature = _utility.GetInt(worksheet.Cells[row, 4]).Value,
                                         default_feature = _utility.GetInt(worksheet.Cells[row, 5]).Value,
@@ -300,7 +341,7 @@ namespace StoreManagePlan.Controllers
                                 await _context.SaveChangesAsync();
 
                                 jsonData.status = "success";
-                                jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
+                                //jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
 
                             }
                         }
@@ -376,7 +417,7 @@ namespace StoreManagePlan.Controllers
 
             var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
 
-            if (log == null)
+            if (log == null || log.current_name == null)
             {
                 return NotFound();
             }
