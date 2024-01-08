@@ -8,21 +8,37 @@ using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
+using System.Collections.Generic;
+using System.IO;
+using NuGet.Packaging.Core;
+using System.Text.Json;
+using Elfie.Serialization;
+using StoreManagePlan.Repository;
+using System.Globalization;
+using System.Xml.Linq;
+using Microsoft.IdentityModel.Tokens;
 
 namespace StoreManagePlan.Controllers
 {
     public class StoresController : Controller
     {
+        IUtility _utility;
         private readonly StoreManagePlanContext _context;
-
-        public StoresController(StoreManagePlanContext context)
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public static string _menu = "Store";
+        public StoresController(StoreManagePlanContext context, IWebHostEnvironment hostingEnvironment, IUtility utility)
         {
             _context = context;
+            _hostingEnvironment = hostingEnvironment;
+            _utility = utility;
         }
 
         // GET: Stores
         public async Task<IActionResult> Index()
         {
+            var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
+
+            ViewBag.historyLog = history;
             ViewBag.menu = "store";
             var storeManagePlanContext = _context.Store.Include(s => s.store_type);
             return View(await storeManagePlanContext.ToListAsync());
@@ -166,65 +182,122 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
+            ResponseStatus jsonData = new ResponseStatus();
+            ImportLog log = new ImportLog();
+            log.menu = "Store";
+            log.create_date = _utility.CreateDate();
+            log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            ResourceController _resource = new ResourceController();
-
-            if (file != null && file.Length > 0)
+            try
             {
-                using (var stream = new MemoryStream())
+                if (file != null && file.Length > 0)
                 {
-                    file.CopyTo(stream);
-                    using (var package = new ExcelPackage(stream))
+                    using (var stream = new MemoryStream())
                     {
-                        var worksheet = package.Workbook.Worksheets[0];
-                        var rowCount = worksheet.Dimension.Rows;
-
-                        var excelDataList = new List<Store>();
-
-
-
-
-                        for (int row = 2; row <= rowCount; row++)
+                        file.CopyTo(stream);
+                        using (var package = new ExcelPackage(stream))
                         {
+                            var worksheet = package.Workbook.Worksheets[0];
 
-
-                            //get item id
-                            var stroeTypeID = _context.StoreType.Where(m => m.store_type_code == worksheet.Cells[row, 3].Value.ToString()).Select(m => m.id).SingleOrDefault();
-
-
-                            excelDataList.Add(new Store
+                            if (worksheet.Cells[1, 1].Value.ToString() != "store")
                             {
-                            
-                                store_code = worksheet.Cells[row, 1].Value.ToString(),
-                                store_name = worksheet.Cells[row, 2].Value.ToString(),
-                                type_id = stroeTypeID,
-                                create_date = _resource.CreateDate(),
-                                update_date = _resource.CreateDate(),
-                                // Add other properties as needed
-                            });
-                        }
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "invalid file";
 
-                        // Process the imported data (you can save it to a database, etc.)
-                        // Example: SaveToDatabase(excelDataList);
-                        if (ModelState.IsValid)
-                        {
-                            foreach (var item in excelDataList)
-                            {
-                                _context.Add(item);
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
                             }
-                            await _context.SaveChangesAsync();
-                            return RedirectToAction("index");
+
+                            string contentRootPath = _hostingEnvironment.ContentRootPath;
+                            DateTime currentDate = DateTime.Now;
+                            string dateStringWithMilliseconds = currentDate.ToString("yyyyMMddHHmmssfff");
+                            string ext = Path.GetExtension(file.FileName);
+                            string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var newName = fileName + "_" + dateStringWithMilliseconds + ext;
+                            string yourFilePath = Path.Combine(contentRootPath, "Shared", newName);
+
+                            log.current_name = newName;
+                            _utility.SaveExcelFile(package, yourFilePath);
+
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            var excelDataList = new List<Store>();
+                            var excelUpdateList = new List<Store>();
+                            for (int row = 3; row <= rowCount; row++)
+                            {
+                                var effDate = worksheet.Cells[row, 3];
+                                var itemOld = await _context.Store.Where(i => i.store_code == worksheet.Cells[row, 2].Value.ToString()).FirstOrDefaultAsync();
+                                var typeId = _utility.GetInt(worksheet.Cells[row, 1]);
+                                var storeName = worksheet.Cells[row, 3].Value.ToString();
+
+                                if (itemOld != null)
+                                {
+                                    itemOld.type_id = typeId.Value;
+                                    itemOld.store_name = storeName;
+                                    itemOld.update_date = _utility.CreateDate();
+                                    excelUpdateList.Add(itemOld);
+                                }
+                                else
+                                {
+                                    excelDataList.Add(new Store
+                                    {
+
+                                        type_id = typeId.Value,
+                                        store_name = storeName,
+                                        create_date = _utility.CreateDate(),
+                                    });
+
+                                }
+
+
+
+                            }
+
+                            if (ModelState.IsValid)
+                            {
+                                _context.Add(excelDataList);
+                                _context.Update(excelUpdateList);
+
+                                await _context.SaveChangesAsync();
+
+                                jsonData.status = "success";
+                                jsonData.message = JsonSerializer.Serialize(_context.Item.ToList());
+
+                            }
                         }
                     }
                 }
+                else
+                {
+                    jsonData.status = "unsuccessful";
+                    jsonData.message = "no data";
+                }
+            }
+            catch (Exception ex)
+            {
+                jsonData.status = "unsuccessful";
+                jsonData.message = ex.Message;
             }
 
-            return RedirectToAction(nameof(Index));
+            log.status = jsonData.status;
+            log.message = jsonData.message;
+
+
+            _context.Add(log);
+
+            _context.SaveChanges();
+
+            return Json(jsonData);
+
         }
 
         public IActionResult ExportToExcel()
         {
-            var data = _context.Store.Include(m => m.store_type).ToList();
+            var data = _context.Store.ToList();
             var stream = new MemoryStream();
 
             using (var package = new ExcelPackage(stream))
@@ -232,25 +305,23 @@ namespace StoreManagePlan.Controllers
                 var worksheet = package.Workbook.Worksheets.Add("Sheet1");
 
                 // Header
-                worksheet.Cells[1, 1].Value = "STORE CODE";
-                worksheet.Cells[1, 2].Value = "STORE NAME";
-                worksheet.Cells[1, 3].Value = "STORE TYPE CODE";
-                worksheet.Cells[1, 4].Value = "STORE TYPE NAME";
-                worksheet.Cells[1, 5].Value = "CREATE DATE";
-                worksheet.Cells[1, 6].Value = "UPDATE DATE";         
+                worksheet.Cells[1, 1].Value = "Id";
+                worksheet.Cells[1, 2].Value = "type id";
+                worksheet.Cells[1, 3].Value = "store code";
+                worksheet.Cells[1, 4].Value = "store name";
+                worksheet.Cells[1, 5].Value = "Create date";
+                worksheet.Cells[1, 6].Value = "Update date";
                 // Add more columns as needed
 
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].store_code;
-                    worksheet.Cells[i + 2, 2].Value = data[i].store_name;
-                    worksheet.Cells[i + 2, 3].Value = data[i].store_type.store_type_code;
-                    worksheet.Cells[i + 2, 4].Value = data[i].store_type.store_type_name;
+                    worksheet.Cells[i + 2, 1].Value = data[i].id;
+                    worksheet.Cells[i + 2, 2].Value = data[i].type_id;
+                    worksheet.Cells[i + 2, 3].Value = data[i].store_code;
+                    worksheet.Cells[i + 2, 4].Value = data[i].store_name;
                     worksheet.Cells[i + 2, 5].Value = data[i].create_date;
                     worksheet.Cells[i + 2, 6].Value = data[i].update_date;
-
-
                     // Add more columns as needed
                 }
 
@@ -261,6 +332,29 @@ namespace StoreManagePlan.Controllers
 
             // Set the content type and file name
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Item_List.xlsx");
+        }
+
+        public IActionResult DownloadImportFile(int id)
+        {
+
+            var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
+
+            if (log == null)
+            {
+                return NotFound();
+            }
+
+            string contentRootPath = _hostingEnvironment.ContentRootPath;
+            string yourFilePath = Path.Combine(contentRootPath, "Shared", log.current_name);
+
+            if (!System.IO.File.Exists(yourFilePath))
+            {
+                return NotFound();
+            }
+
+            byte[] fileContents = System.IO.File.ReadAllBytes(yourFilePath);
+
+            return File(fileContents, "application/octet-stream", log.old_name);
         }
     }
 }

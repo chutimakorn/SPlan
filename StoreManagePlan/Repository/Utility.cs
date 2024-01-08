@@ -73,5 +73,13 @@ namespace StoreManagePlan.Repository
             }
             return null;
         }
+        public void SaveExcelFile(ExcelPackage package, string filePath)
+        {
+            // Ensure the directory exists before saving
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+
+            // Save the Excel package to the specified path
+            package.SaveAs(new FileInfo(filePath));
+        }
     }
 }

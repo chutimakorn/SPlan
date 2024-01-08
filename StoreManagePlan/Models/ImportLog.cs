@@ -10,5 +10,7 @@ namespace StoreManagePlan.Models
         public string? message { get; set; }
         public string? create_date { get; set; }
         public string? status { get; set;}
+        public string? current_name { get; set; }
+        public string? old_name { get; set; }
     }
 }

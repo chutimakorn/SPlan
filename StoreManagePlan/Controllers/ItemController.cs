@@ -10,7 +10,6 @@ using StoreManagePlan.Models;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
-using OfficeOpenXml;
 using NuGet.Packaging.Core;
 using System.Text.Json;
 using Elfie.Serialization;
@@ -18,22 +17,29 @@ using StoreManagePlan.Repository;
 using System.Globalization;
 using System.Xml.Linq;
 
+
 namespace StoreManagePlan.Controllers
 {
     public class ItemController : Controller
     {
         IUtility _utility;
         private readonly StoreManagePlanContext _context;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public static string _menu = "Item";
 
-        public ItemController(StoreManagePlanContext context, IUtility utility)
+        public ItemController(StoreManagePlanContext context, IUtility utility, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
             this._utility = utility;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         // GET: ItemModels
         public async Task<IActionResult> Index()
         {
+            var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
+
+            ViewBag.historyLog = history;
             ViewBag.menu = "item";
             return View(await _context.Item.ToListAsync());
         }
@@ -151,7 +157,7 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string selectedSkus)
         {
-            if (selectedSkus == null || selectedSkus == "")
+            if(selectedSkus == "")
             {
                 return View(await _context.Item.ToListAsync());
             }
@@ -185,6 +191,7 @@ namespace StoreManagePlan.Controllers
             ImportLog log = new ImportLog();
             log.menu = "Item";
             log.create_date = _utility.CreateDate();
+            log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try {
                 if (file != null && file.Length > 0)
@@ -207,6 +214,17 @@ namespace StoreManagePlan.Controllers
 
                                 return Json(jsonData);
                             }
+
+                            string contentRootPath = _hostingEnvironment.ContentRootPath;
+                            DateTime currentDate = DateTime.Now;
+                            string dateStringWithMilliseconds = currentDate.ToString("yyyyMMddHHmmssfff");
+                            string ext = Path.GetExtension(file.FileName);
+                            string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var newName = fileName + "_" + dateStringWithMilliseconds+ ext;
+                            string yourFilePath = Path.Combine(contentRootPath, "Shared", newName);
+
+                            log.current_name = newName;
+                            _utility.SaveExcelFile(package, yourFilePath);
 
                             var rowCount = worksheet.Dimension.Rows;
 
@@ -274,6 +292,7 @@ namespace StoreManagePlan.Controllers
             log.status = jsonData.status;
             log.message = jsonData.message;
 
+
             _context.Add(log);
 
             _context.SaveChanges();
@@ -319,6 +338,29 @@ namespace StoreManagePlan.Controllers
 
             // Set the content type and file name
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Item_List.xlsx");
+        }
+
+        public IActionResult DownloadImportFile(int id)
+        {
+
+            var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
+
+            if (log == null)
+            {
+                return NotFound();
+            }
+
+            string contentRootPath = _hostingEnvironment.ContentRootPath;
+            string yourFilePath = Path.Combine(contentRootPath, "Shared", log.current_name);
+
+            if (!System.IO.File.Exists(yourFilePath))
+            {
+                return NotFound();
+            }
+
+            byte[] fileContents = System.IO.File.ReadAllBytes(yourFilePath);
+
+            return File(fileContents, "application/octet-stream", log.old_name);
         }
     }
 }

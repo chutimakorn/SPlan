@@ -10,23 +10,34 @@ using Newtonsoft.Json;
 using OfficeOpenXml;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
+using StoreManagePlan.Repository;
+using System.Globalization;
+using System.Xml.Linq;
+using System.Text.Json;
 
 namespace StoreManagePlan.Controllers
 {
     public class ItemFeaturesController : Controller
     {
+        IUtility _utility;
         private readonly StoreManagePlanContext _context;
-       
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public static string _menu = "ItemFeature";
 
-        public ItemFeaturesController(StoreManagePlanContext context)
+        public ItemFeaturesController(StoreManagePlanContext context, IUtility utility, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
-          
+            this._utility = utility;
+            _hostingEnvironment = hostingEnvironment;
+
         }
 
         // GET: ItemFeatures
         public async Task<IActionResult> Index()
         {
+            var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
+
+            ViewBag.historyLog = history;
             ViewBag.menu = "itemFeature";
             var storeManagePlanContext = _context.ItemFeature.Include(i => i.Item).Include(i => i.Store);
             return View(await storeManagePlanContext.ToListAsync());
@@ -205,67 +216,123 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
+            ResponseStatus jsonData = new ResponseStatus();
+            ImportLog log = new ImportLog();
+            log.menu = "ItemFeature";
+            log.create_date = _utility.CreateDate();
+            log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            ResourceController _resource = new ResourceController();
-
-            if (file != null && file.Length > 0)
+            try
             {
-                using (var stream = new MemoryStream())
+                if (file != null && file.Length > 0)
                 {
-                    file.CopyTo(stream);
-                    using (var package = new ExcelPackage(stream))
+                    using (var stream = new MemoryStream())
                     {
-                        var worksheet = package.Workbook.Worksheets[0];
-                        var rowCount = worksheet.Dimension.Rows;
-
-                        var excelDataList = new List<ItemFeature>();
-
-
-
-
-                        for (int row = 2; row <= rowCount; row++)
+                        file.CopyTo(stream);
+                        using (var package = new ExcelPackage(stream))
                         {
+                            var worksheet = package.Workbook.Worksheets[0];
 
-                            //get store id
-                            var storeID = _context.Store.Where(m => m.store_code == worksheet.Cells[row, 1].Value.ToString()).Select(m => m.id).SingleOrDefault();
-
-                            //get item id
-                            var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 2].Value.ToString()).Select(m => m.id).SingleOrDefault();
-
-                            excelDataList.Add(new ItemFeature
+                            if (worksheet.Cells[1, 1].Value.ToString() != "item feature")
                             {
-                                store_id = storeID,
-                                item_id = itemID,
-                                minimum_feature = int.Parse(worksheet.Cells[row, 3].Value.ToString()),
-                                maximum_feature = int.Parse(worksheet.Cells[row, 4].Value.ToString()),
-                                default_feature = int.Parse(worksheet.Cells[row, 5].Value.ToString()),
-                                create_date = _resource.CreateDate(),
-                                update_date = _resource.CreateDate(),
-                                // Add other properties as needed
-                            });
-                        }
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "invalid file";
 
-                        // Process the imported data (you can save it to a database, etc.)
-                        // Example: SaveToDatabase(excelDataList);
-                        if (ModelState.IsValid)
-                        {
-                            foreach (var item in excelDataList)
-                            {
-                                _context.Add(item);
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
                             }
-                            await _context.SaveChangesAsync();
-                            return RedirectToAction("index");
+
+                            string contentRootPath = _hostingEnvironment.ContentRootPath;
+                            DateTime currentDate = DateTime.Now;
+                            string dateStringWithMilliseconds = currentDate.ToString("yyyyMMddHHmmssfff");
+                            string ext = Path.GetExtension(file.FileName);
+                            string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var newName = fileName + "_" + dateStringWithMilliseconds + ext;
+                            string yourFilePath = Path.Combine(contentRootPath, "Shared", newName);
+
+                            log.current_name = newName;
+                            _utility.SaveExcelFile(package, yourFilePath);
+
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            var excelDataList = new List<ItemFeature>();
+                            var excelUpdateList = new List<ItemFeature>();
+                            for (int row = 3; row <= rowCount; row++)
+                            {
+                                var storeId = _utility.GetInt(worksheet.Cells[row, 1]);
+                                var itemId = _utility.GetInt(worksheet.Cells[row, 2]);
+
+                                var itemOld = await _context.ItemFeature.Where(i => i.store_id == storeId && i.item_id == itemId).FirstOrDefaultAsync();
+
+                                if (itemOld != null)
+                                {
+                                    itemOld.minimum_feature = _utility.GetInt(worksheet.Cells[row, 3]).Value;
+                                    itemOld.maximum_feature = _utility.GetInt(worksheet.Cells[row, 4]).Value;
+                                    itemOld.default_feature = _utility.GetInt(worksheet.Cells[row, 5]).Value;
+                                    excelUpdateList.Add(itemOld);
+                                }
+                                else
+                                {
+                                    excelDataList.Add(new ItemFeature
+                                    {
+
+                                        store_id = storeId.Value,
+                                        item_id = itemId.Value,
+                                        minimum_feature = _utility.GetInt(worksheet.Cells[row, 3]).Value,
+                                        maximum_feature = _utility.GetInt(worksheet.Cells[row, 4]).Value,
+                                        default_feature = _utility.GetInt(worksheet.Cells[row, 5]).Value,
+                                    });
+
+                                }
+
+
+
+                            }
+
+                            if (ModelState.IsValid)
+                            {
+                                _context.Add(excelDataList);
+                                _context.Update(excelUpdateList);
+                                await _context.SaveChangesAsync();
+
+                                jsonData.status = "success";
+                                jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
+
+                            }
                         }
                     }
                 }
+                else
+                {
+                    jsonData.status = "unsuccessful";
+                    jsonData.message = "no data";
+                }
+            }
+            catch (Exception ex)
+            {
+                jsonData.status = "unsuccessful";
+                jsonData.message = ex.Message;
             }
 
-            return RedirectToAction(nameof(Index));
+            log.status = jsonData.status;
+            log.message = jsonData.message;
+
+
+            _context.Add(log);
+
+            _context.SaveChanges();
+
+            return Json(jsonData);
+
         }
 
         public IActionResult ExportToExcel()
         {
-            var data = _context.ItemFeature.Include(m => m.Store).ToList();
+            var data = _context.ItemFeature.ToList();
             var stream = new MemoryStream();
 
             using (var package = new ExcelPackage(stream))
@@ -273,31 +340,25 @@ namespace StoreManagePlan.Controllers
                 var worksheet = package.Workbook.Worksheets.Add("Sheet1");
 
                 // Header
-                worksheet.Cells[1, 1].Value = "STORE CODE";
-                worksheet.Cells[1, 2].Value = "STORE NAME";
-                worksheet.Cells[1, 3].Value = "SKU CODE";
-                worksheet.Cells[1, 4].Value = "ITEM NAME";
-                worksheet.Cells[1, 5].Value = "MINIMUM FEATURE";
-                worksheet.Cells[1, 6].Value = "MAXIMUM FEATURE";
-                worksheet.Cells[1, 7].Value = "DEFAULT VALUE";
-                worksheet.Cells[1, 8].Value = "CEATE DATE";
-                worksheet.Cells[1, 9].Value = "UPDATE DATE";
+                worksheet.Cells[1, 1].Value = "store id";
+                worksheet.Cells[1, 2].Value = "item id";
+                worksheet.Cells[1, 3].Value = "minimum feature";
+                worksheet.Cells[1, 4].Value = "maximum feature";
+                worksheet.Cells[1, 5].Value = "default feature";
+                worksheet.Cells[1, 6].Value = "create date";
+                worksheet.Cells[1, 6].Value = "update date";
                 // Add more columns as needed
 
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].Store.store_code;
-                    worksheet.Cells[i + 2, 2].Value = data[i].Store.store_name;
-                    worksheet.Cells[i + 2, 3].Value = data[i].Item.sku_code;
-                    worksheet.Cells[i + 2, 4].Value = data[i].Item.sku_name;
-                    worksheet.Cells[i + 2, 5].Value = data[i].minimum_feature;
-                    worksheet.Cells[i + 2, 6].Value = data[i].maximum_feature;
-                    worksheet.Cells[i + 2, 7].Value = data[i].default_feature;
-                    worksheet.Cells[i + 2, 8].Value = data[i].create_date;
-                    worksheet.Cells[i + 2, 9].Value = data[i].update_date;
-                  
-               
+                    worksheet.Cells[i + 2, 1].Value = data[i].store_id;
+                    worksheet.Cells[i + 2, 2].Value = data[i].item_id;
+                    worksheet.Cells[i + 2, 3].Value = data[i].minimum_feature;
+                    worksheet.Cells[i + 2, 4].Value = data[i].maximum_feature;
+                    worksheet.Cells[i + 2, 5].Value = data[i].default_feature;
+                    worksheet.Cells[i + 2, 6].Value = data[i].create_date;
+                    worksheet.Cells[i + 2, 7].Value = data[i].update_date;
                     // Add more columns as needed
                 }
 
@@ -307,7 +368,30 @@ namespace StoreManagePlan.Controllers
             stream.Position = 0;
 
             // Set the content type and file name
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Item_List.xlsx");
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ItemFeature_List.xlsx");
+        }
+
+        public IActionResult DownloadImportFile(int id)
+        {
+
+            var log = _context.ImportLog.Where(i => i.id == id).FirstOrDefault();
+
+            if (log == null)
+            {
+                return NotFound();
+            }
+
+            string contentRootPath = _hostingEnvironment.ContentRootPath;
+            string yourFilePath = Path.Combine(contentRootPath, "Shared", log.current_name);
+
+            if (!System.IO.File.Exists(yourFilePath))
+            {
+                return NotFound();
+            }
+
+            byte[] fileContents = System.IO.File.ReadAllBytes(yourFilePath);
+
+            return File(fileContents, "application/octet-stream", log.old_name);
         }
     }
 }
