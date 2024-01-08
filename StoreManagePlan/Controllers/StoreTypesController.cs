@@ -25,7 +25,7 @@ namespace StoreManagePlan.Controllers
         IUtility _utility;
         private readonly StoreManagePlanContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public static string _menu = "StoreType";
+        public static string _menu = "storeType";
         public StoreTypesController(StoreManagePlanContext context, IUtility utility, IWebHostEnvironment hostingEnvironment)
         {
             _context = context;
