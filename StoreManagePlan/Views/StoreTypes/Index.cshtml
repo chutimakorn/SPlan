@@ -59,6 +59,7 @@
 @{
     ViewData["Title"] = "Index";
     var disable = "";
+    List<ImportLog> importLogs = new List<ImportLog>(ViewBag.historyLog);
 }
 @*
 <h1>Index</h1>
@@ -199,6 +200,49 @@
 
             </div>
             <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
+                <div class="card">
+                    <h5 class="card-header">New Items</h5>
+                    <div class="table-responsive text-nowrap">
+
+                        <table class="table">
+                            <thead style="background-color:#80808038">
+                                <tr class="text-nowrap">
+
+                                    <th>File Name</th>
+                                    <th>Error Message</th>
+                                    <th>Status</th>
+                                    <th></th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (importLogs.Count() == 0)
+                                {
+                                    <!-- ถ้า Model เท่ากับ null หรือไม่มีข้อมูล -->
+                                    <tr>
+                                        <td colspan="4" class="text-center">No data</td>
+                                    </tr>
+                                }
+                                else
+                                {
+
+                                    @foreach (var item in importLogs)
+                                    {
+
+                                        <tr>
+
+                                            <td>@item.old_name</td>
+                                            <td>@item.message</td>
+                                            <td>@item.status</td>
+                                            <td><a asp-action="DownloadImportFile" asp-route-id="@item.id">View</a> </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

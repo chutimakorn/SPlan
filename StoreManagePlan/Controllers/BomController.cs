@@ -26,6 +26,7 @@ namespace StoreManagePlan.Controllers
     {
         IUtility _utility;
         private readonly StoreManagePlanContext _context;
+        private readonly String _menu = "Bom";
 
         public BomController(StoreManagePlanContext context, IUtility utility)
         {
@@ -37,7 +38,7 @@ namespace StoreManagePlan.Controllers
         {
             ViewBag.menu = "bom";
 
-            var history = _context.ImportLog.Where(m => m.menu == "Bom").ToList();
+            var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 
             ViewBag.historyLog = history;
 
@@ -92,7 +93,7 @@ namespace StoreManagePlan.Controllers
             CultureInfo culture = new CultureInfo("en-US");
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
-            log.menu = "Bom";
+            log.menu = _menu;
             log.create_date = _utility.CreateDate();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try
@@ -273,6 +274,12 @@ namespace StoreManagePlan.Controllers
 
             // Set the content type and file name
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Bom_List.xlsx");
+        }
+
+
+        public IActionResult DownloadImportFile(int id)
+        {
+            return RedirectToAction(nameof(Index));
         }
     }
 }
