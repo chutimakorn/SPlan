@@ -73,7 +73,6 @@
         // นำรายการ SKU มาใส่ใน hidden input
         $("#hiddenInputId").val(selected.join(','));
 
-        // แสดง alert เพื่อตรวจสอบผลลัพธ์
-        alert("Selected SKUs: " + $("#hiddenInputId").val());
+       
     });
 });

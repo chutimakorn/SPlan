@@ -151,7 +151,7 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string selectedSkus)
         {
-            if(selectedSkus == "")
+            if (selectedSkus == null || selectedSkus == "")
             {
                 return View(await _context.Item.ToListAsync());
             }

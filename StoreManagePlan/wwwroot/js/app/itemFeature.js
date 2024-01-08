@@ -77,10 +77,7 @@
         // นำรายการ SKU มาใส่ใน hidden input
         $("#hiddenInputId").val(JSON.stringify(selectedItems));
 
-        // แสดง alert เพื่อตรวจสอบผลลัพธ์
-        alert("Selected SKUs: " + $("#hiddenInputId").val());
-
-   
+      
 
     });
 
