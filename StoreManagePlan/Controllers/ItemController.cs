@@ -11,17 +11,24 @@ using OfficeOpenXml;
 using System.Collections.Generic;
 using System.IO;
 using OfficeOpenXml;
+using NuGet.Packaging.Core;
+using System.Text.Json;
+using Elfie.Serialization;
+using StoreManagePlan.Repository;
+using System.Globalization;
+using System.Xml.Linq;
 
 namespace StoreManagePlan.Controllers
 {
     public class ItemController : Controller
     {
-
+        IUtility _utility;
         private readonly StoreManagePlanContext _context;
 
-        public ItemController(StoreManagePlanContext context)
+        public ItemController(StoreManagePlanContext context, IUtility utility)
         {
             _context = context;
+            this._utility = utility;
         }
 
         // GET: ItemModels
@@ -174,50 +181,105 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
+            ResponseStatus jsonData = new ResponseStatus();
+            ImportLog log = new ImportLog();
+            log.menu = "Item";
+            log.create_date = _utility.CreateDate();
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-            if (file != null && file.Length > 0)
-            {
-                using (var stream = new MemoryStream())
+            try {
+                if (file != null && file.Length > 0)
                 {
-                    file.CopyTo(stream);
-                    using (var package = new ExcelPackage(stream))
+                    using (var stream = new MemoryStream())
                     {
-                        var worksheet = package.Workbook.Worksheets[0];
-                        var rowCount = worksheet.Dimension.Rows;
-
-                        var excelDataList = new List<Item>();
-
-                        for (int row = 2; row <= rowCount; row++)
+                        file.CopyTo(stream);
+                        using (var package = new ExcelPackage(stream))
                         {
-                            excelDataList.Add(new Item
-                            {
-                                id = int.Parse(worksheet.Cells[row, 1].Value.ToString()),
-                                sku_code = worksheet.Cells[row, 2].Value.ToString(),
-                                sku_name = worksheet.Cells[row, 3].Value.ToString(),
-                                create_date = worksheet.Cells[row, 4].Value.ToString(),
-                                effective_date = worksheet.Cells[row, 5].Value.ToString(),
-                                update_date = worksheet.Cells[row, 6].Value.ToString(),
-                                // Add other properties as needed
-                            });
-                        }
+                            var worksheet = package.Workbook.Worksheets[0];
 
-                        // Process the imported data (you can save it to a database, etc.)
-                        // Example: SaveToDatabase(excelDataList);
-                        if (ModelState.IsValid)
-                        {
-                            foreach (var item in excelDataList)
-                            {
-                                _context.Add(item);
+                            if (worksheet.Cells[1, 1].Value.ToString() != "item") {
+                                jsonData.status = "unsuccessful";
+                                jsonData.message = "invalid file";
+
+                                log.status = jsonData.status;
+                                log.message = jsonData.message;
+                                _context.Add(log);
+                                _context.SaveChanges();
+
+                                return Json(jsonData);
                             }
-                            await _context.SaveChangesAsync();
-                            return RedirectToAction("index");
+
+                            var rowCount = worksheet.Dimension.Rows;
+
+                            var excelDataList = new List<Item>();
+                            var excelUpdateList = new List<Item>();
+                            for (int row = 3; row <= rowCount; row++)
+                            {
+                                var effDate = worksheet.Cells[row, 3];
+                                var itemOld = await _context.Item.Where(i => i.sku_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefaultAsync();
+
+                                if (itemOld != null)
+                                {
+                                    itemOld.sku_name = worksheet.Cells[row, 2].Value.ToString();
+                                    itemOld.update_date = _utility.CreateDate();
+                                    itemOld.effective_date = effDate.Value == null ? null : worksheet.Cells[row, 3].Value.ToString();
+                                    excelUpdateList.Add(itemOld);
+                                }
+                                else
+                                {
+                                    excelDataList.Add(new Item
+                                    {
+
+                                        sku_code = worksheet.Cells[row, 1].Value.ToString(),
+                                        sku_name = worksheet.Cells[row, 2].Value.ToString(),
+                                        create_date = _utility.CreateDate(),
+                                        effective_date = effDate.Value == null ? null : worksheet.Cells[row, 3].Value.ToString(),
+                                    });
+
+                                }
+
+
+                                
+                            }
+
+                            if (ModelState.IsValid)
+                            {
+                                foreach (var item in excelDataList)
+                                {
+                                    _context.Add(item);
+                                }
+                                foreach (var item in excelUpdateList)
+                                {
+                                    _context.Update(item);
+                                }
+                                await _context.SaveChangesAsync();
+
+                                jsonData.status = "success";
+                                jsonData.message = JsonSerializer.Serialize(_context.Item.ToList());
+
+                            }
                         }
                     }
                 }
+                else
+                {
+                    jsonData.status = "unsuccessful";
+                    jsonData.message = "no data";
+                }
+            }
+            catch (Exception ex) {
+                jsonData.status = "unsuccessful";
+                jsonData.message = ex.Message;
             }
 
-            return RedirectToAction(nameof(Index));
+            log.status = jsonData.status;
+            log.message = jsonData.message;
+
+            _context.Add(log);
+
+            _context.SaveChanges();
+
+            return Json(jsonData);
+
         }
 
         public IActionResult ExportToExcel()
