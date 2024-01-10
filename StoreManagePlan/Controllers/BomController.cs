@@ -98,6 +98,7 @@ namespace StoreManagePlan.Controllers
             ImportLog log = new ImportLog();
             log.menu = _menu;
             log.create_date = _utility.CreateDate();
+            log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try
             {
@@ -108,6 +109,17 @@ namespace StoreManagePlan.Controllers
                         file.CopyTo(stream);
                         using (var package = new ExcelPackage(stream))
                         {
+                            string contentRootPath = _hostingEnvironment.ContentRootPath;
+                            DateTime currentDate = DateTime.Now;
+                            string dateStringWithMilliseconds = currentDate.ToString("yyyyMMddHHmmssfff");
+                            string ext = Path.GetExtension(file.FileName);
+                            string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var newName = fileName + "_" + dateStringWithMilliseconds + ext;
+                            string yourFilePath = Path.Combine(contentRootPath, "Shared", newName);
+
+                            log.current_name = newName;
+                            _utility.SaveExcelFile(package, yourFilePath);
+
                             var worksheet = package.Workbook.Worksheets[0];
                             var rowCount = worksheet.Dimension.Rows;
 
