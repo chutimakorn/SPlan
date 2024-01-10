@@ -415,10 +415,10 @@ namespace StoreManagePlan.Controllers
                 {
 
                     var store = _context.Store.Where(m => m.id == data[i].store_id).SingleOrDefault();
-                    var storeType = _context.StoreType.Where(m => m.id == data[i].item_id).SingleOrDefault();
+                    var storeType = _context.Item.Where(m => m.id == data[i].item_id).SingleOrDefault();
 
                     worksheet.Cells[i + 2, 1].Value = store.store_code;
-                    worksheet.Cells[i + 2, 2].Value = storeType.store_type_code;
+                    worksheet.Cells[i + 2, 2].Value = storeType.sku_code;
                     worksheet.Cells[i + 2, 3].Value = data[i].minimum_feature;
                     worksheet.Cells[i + 2, 4].Value = data[i].maximum_feature;
                     worksheet.Cells[i + 2, 5].Value = data[i].default_feature;
