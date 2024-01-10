@@ -210,6 +210,7 @@
 
                                     <th>File Name</th>
                                     <th>Error Message</th>
+                                    <th>Date</th>
                                     <th>Status</th>
                                     <th></th>
 
@@ -229,11 +230,12 @@
 
                                     @foreach (var item in importLogs)
                                     {
-
+                                        var date = resource.ConvertDate(item.create_date);
                                         <tr>
 
                                             <td>@item.old_name</td>
                                             <td>@item.message</td>
+                                            <td>@date</td>
                                             <td>@item.status</td>
                                             <td><a asp-action="DownloadImportFile" asp-route-id="@item.id">View</a> </td>
                                         </tr>
