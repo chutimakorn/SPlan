@@ -361,23 +361,23 @@ namespace StoreManagePlan.Controllers
                 var worksheet = package.Workbook.Worksheets.Add("Sheet1");
 
                 // Header
-                worksheet.Cells[1, 1].Value = "Id";
-                worksheet.Cells[1, 2].Value = "type id";
-                worksheet.Cells[1, 3].Value = "store code";
-                worksheet.Cells[1, 4].Value = "store name";
-                worksheet.Cells[1, 5].Value = "Create date";
-                worksheet.Cells[1, 6].Value = "Update date";
+               
+                worksheet.Cells[1, 1].Value = "type code";
+                worksheet.Cells[1, 2].Value = "store code";
+                worksheet.Cells[1, 3].Value = "store name";
+                worksheet.Cells[1, 4].Value = "Create date";
+                worksheet.Cells[1, 5].Value = "Update date";
                 // Add more columns as needed
 
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].id;
-                    worksheet.Cells[i + 2, 2].Value = data[i].type_id;
-                    worksheet.Cells[i + 2, 3].Value = data[i].store_code;
-                    worksheet.Cells[i + 2, 4].Value = data[i].store_name;
-                    worksheet.Cells[i + 2, 5].Value = data[i].create_date;
-                    worksheet.Cells[i + 2, 6].Value = data[i].update_date;
+                   
+                    worksheet.Cells[i + 2, 1].Value = data[i].type_id;
+                    worksheet.Cells[i + 2, 2].Value = data[i].store_code;
+                    worksheet.Cells[i + 2, 3].Value = data[i].store_name;
+                    worksheet.Cells[i + 2, 4].Value = data[i].create_date;
+                    worksheet.Cells[i + 2, 5].Value = data[i].update_date;
                     // Add more columns as needed
                 }
 
