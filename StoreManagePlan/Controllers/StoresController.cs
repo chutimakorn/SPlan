@@ -199,6 +199,17 @@ namespace StoreManagePlan.Controllers
                         file.CopyTo(stream);
                         using (var package = new ExcelPackage(stream))
                         {
+                            string contentRootPath = _hostingEnvironment.ContentRootPath;
+                            DateTime currentDate = DateTime.Now;
+                            string dateStringWithMilliseconds = currentDate.ToString("yyyyMMddHHmmssfff");
+                            string ext = Path.GetExtension(file.FileName);
+                            string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                            var newName = fileName + "_" + dateStringWithMilliseconds + ext;
+                            string yourFilePath = Path.Combine(contentRootPath, "Shared", newName);
+
+                            log.current_name = newName;
+                            _utility.SaveExcelFile(package, yourFilePath);
+
                             var worksheet = package.Workbook.Worksheets[0];
                             var rowCount = worksheet.Dimension.Rows;
 
@@ -227,18 +238,6 @@ namespace StoreManagePlan.Controllers
 
                                 return Json(jsonData);
                             }
-
-                            string contentRootPath = _hostingEnvironment.ContentRootPath;
-                            DateTime currentDate = DateTime.Now;
-                            string dateStringWithMilliseconds = currentDate.ToString("yyyyMMddHHmmssfff");
-                            string ext = Path.GetExtension(file.FileName);
-                            string fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                            var newName = fileName + "_" + dateStringWithMilliseconds + ext;
-                            string yourFilePath = Path.Combine(contentRootPath, "Shared", newName);
-
-                            log.current_name = newName;
-                            _utility.SaveExcelFile(package, yourFilePath);
-
 
                             var excelDataList = new List<Store>();
                             var excelUpdateList = new List<Store>();
