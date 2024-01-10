@@ -98,6 +98,7 @@ namespace StoreManagePlan.Controllers
             ImportLog log = new ImportLog();
             log.menu = _menu;
             log.create_date = _utility.CreateDate();
+            log.old_name = file.FileName;
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try
             {
