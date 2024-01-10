@@ -38,10 +38,11 @@ namespace StoreManagePlan.Controllers
         {
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 
+            ViewBag.role = HttpContext.Session.GetInt32("Role");
             ViewBag.historyLog = history;
             ViewBag.menu = _menu;
-            var storeManagePlanContext = _context.Store.Include(s => s.store_type);
-            return View(await storeManagePlanContext.ToListAsync());
+       
+            return View(await _context.Store.Include(m => m.store_type).ToListAsync());
         }
 
         // GET: Stores/Details/5
@@ -190,6 +191,7 @@ namespace StoreManagePlan.Controllers
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             try
             {
+                ViewBag.role = HttpContext.Session.GetInt32("Role");
                 if (file != null && file.Length > 0)
                 {
                     using (var stream = new MemoryStream())
@@ -243,15 +245,15 @@ namespace StoreManagePlan.Controllers
                             for (int row = 3; row <= rowCount; row++)
                             {
                                 var effDate = worksheet.Cells[row, 3];
-                                var itemOld = await _context.Store.Where(i => i.store_code == worksheet.Cells[row, 2].Value.ToString()).FirstOrDefaultAsync();
+                                var itemOld =  _context.Store.Where(i => i.store_code == worksheet.Cells[row, 2].Value.ToString()).SingleOrDefault();
 
-                                var type = _context.StoreType.Where(i => i.store_type_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefaultAsync();
+                                var storeType = _context.StoreType.Where(i => i.store_type_code == worksheet.Cells[row, 1].Value.ToString()).SingleOrDefault();
 
 
                                 var storeName = worksheet.Cells[row, 3].Value.ToString();
 
 
-                                if (type == null)
+                                if (storeType == null)
                                 {
                                     jsonData.status = "unsuccessful";
                                     jsonData.message = "sku id is null";
@@ -267,7 +269,7 @@ namespace StoreManagePlan.Controllers
 
                                 if (itemOld != null)
                                 {
-                                    itemOld.type_id = type.Id;
+                                    itemOld.type_id = storeType.id;
                                     itemOld.store_name = storeName;
                                     itemOld.update_date = _utility.CreateDate();
                                     excelUpdateList.Add(itemOld);
@@ -277,9 +279,10 @@ namespace StoreManagePlan.Controllers
                                     excelDataList.Add(new Store
                                     {
 
-                                        type_id = type.Id,
+                                        type_id = storeType.id,
                                         store_name = storeName,
                                         create_date = _utility.CreateDate(),
+                                        update_date = _utility.CreateDate(),
                                     });
 
                                 }
@@ -288,16 +291,36 @@ namespace StoreManagePlan.Controllers
 
                             }
 
+                        
+
                             if (ModelState.IsValid)
                             {
-                                _context.Add(excelDataList);
-                                _context.Update(excelUpdateList);
+                                
+                                    try
+                                    {
+                                        foreach (var item in excelDataList)
+                                        {
+                                            _context.Store.Add(item);
+                                        }
 
-                                await _context.SaveChangesAsync();
+                                        foreach (var item in excelUpdateList)
+                                        {
+                                            _context.Store.Update(item);
+                                        }
 
-                                jsonData.status = "success";
-                                //jsonData.message = JsonSerializer.Serialize(_context.Item.ToList());
+                                      
+                                      
 
+                                        jsonData.status = "success";
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                       
+                                        jsonData.status = "unsuccessful";
+                                        jsonData.message = ex.Message;
+                                        // คุณสามารถเพิ่มข้อมูลเพิ่มเติมใน message ได้ตามความเหมาะสม
+                                    }
+                               
                             }
                         }
                     }
