@@ -37,7 +37,7 @@ namespace StoreManagePlan.Controllers
         public async Task<IActionResult> Index()
         {
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
-
+            ViewBag.role = HttpContext.Session.GetInt32("Role");
             ViewBag.historyLog = history;
             ViewBag.menu = "storeType";
             return View(await _context.StoreType.ToListAsync());
@@ -188,6 +188,7 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(IFormFile file)
         {
+            ViewBag.role = HttpContext.Session.GetInt32("Role");
             ResponseStatus jsonData = new ResponseStatus();
             ImportLog log = new ImportLog();
             log.menu = _menu;
@@ -249,7 +250,7 @@ namespace StoreManagePlan.Controllers
                             for (int row = 3; row <= rowCount; row++)
                             {
                                 var effDate = worksheet.Cells[row, 3];
-                                var itemOld = await _context.StoreType.Where(i => i.store_type_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefaultAsync();
+                                var itemOld =  _context.StoreType.Where(i => i.store_type_code == worksheet.Cells[row, 1].Value.ToString()).SingleOrDefault();
 
                                 if (itemOld != null)
                                 {
@@ -265,19 +266,39 @@ namespace StoreManagePlan.Controllers
                                         store_type_code = worksheet.Cells[row, 1].Value.ToString(),
                                         store_type_name = worksheet.Cells[row, 2].Value.ToString(),
                                         create_date = _utility.CreateDate(),
+                                        update_date = _utility.CreateDate(),
                                     });
                                 }
                             }
 
                             if (ModelState.IsValid)
                             {
-                                _context.Add(excelDataList);
-                                _context.Update(excelUpdateList);
-                                await _context.SaveChangesAsync();
+                               
+                                    try
+                                    {
+                                        foreach (var item in excelDataList)
+                                        {
+                                            _context.StoreType.Add(item);
+                                        }
 
-                                jsonData.status = "success";
-                                //jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
+                                        foreach (var item in excelUpdateList)
+                                        {
+                                            _context.StoreType.Update(item);
+                                        }
 
+                                      
+                                      
+
+                                        jsonData.status = "success";
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                 
+                                        jsonData.status = "unsuccessful";
+                                        jsonData.message = ex.Message;
+                                        // คุณสามารถเพิ่มข้อมูลเพิ่มเติมใน message ได้ตามความเหมาะสม
+                                    }
+                                
                             }
                         }
                     }

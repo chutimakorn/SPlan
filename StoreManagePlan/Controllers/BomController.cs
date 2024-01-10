@@ -39,6 +39,7 @@ namespace StoreManagePlan.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.menu = "bom";
+            ViewBag.role = HttpContext.Session.GetInt32("Role");
 
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 

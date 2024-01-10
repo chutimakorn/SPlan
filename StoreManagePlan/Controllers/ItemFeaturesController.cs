@@ -39,6 +39,7 @@ namespace StoreManagePlan.Controllers
 
             ViewBag.historyLog = history;
             ViewBag.menu = "itemFeature";
+            ViewBag.role = HttpContext.Session.GetInt32("Role");
             var storeManagePlanContext = _context.ItemFeature.Include(i => i.Item).Include(i => i.Store);
             return View(await storeManagePlanContext.ToListAsync());
         }
@@ -277,9 +278,9 @@ namespace StoreManagePlan.Controllers
                             {
                                 
 
-                                var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 2].Value.ToString()).FirstOrDefault();
+                                var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 2].Value.ToString()).SingleOrDefault();
 
-                                var storeID = _context.Store.Where(m => m.store_code == worksheet.Cells[row, 1].Value.ToString()).FirstOrDefault();
+                                var storeID = _context.Store.Where(m => m.store_code == worksheet.Cells[row, 1].Value.ToString()).SingleOrDefault();
 
                                 if (itemID == null)
                                 {
@@ -307,7 +308,7 @@ namespace StoreManagePlan.Controllers
                                     return Json(jsonData);
                                 }
 
-                                var itemOld = await _context.ItemFeature.Where(i => i.store_id == storeID.id && i.item_id == itemID.id).FirstOrDefaultAsync();
+                                var itemOld = _context.ItemFeature.Where(i => i.store_id == storeID.id && i.item_id == itemID.id).SingleOrDefault();
 
                                 if (itemOld != null)
                                 {

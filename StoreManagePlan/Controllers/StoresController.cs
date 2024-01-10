@@ -270,6 +270,7 @@ namespace StoreManagePlan.Controllers
                                 if (itemOld != null)
                                 {
                                     itemOld.type_id = storeType.id;
+                                    itemOld.store_code = itemOld.store_code;
                                     itemOld.store_name = storeName;
                                     itemOld.update_date = _utility.CreateDate();
                                     excelUpdateList.Add(itemOld);
@@ -281,6 +282,7 @@ namespace StoreManagePlan.Controllers
 
                                         type_id = storeType.id,
                                         store_name = storeName,
+                                        store_code = worksheet.Cells[row, 2].Value.ToString(),
                                         create_date = _utility.CreateDate(),
                                         update_date = _utility.CreateDate(),
                                     });

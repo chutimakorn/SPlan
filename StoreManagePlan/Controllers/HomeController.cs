@@ -35,9 +35,17 @@ namespace StoreManagePlan.Controllers
 
                 role = 1;
             }
-            else if(user == "user" && password == "0000")
+            else if(user == "planner" && password == "0000")
             {
                 role = 2;
+            }
+            else if (user == "storehub" && password == "1111")
+            {
+                role = 3;
+            }
+            else if (user == "storespoke" && password == "1111")
+            {
+                role = 4;
             }
             else
             {
