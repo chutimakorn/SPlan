@@ -39,7 +39,7 @@ namespace StoreManagePlan.Controllers
 
             ViewBag.historyLog = history;
             ViewBag.menu = "itemFeature";
-            ViewBag.role = HttpContext.Session.GetInt32("Role");
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
             var storeManagePlanContext = _context.ItemFeature.Include(i => i.Item).Include(i => i.Store);
             return View(await storeManagePlanContext.ToListAsync());
         }
@@ -337,12 +337,31 @@ namespace StoreManagePlan.Controllers
 
                             if (ModelState.IsValid)
                             {
-                                _context.Add(excelDataList);
-                                _context.Update(excelUpdateList);
-                                await _context.SaveChangesAsync();
 
-                                jsonData.status = "success";
-                                //jsonData.message = System.Text.Json.JsonSerializer.Serialize(_context.Item.ToList());
+                                try
+                                {
+                                    foreach (var item in excelDataList)
+                                    {
+                                        _context.Add(item);
+                                    }
+
+                                    foreach (var item in excelUpdateList)
+                                    {
+                                        _context.Update(item);
+                                    }
+
+
+
+
+                                    jsonData.status = "success";
+                                }
+                                catch (Exception ex)
+                                {
+
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = ex.Message;
+                                    // คุณสามารถเพิ่มข้อมูลเพิ่มเติมใน message ได้ตามความเหมาะสม
+                                }
 
                             }
                         }
@@ -382,8 +401,8 @@ namespace StoreManagePlan.Controllers
                 var worksheet = package.Workbook.Worksheets.Add("Sheet1");
 
                 // Header
-                worksheet.Cells[1, 1].Value = "store id";
-                worksheet.Cells[1, 2].Value = "item id";
+                worksheet.Cells[1, 1].Value = "store code";
+                worksheet.Cells[1, 2].Value = "sku code";
                 worksheet.Cells[1, 3].Value = "minimum feature";
                 worksheet.Cells[1, 4].Value = "maximum feature";
                 worksheet.Cells[1, 5].Value = "default feature";
@@ -394,8 +413,12 @@ namespace StoreManagePlan.Controllers
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].store_id;
-                    worksheet.Cells[i + 2, 2].Value = data[i].item_id;
+
+                    var store = _context.Store.Where(m => m.id == data[i].store_id).SingleOrDefault();
+                    var storeType = _context.StoreType.Where(m => m.id == data[i].item_id).SingleOrDefault();
+
+                    worksheet.Cells[i + 2, 1].Value = store.store_code;
+                    worksheet.Cells[i + 2, 2].Value = storeType.store_type_code;
                     worksheet.Cells[i + 2, 3].Value = data[i].minimum_feature;
                     worksheet.Cells[i + 2, 4].Value = data[i].maximum_feature;
                     worksheet.Cells[i + 2, 5].Value = data[i].default_feature;

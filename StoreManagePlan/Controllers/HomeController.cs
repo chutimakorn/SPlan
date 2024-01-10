@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using StoreManagePlan.Models;
 using System.Diagnostics;
 
@@ -54,8 +55,16 @@ namespace StoreManagePlan.Controllers
                 return View();
             }
 
-            HttpContext.Session.SetInt32("Role", role);
+           
+          
+            var cookieOptions = new CookieOptions
+            {
+                Expires = DateTimeOffset.Now.Add(TimeSpan.FromDays(30)), // ??????????????????????? Cookie
+                HttpOnly = true,
+                IsEssential = true,
+            };
 
+            HttpContext.Response.Cookies.Append("Role", role.ToString(), cookieOptions);
 
             return RedirectToAction("Index", "Bom");
 
