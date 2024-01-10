@@ -372,8 +372,9 @@ namespace StoreManagePlan.Controllers
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                   
-                    worksheet.Cells[i + 2, 1].Value = data[i].type_id;
+                    var storeType = _context.StoreType.Where(m => m.id == data[i].type_id).SingleOrDefault();
+
+                    worksheet.Cells[i + 2, 1].Value = storeType.store_type_code;
                     worksheet.Cells[i + 2, 2].Value = data[i].store_code;
                     worksheet.Cells[i + 2, 3].Value = data[i].store_name;
                     worksheet.Cells[i + 2, 4].Value = data[i].create_date;
