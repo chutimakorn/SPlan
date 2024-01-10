@@ -328,7 +328,7 @@ namespace StoreManagePlan.Controllers
 
         public IActionResult ExportToExcel()
         {
-            var data = _context.Item.ToList();
+            var data = _context.StoreType.ToList();
             var stream = new MemoryStream();
 
             using (var package = new ExcelPackage(stream))
@@ -347,11 +347,11 @@ namespace StoreManagePlan.Controllers
                 for (var i = 0; i < data.Count; i++)
                 {
                 
-                    worksheet.Cells[i + 2, 1].Value = data[i].sku_code;
-                    worksheet.Cells[i + 2, 2].Value = data[i].sku_name;
+                    worksheet.Cells[i + 2, 1].Value = data[i].store_type_code;
+                    worksheet.Cells[i + 2, 2].Value = data[i].store_type_name;
                     worksheet.Cells[i + 2, 3].Value = data[i].create_date;
                     worksheet.Cells[i + 2, 4].Value = data[i].update_date;
-                    worksheet.Cells[i + 2, 5].Value = data[i].effective_date;
+                
                     // Add more columns as needed
                 }
 

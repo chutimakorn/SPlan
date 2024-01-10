@@ -327,6 +327,9 @@ namespace StoreManagePlan.Controllers
                                         minimum_feature = _utility.GetInt(worksheet.Cells[row, 3]).Value,
                                         maximum_feature = _utility.GetInt(worksheet.Cells[row, 4]).Value,
                                         default_feature = _utility.GetInt(worksheet.Cells[row, 5]).Value,
+                                        create_date = _utility.CreateDate(),
+                                        update_date = _utility.CreateDate(),
+                                       
                                     });
 
                                 }
