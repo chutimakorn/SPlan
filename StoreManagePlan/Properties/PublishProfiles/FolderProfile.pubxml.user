@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>C:\Data\Publish\Splan</_PublishTargetUrl>
-    <History>True|2024-01-02T13:23:22.1760178Z;</History>
+    <History>True|2024-01-12T03:16:01.1568064Z;True|2024-01-12T09:55:07.3911201+07:00;True|2024-01-02T20:23:22.1760178+07:00;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

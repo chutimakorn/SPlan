@@ -1,84 +1,11 @@
-﻿@* @model IEnumerable<StoreManagePlan.Models.ItemFeature>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.minimum_feature)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.maximum_feature)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.default_feature)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.create_date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.update_date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Store)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Item)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.minimum_feature)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.maximum_feature)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.default_feature)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.create_date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.update_date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Store.id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Item.id)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
- *@
-
-@model IEnumerable<StoreManagePlan.Models.ItemFeature>
+﻿@model IEnumerable<StoreManagePlan.Models.ItemFeature>
 @using StoreManagePlan.Controllers
 
 @{
     ViewData["Title"] = "Index";
     var disable = "";
     List<ImportLog> importLogs = new List<ImportLog>(ViewBag.historyLog);
-
+    ResourceController resource = new ResourceController();
 }
 @*
 <h1>Index</h1>
