@@ -23,6 +23,7 @@ namespace StoreManagePlan.Controllers
         private readonly StoreManagePlanContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
         public static string _menu = "ItemFeature";
+        private const int PageSize = 10;
 
         public ItemFeaturesController(StoreManagePlanContext context, IUtility utility, IWebHostEnvironment hostingEnvironment)
         {
@@ -33,7 +34,7 @@ namespace StoreManagePlan.Controllers
         }
 
         // GET: ItemFeatures
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 
@@ -42,6 +43,22 @@ namespace StoreManagePlan.Controllers
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
             var storeManagePlanContext = _context.ItemFeature.Include(i => i.Item).Include(i => i.Store);
             return View(await storeManagePlanContext.ToListAsync());
+        }
+
+        private List<ItemFeature> GetItemsFromDataSource(int page)
+        {
+            var totalItems = _context.ItemFeature.Count();
+            var totalPages = (int)Math.Ceiling((double)totalItems / PageSize);
+
+            var items = _context.ItemFeature
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+
+            return items;
         }
 
         // GET: ItemFeatures/Details/5

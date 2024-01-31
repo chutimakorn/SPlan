@@ -341,5 +341,11 @@ namespace StoreManagePlan.Controllers
 
             return File(fileContents, "application/octet-stream", log.old_name);
         }
+        public async Task<IActionResult> TestMultipleSelection()
+        {
+            return View();
+
+
+        }
     }
 }
