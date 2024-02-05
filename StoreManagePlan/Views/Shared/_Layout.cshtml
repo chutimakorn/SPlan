@@ -33,6 +33,7 @@
     var menuitemFeature = "";
     var menuStore = "";
     var menuStoreType = "";
+    var menuStoreRelate = "";
     var menuMasterOpen = "";
     var menuPPR = "";
 
@@ -65,6 +66,11 @@
     {
         menuPPR = "active";
       
+    }
+    else if (ViewBag.menu == "storeRelates")
+    {
+        menuStoreRelate = "active";
+
     }
     else
     {
@@ -242,10 +248,9 @@
                                 <div data-i18n="Support">Plan Approve</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="https://github.com/themeselection/sneat-html-admin-template-free/issues"
-                               target="_blank"
-                               class="menu-link">
+                        <li class="menu-item @menuStoreRelate">
+                            <a asp-controller="StoreRelations" asp-action="Index" class="menu-link">
+                           
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
                                 <div data-i18n="Support">Store Relation</div>
                             </a>

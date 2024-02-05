@@ -26,7 +26,7 @@ namespace StoreManagePlan.Data
         {
             modelBuilder.Entity<Item>().ToTable("Item");
             modelBuilder.Entity<ItemFeature>().ToTable("ItemFeature").HasKey(pf => new { pf.store_id, pf.item_id });
-            modelBuilder.Entity<StoreRelation>().ToTable("StoreRelation").HasKey(pf => new { pf.store_hub_id, pf.store_spoke_id });
+            modelBuilder.Entity<StoreRelation>().ToTable("StoreRelation");
             modelBuilder.Entity<Store>().ToTable("Store");
             modelBuilder.Entity<StoreType>().ToTable("StoreType");
             modelBuilder.Entity<ImportLog>().ToTable("ImportLog");

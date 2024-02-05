@@ -1,0 +1,141 @@
+﻿@model IEnumerable<StoreManagePlan.Models.StoreRelation>
+@using StoreManagePlan.Controllers
+@{
+    ViewData["Title"] = "Index";
+    ResourceController resource = new ResourceController();
+}
+
+
+
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <form id="form1" asp-action="Index" method="get">
+
+        <div class="mb-3" style="display: flex; justify-content: space-between; align-items: center;">
+
+            <select id="defaultSelectProducer" name="hubID" class="form-select" onchange="submitForm()" style="width: 30%;">
+                <option value="0">Select Producer</option>
+              
+                @{
+                    List<Store> hubList = ViewBag.storeHub;
+                    foreach (var hub in hubList)
+                    {
+                        <option value="@hub.id">@hub.store_name</option>
+                    }
+
+                }
+
+
+            </select>
+
+            <div style="">
+                <a href="/StoreRelations/Create"><input class="btn btn-outline-success" type="button" value="Create" /></a>
+            </div>
+
+        </div>
+        <div class="mb-3" style="width:30%">
+
+            <select id="defaultSelectSeller" name="SpokeID" class="form-select" onchange="submitForm()">
+                <option value="0">Select Seller</option>
+                @{
+                    List<Store> spokeList = ViewBag.storeSpoke;
+                    foreach (var spoke in spokeList)
+                    {
+                        <option value="@spoke.id">@spoke.store_name</option>
+                    }
+
+                }
+
+            </select>
+
+        </div>
+        <div class="mb-3" style="width:30%;display: flex;">
+
+            <input id="html5-date-input" type="date" name="start" class="form-select" style="margin-right: 10px" onchange="submitForm()" />
+
+
+            <input id="html5-date-input" type="date" name="end" class="form-select" onchange="submitForm()" />
+
+
+        </div>
+
+    </form>
+
+    <div class="nav-align-top ">
+
+
+        <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+            <div class="mt-3 mb-3">
+                <div class="d-flex justify-content-start">
+                    <div class="btn-group">
+                        <button type="submit" id="export-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-download"></span>&nbsp; Export</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h5 class="card-header">Summary by Product</h5>
+                <div class="table-responsive text-nowrap">
+                    <table id="table-data" class="table" style="text-align-last: left;">
+                        <thead style="background-color:#80808038">
+                            <tr class="text-nowrap">
+
+                                <th><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
+                                <th>Producer</th>
+                                <th>Seller</th>
+                                <th>Start</th>
+                                <th>End</th>
+
+
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                var dateStart = resource.ConvertDate(item.start_date);
+                                var dateEnd = resource.ConvertDate(item.end_date);
+                                <tr>
+                                    <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+                                    <th>@item.StoreHub.store_name</th>
+                                    <th>@item.StoreSpoke.store_name</th>
+                                    <th>@dateStart</th>
+                                    <th>@dateEnd</th>
+
+                                </tr>
+                            }
+
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" id="hiddenInputId" name="selectedSkus" />
+                <div class="mt-3 mb-3">
+                    <div class="d-flex justify-content-start">
+                        <div class="btn-group">
+                            <button type="submit" id="delete-btn" class="btn btn-outline-danger"><span class="tf-icons bx bx-trash"></span>&nbsp; Delete</button>
+
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function submitForm() {
+        document.getElementById("form1").submit();
+    }
+   
+    $(document).ready(function () {
+        $('#defaultSelectProducer').val('1');
+    });
+    
+</script>
