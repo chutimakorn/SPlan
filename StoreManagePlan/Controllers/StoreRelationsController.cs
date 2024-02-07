@@ -268,15 +268,27 @@ namespace StoreManagePlan.Controllers
         }
 
         // POST: StoreRelations/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(string selectedID)
         {
-            var storeRelation = await _context.StoreRelation.FindAsync(id);
-            if (storeRelation != null)
+            if (selectedID == "")
             {
-                _context.StoreRelation.Remove(storeRelation);
+                return View(await _context.Item.ToListAsync());
             }
+
+            var idList = selectedID.Split(',');
+
+            foreach (var id in idList)
+            {
+
+                var itemModel = _context.StoreRelation.Where(m => m.id == Convert.ToInt32(id)).SingleOrDefault();
+                if (itemModel != null)
+                {
+                    _context.StoreRelation.Remove(itemModel);
+                }
+
+            }
+
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

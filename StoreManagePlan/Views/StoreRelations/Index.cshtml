@@ -13,48 +13,50 @@
 
         <div class="mb-3" style="display: flex; justify-content: space-between; align-items: center;">
 
-            <select id="defaultSelectProducer" name="hubID" class="form-select" onchange="submitForm()" style="width: 30%;">
-                <option value="0">Select Producer</option>
-              
-                @{
-                    List<Store> hubList = ViewBag.storeHub;
-                    foreach (var hub in hubList)
-                    {
-                        <option value="@hub.id">@hub.store_name</option>
-                    }
+            <div style="display: flex;width: 30%;">
+                <select id="defaultSelectProducer" name="hubID" class="form-select" onchange="submitForm()" >
+                    <option value="0">Select Producer</option>
+                    <option value="1">BIGC</option>
+                </select>
 
-                }
+                <div style="align-self: center;margin-left:10px">
+                    <input type="button" class="btn btn-outline-secondary" value="Clear" onclick="clearProducer()" />
+                    
+                </div>
 
-
-            </select>
-
+            </div>
+           
             <div style="">
-                <a href="/StoreRelations/Create"><input class="btn btn-outline-success" type="button" value="Create" /></a>
+                <a href="/StoreRelations/Create"><input class="btn btn-outline-success" type="button" value="Create"></a>
             </div>
 
         </div>
-        <div class="mb-3" style="width:30%">
-
+        <div class="mb-3">
+            <div style="display: flex;width: 30%;">
             <select id="defaultSelectSeller" name="SpokeID" class="form-select" onchange="submitForm()">
                 <option value="0">Select Seller</option>
                 @{
                     List<Store> spokeList = ViewBag.storeSpoke;
                     foreach (var spoke in spokeList)
                     {
-                        <option value="@spoke.id">@spoke.store_name</option>
+                            <option value="@spoke.id">@spoke.store_name</option>
                     }
 
                 }
 
             </select>
+                <div style="align-self: center;margin-left:10px">
+                    <input type="button" class="btn btn-outline-secondary" value="Clear" onclick="clearSeller()" />
 
+                </div>
+            </div>
         </div>
         <div class="mb-3" style="width:30%;display: flex;">
 
-            <input id="html5-date-input" type="date" name="start" class="form-select" style="margin-right: 10px" onchange="submitForm()" />
+            <input id="html5-date-input-start" type="date" name="start" class="form-select" style="margin-right: 10px" onchange="submitForm()" />
 
 
-            <input id="html5-date-input" type="date" name="end" class="form-select" onchange="submitForm()" />
+            <input id="html5-date-input-end" type="date" name="end" class="form-select" onchange="submitForm()" />
 
 
         </div>
@@ -96,7 +98,7 @@
                                 var dateStart = resource.ConvertDate(item.start_date);
                                 var dateEnd = resource.ConvertDate(item.end_date);
                                 <tr>
-                                    <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+                                    <td scope="row"><input class="form-check-input" type="checkbox" value="@item.id" id="defaultCheck"></td>
                                     <th>@item.StoreHub.store_name</th>
                                     <th>@item.StoreSpoke.store_name</th>
                                     <th>@dateStart</th>
@@ -111,7 +113,7 @@
                 </div>
             </div>
             <form asp-action="Delete" method="post">
-                <input type="hidden" id="hiddenInputId" name="selectedSkus" />
+                <input type="hidden" id="hiddenInputId" name="selectedID" />
                 <div class="mt-3 mb-3">
                     <div class="d-flex justify-content-start">
                         <div class="btn-group">
@@ -129,13 +131,66 @@
     </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
 <script>
+
+    $(document).ready(function () {
+        $('#html5-date-input-start').val("@ViewBag.start");
+        $('#html5-date-input-end').val("@ViewBag.end");
+
+      
+
+        $("#checkAll").on("change", function () {
+            // หา Checkbox ทุกตัวใน tbody
+            var checkboxes = $("tbody input[type=checkbox]");
+
+            // ตั้งค่า Checked ของ Checkbox ทุกตัวตาม Checkbox ทั้งหมด
+            checkboxes.prop("checked", $(this).prop("checked"));
+        });
+
+        // เมื่อคลิกที่ Checkbox ใน tbody
+        $("tbody input[type=checkbox]").on("change", function () {
+            // ตรวจสอบว่า Checkbox ทั้งหมดควรติ๊กหรือไม่
+            var checkAllCheckbox = $("#checkAll");
+            checkAllCheckbox.prop("checked", $("tbody input[type=checkbox]:checked").length === checkboxes.length);
+        });
+
+        // เมื่อคลิกที่ปุ่ม delete
+        $("#delete-btn").on("click", function () {
+            var checkedCheckboxes = $('input#defaultCheck:checked'); // เลือก checkbox ที่ถูกเลือกทั้งหมด
+            // รวม SKU ที่ถูก check ใน checkbox
+            var selectedIds = checkedCheckboxes.map(function () {
+                return this.value; // ดึงค่า value ของ checkbox ที่ถูกเลือก
+            }).get().join(','); // รวมค่าในรูปแบบ string และใช้ ',' เป็นตัวคั่น
+
+            if (selectedIds == "") {
+                alert("กรุณาเลือกสิ่งที่ต้องการลบ")
+            }
+
+            $('#hiddenInputId').val(selectedIds); // ตั้งค่าใน hidden input
+
+
+        });
+    });
+
     function submitForm() {
         document.getElementById("form1").submit();
-    }
+    };
+    function clearSeller() {
+        $('#defaultSelectSeller').val("0");
+
+        document.getElementById("form1").submit();
+    };
+    function clearProducer() {
+        $('#defaultSelectProducer').val("0");
+        document.getElementById("form1").submit();
+    };
    
-    $(document).ready(function () {
-        $('#defaultSelectProducer').val('1');
-    });
-    
+     const $select = document.querySelector('#defaultSelectProducer');
+     $select.value = '@ViewBag.hubID'
+
+    const $selectSpoke = document.querySelector('#defaultSelectSeller');
+    $selectSpoke.value = '@ViewBag.SpokeID'
+
+   
 </script>
