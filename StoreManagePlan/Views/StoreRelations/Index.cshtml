@@ -96,62 +96,66 @@
                 </div>
             </div>
 
-            <div class="card">
-                <h5 class="card-header">Summary by Product</h5>
-                <div class="table-responsive text-nowrap">
-                    <table id="table-data" class="table" style="text-align-last: left;">
-                        <thead style="background-color:#80808038">
-                            <tr class="text-nowrap">
-
-                                <th style="width:10%"><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
-                                <th>Producer</th>
-                                <th>Seller</th>
-                                <th>Start</th>
-                                <th>End</th>
+            
 
 
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                <div class="card" style="padding:10px">
+                    <h5 class="card-header">Summary by Product</h5>
+                    <div class="card-datatable table-responsive">
+                        <table id="table-data" class="table" style="text-align-last: left;">
+                            <thead style="background-color:#80808038">
+                                <tr class="text-nowrap">
 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
-                                var dateStart = resource.ConvertDate(item.start_date);
-                                var dateEnd = resource.ConvertDate(item.end_date);
-                                <tr>
-                                    <td style="width:10%"><input class="form-check-input" type="checkbox" value="@item.id" id="defaultCheck"></td>
-                                    <td>@item.StoreHub.store_name</td>
-                                    <td>@item.StoreSpoke.store_name</td>
-                                    <td>@dateStart</td>
-                                    <td>@dateEnd</td>
+                                    <th><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
+                                    <th>Producer</th>
+                                    <th>Seller</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+
+
 
                                 </tr>
-                            }
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    var dateStart = resource.ConvertDate(item.start_date);
+                                    var dateEnd = resource.ConvertDate(item.end_date);
+                                    <tr>
+                                        <td style="width:10%"><input class="form-check-input" type="checkbox" value="@item.id" id="defaultCheck"></td>
+                                        <td>@item.StoreHub.store_name</td>
+                                        <td>@item.StoreSpoke.store_name</td>
+                                        <td>@dateStart</td>
+                                        <td>@dateEnd</td>
+
+                                    </tr>
+                                }
 
 
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <form asp-action="Delete" method="post">
-                <input type="hidden" id="hiddenInputId" name="selectedID" />
-                <div class="mt-3 mb-3">
-                    <div class="d-flex justify-content-start">
-                        <div class="btn-group">
-                            <button type="submit" id="delete-btn" class="btn btn-outline-danger"><span class="tf-icons bx bx-trash"></span>&nbsp; Delete</button>
-
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" id="hiddenInputId" name="selectedID" />
+                    <div class="mt-3 mb-3">
+                        <div class="d-flex justify-content-start">
+                            <div class="btn-group">
+                                <button type="submit" id="delete-btn" class="btn btn-outline-danger"><span class="tf-icons bx bx-trash"></span>&nbsp; Delete</button>
 
-            </form>
+                            </div>
+                        </div>
+                    </div>
 
-
+                </form>
+            </div>
         </div>
 
     </div>
 </div>
-
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
 <script src="~/js/app/storeRelates.js"></script>
 <script>

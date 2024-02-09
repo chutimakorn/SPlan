@@ -40,7 +40,7 @@ namespace StoreManagePlan.Controllers
 
             ViewBag.historyLog = history;
             ViewBag.menu = "itemFeature";
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             var storeManagePlanContext = _context.ItemFeature.Include(i => i.Item).Include(i => i.Store);
             return View(await storeManagePlanContext.ToListAsync());
         }

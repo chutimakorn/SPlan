@@ -8,7 +8,7 @@ namespace StoreManagePlan.Controllers
         // GET: ProductPlanReviewController
         public ActionResult Index()
         {
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             return View();
         }
 

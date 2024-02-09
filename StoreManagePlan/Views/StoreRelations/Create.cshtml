@@ -20,7 +20,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">
-            บันทึกไม่สำเร็จ.
+            กรุณาเลือก Producer
         </div>
     </div>
 
@@ -95,7 +95,7 @@
     <a asp-action="Index">Cancel</a>
 </div>
 
-<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="~/js/multiselect.min.js"></script>
 
@@ -113,8 +113,8 @@
             if ($('#defaultSelect').val() === '0') {
                     e.preventDefault()
                 // $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
-                // $('#import-not-success').toast('show');
-                alert('กรุณาเลือก Producer');
+                 jQuery('#import-not-success').toast('show');
+                //alert('กรุณาเลือก Producer');
             
                 return;
             }

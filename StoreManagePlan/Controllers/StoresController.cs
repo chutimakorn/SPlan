@@ -38,7 +38,7 @@ namespace StoreManagePlan.Controllers
         {
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.historyLog = history;
             ViewBag.menu = _menu;
        
