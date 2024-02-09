@@ -26,7 +26,7 @@ namespace StoreManagePlan.Controllers
         // GET: StoreRelations
         public async Task<IActionResult> Index(string SpokeID, string hubID,string start,string end)
         {
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.menu = "storeRelates";
             ResourceController resource = new ResourceController();
 
@@ -110,7 +110,7 @@ namespace StoreManagePlan.Controllers
         // GET: StoreRelations/Create
         public IActionResult Create()
         {
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.menu = "storeRelates";
 
             var spokeInHub = _context.StoreRelation
@@ -174,7 +174,7 @@ namespace StoreManagePlan.Controllers
             }
 
 
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.menu = "storeRelates";
 
             var spokeInHub = _context.StoreRelation
