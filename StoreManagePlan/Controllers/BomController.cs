@@ -39,7 +39,7 @@ namespace StoreManagePlan.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.menu = "bom";
-            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies.TryGetValue("Role", out string roleValue));
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
 
             var history = _context.ImportLog.Where(m => m.menu == _menu).ToList();
 

@@ -69,7 +69,7 @@ namespace StoreManagePlan.Controllers
             }
             if (end == null || end == "")
             {
-                end = "9999999";
+                end = "99999999";
             }
             else
             {
@@ -310,8 +310,8 @@ namespace StoreManagePlan.Controllers
                 worksheet.Cells[1, 2].Value = "Seller";
                 worksheet.Cells[1, 3].Value = "Start";
                 worksheet.Cells[1, 4].Value = "End";
-                worksheet.Cells[1, 4].Value = "Create date";
-                worksheet.Cells[1, 4].Value = "Upate date";
+                worksheet.Cells[1, 5].Value = "Create date";
+                worksheet.Cells[1, 6].Value = "Upate date";
 
                 // Add more columns as needed
 
