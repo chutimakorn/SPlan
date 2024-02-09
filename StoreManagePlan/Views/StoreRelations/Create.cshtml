@@ -1,54 +1,17 @@
 ﻿@model StoreManagePlan.Models.StoreRelation
 
-@* @{
-    ViewData["Title"] = "Create";
-}
-
-<h1>Create</h1>
-
-<h4>StoreRelation</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="store_hub_id" class="control-label"></label>
-                <select asp-for="store_hub_id" class ="form-control" asp-items="ViewBag.store_hub_id"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="store_spoke_id" class="control-label"></label>
-                <select asp-for="store_spoke_id" class ="form-control" asp-items="ViewBag.store_spoke_id"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="start_date" class="control-label"></label>
-                <input asp-for="start_date" class="form-control" />
-                <span asp-validation-for="start_date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="end_date" class="control-label"></label>
-                <input asp-for="end_date" class="form-control" />
-                <span asp-validation-for="end_date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="create_date" class="control-label"></label>
-                <input asp-for="create_date" class="form-control" />
-                <span asp-validation-for="create_date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="update_date" class="control-label"></label>
-                <input asp-for="update_date" class="form-control" />
-                <span asp-validation-for="update_date" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div> *@
-
-
 <div class="container-xxl flex-grow-1 container-p-y">
+
+    <div class="bs-toast toast toast-placement-ex fade bg-success top-0 end-0 m-2" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกสำเร็จ.
+        </div>
+    </div>
 
     <div class="bs-toast toast toast-placement-ex fade bg-danger top-0 end-0 m-2" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
         <div class="toast-header">
@@ -56,8 +19,8 @@
             <div class="me-auto fw-medium">แจ้งเตือน</div>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
-        <div class="toast-body" id="toastMessage">
-            <!-- ข้อความแจ้งเตือนจะถูกแสดงที่นี่ -->
+        <div class="toast-body">
+            บันทึกไม่สำเร็จ.
         </div>
     </div>
 
@@ -80,7 +43,7 @@
         </div>
         <div class="mb-3" style="width:30%;display: flex;">
 
-            <input id="html5-date-input" type="date" name="start" class="form-select" style="margin-right: 10px"/>
+            <input id="html5-date-input" type="date" name="start" class="form-select" style="margin-right: 10px" />
 
 
             <input id="html5-date-input" type="date" name="end" class="form-select" />
@@ -90,8 +53,8 @@
         <div><span style="color:red">*</span>Selected Seller</div>
         <div class="row">
             <div class="col-xxl-5">
-              
-                <select name="from[]" id="multiselect" class="form-control" size="8" multiple="multiple" >
+
+                <select name="from[]" id="multiselect" class="form-control" size="8" multiple="multiple">
 
                     @{
                         List<Store> spokeList = ViewBag.storeSpoke;
@@ -100,7 +63,7 @@
                             <option value="@spoke.id">@spoke.store_name</option>
                         }
 
-                    }                  
+                    }
                 </select>
             </div>
 
@@ -122,7 +85,7 @@
                 <button type="submit" id="submit" class="btn btn-block btn-sm btn-primary">submit</button>
             </div>
         </div>
-        <input name="listSpoke" id="listSpoke" type="hidden"/>
+        <input name="listSpoke" id="listSpoke" type="hidden" />
 
     </form>
 
@@ -131,6 +94,7 @@
 <div>
     <a asp-action="Index">Cancel</a>
 </div>
+
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="~/js/multiselect.min.js"></script>
@@ -138,26 +102,31 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function ($) {
+     
         $('#multiselect').multiselect();
         var values = [];
 
         $('#submit').click(function (e) {
-       
+
 
             // ตรวจสอบการเลือกรายการใน dropdown และ multiselect_to
             if ($('#defaultSelect').val() === '0') {
-
+                    e.preventDefault()
+                // $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
+                // $('#import-not-success').toast('show');
                 alert('กรุณาเลือก Producer');
+            
                 return;
             }
 
-         
+
 
             // ดำเนินการ submit เมื่อผู้ใช้เลือกรายการครบถ้วน
             var x = document.getElementById("multiselect_to");
             if (x.length === 0) {
 
                 alert('กรุณาเลือก Selected Seller อย่างน้อย 1 รายการ');
+                e.preventDefault()
                 return;
             }
             for (var i = 0; i < x.length; i++) {
@@ -165,7 +134,8 @@
             }
             var resultString = values.join(', ');
             $('#listSpoke').val(resultString);
-       
+            // $('#form1').submit();
+
         });
     });
 </script>

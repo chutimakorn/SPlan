@@ -9,6 +9,27 @@
 
 
 <div class="container-xxl flex-grow-1 container-p-y">
+    <div class="bs-toast toast toast-placement-ex fade bg-success top-0 end-0 m-2" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกสำเร็จ.
+        </div>
+    </div>
+
+    <div class="bs-toast toast toast-placement-ex fade bg-danger top-0 end-0 m-2" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">แจ้งเตือน</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกไม่สำเร็จ.
+        </div>
+    </div>
     <form id="form1" asp-action="Index" method="get">
 
         <div class="mb-3" style="display: flex; justify-content: space-between; align-items: center;">
@@ -82,7 +103,7 @@
                         <thead style="background-color:#80808038">
                             <tr class="text-nowrap">
 
-                                <th><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
+                                <th style="width:10%"><input class="form-check-input" type="checkbox" value="" id="checkAll"></th>
                                 <th>Producer</th>
                                 <th>Seller</th>
                                 <th>Start</th>
@@ -98,11 +119,11 @@
                                 var dateStart = resource.ConvertDate(item.start_date);
                                 var dateEnd = resource.ConvertDate(item.end_date);
                                 <tr>
-                                    <td scope="row"><input class="form-check-input" type="checkbox" value="@item.id" id="defaultCheck"></td>
-                                    <th>@item.StoreHub.store_name</th>
-                                    <th>@item.StoreSpoke.store_name</th>
-                                    <th>@dateStart</th>
-                                    <th>@dateEnd</th>
+                                    <td style="width:10%"><input class="form-check-input" type="checkbox" value="@item.id" id="defaultCheck"></td>
+                                    <td>@item.StoreHub.store_name</td>
+                                    <td>@item.StoreSpoke.store_name</td>
+                                    <td>@dateStart</td>
+                                    <td>@dateEnd</td>
 
                                 </tr>
                             }
@@ -132,6 +153,7 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+@* <script src="~/js/app/storeRelates.js"></script> *@
 <script>
 
     $(document).ready(function () {
@@ -156,7 +178,7 @@
         });
 
         // เมื่อคลิกที่ปุ่ม delete
-        $("#delete-btn").on("click", function () {
+        $("#delete-btn").on("click", function (e) {
             var checkedCheckboxes = $('input#defaultCheck:checked'); // เลือก checkbox ที่ถูกเลือกทั้งหมด
             // รวม SKU ที่ถูก check ใน checkbox
             var selectedIds = checkedCheckboxes.map(function () {
@@ -164,7 +186,10 @@
             }).get().join(','); // รวมค่าในรูปแบบ string และใช้ ',' เป็นตัวคั่น
 
             if (selectedIds == "") {
-                alert("กรุณาเลือกสิ่งที่ต้องการลบ")
+                $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
+                $('#import-not-success').toast('show');
+                // alert("กรุณาเลือกสิ่งที่ต้องการลบ")
+                e.preventDefault()
             }
 
             $('#hiddenInputId').val(selectedIds); // ตั้งค่าใน hidden input
