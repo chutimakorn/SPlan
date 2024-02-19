@@ -44,7 +44,7 @@ namespace StoreManagePlan.Controllers
             {
                 role = 3;
             }
-            else if (user == "storespoke" && password == "1111")
+            else if (user == "storespoke" && password == "2222")
             {
                 role = 4;
             }
