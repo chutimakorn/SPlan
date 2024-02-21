@@ -11,5 +11,6 @@ namespace StoreManagePlan.Repository
         int? GetInt(ExcelRangeBase cell);
         double? GetDecimal(ExcelRangeBase cell);
         void SaveExcelFile(ExcelPackage package, string filePath);
+        bool CheckInt(ExcelRangeBase cell);
     }
 }

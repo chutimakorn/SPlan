@@ -91,8 +91,25 @@
                     </div>
                 </div>
 
+                
+                
+
                 <div class="card" style="padding:10px">
-                    <h5 class="card-header">New Items</h5>
+                    <div class="row">
+                        <div class="col-8">
+                            <h5 class="card-header">New Items</h5>
+                        </div>
+                        <div class="col-4">
+                            <div class="row">
+                                <div class="row">
+                                    <form class="input-group" asp-action="Index" method="get">
+                                        <input type="text" class="form-control" name="searchTerm" value="@ViewBag.searchTerm" placeholder="Search" />
+                                        <button class="btn btn-outline-primary" type="submit">Search</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive text-nowrap">
                         <table id="table-data" class="table">
                             <thead style="background-color:#80808038">

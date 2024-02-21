@@ -293,7 +293,6 @@ namespace StoreManagePlan.Controllers
                             var excelUpdateList = new List<ItemFeature>();
                             for (int row = 3; row <= rowCount; row++)
                             {
-                                
 
                                 var itemID = _context.Item.Where(m => m.sku_code == worksheet.Cells[row, 2].Value.ToString()).SingleOrDefault();
 
@@ -316,6 +315,19 @@ namespace StoreManagePlan.Controllers
                                 {
                                     jsonData.status = "unsuccessful";
                                     jsonData.message = "store not found";
+                                    log.status = jsonData.status;
+                                    log.message = jsonData.message;
+
+                                    _context.Add(log);
+                                    _context.SaveChanges();
+
+                                    return Json(jsonData);
+                                }
+
+                                if (!_utility.CheckInt(worksheet.Cells[row, 3]) || !_utility.CheckInt(worksheet.Cells[row, 4]) || !_utility.CheckInt(worksheet.Cells[row, 5])) 
+                                {
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = "please check row "+ (row-2).ToString();
                                     log.status = jsonData.status;
                                     log.message = jsonData.message;
 

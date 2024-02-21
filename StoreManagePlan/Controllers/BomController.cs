@@ -36,7 +36,7 @@ namespace StoreManagePlan.Controllers
             _hostingEnvironment = hostingEnvironment;   
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchTerm)
         {
             ViewBag.menu = "bom";
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
@@ -45,7 +45,23 @@ namespace StoreManagePlan.Controllers
 
             ViewBag.historyLog = history;
 
-            return View(await _context.Bom.Include(m => m.Item).ToListAsync());
+            List<Bom> list;
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                list = await _context.Bom
+                    .Include(m => m.Item)
+                    .Where(m => m.Item.sku_code.ToString().Contains(searchTerm) ||
+                                m.ingredient_name.Contains(searchTerm) ||
+                                m.ingredient_sku.ToString().Contains(searchTerm))
+                    .ToListAsync();
+            }
+            else
+            {
+                list = await _context.Bom.Include(m => m.Item).ToListAsync();
+            }
+            ViewBag.searchTerm = searchTerm;
+            return View(list);
 
 
         }
@@ -175,6 +191,21 @@ namespace StoreManagePlan.Controllers
 
                                     return Json(jsonData);
                                 }
+
+
+                                if (!_utility.CheckInt(worksheet.Cells[row, 2]) || !_utility.CheckInt(worksheet.Cells[row, 3]) || !_utility.CheckInt(worksheet.Cells[row, 7]))
+                                {
+                                    jsonData.status = "unsuccessful";
+                                    jsonData.message = "please check row " + (row - 2).ToString();
+                                    log.status = jsonData.status;
+                                    log.message = jsonData.message;
+
+                                    _context.Add(log);
+                                    _context.SaveChanges();
+
+                                    return Json(jsonData);
+                                }
+
 
                                 if (itemOld != null)
                                 {

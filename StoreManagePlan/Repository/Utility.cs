@@ -81,5 +81,14 @@ namespace StoreManagePlan.Repository
             // Save the Excel package to the specified path
             package.SaveAs(new FileInfo(filePath));
         }
+        public bool CheckInt(ExcelRangeBase cell)
+        {
+            
+            if (cell.Value != null)
+            {
+                return decimal.TryParse(cell.Value.ToString(), out decimal result);
+            }
+            return false;
+        }
     }
 }
