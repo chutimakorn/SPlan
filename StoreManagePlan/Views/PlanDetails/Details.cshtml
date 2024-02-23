@@ -1,0 +1,72 @@
+﻿@model StoreManagePlan.Models.PlanDetail
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>PlanDetail</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_mon)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_mon)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_tues)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_tues)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_wed)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_wed)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_thu)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_thu)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_fri)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_fri)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_sat)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_sat)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_sun)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_sun)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.store)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.store.id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.item)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.item.id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

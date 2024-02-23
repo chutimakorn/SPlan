@@ -243,13 +243,15 @@ namespace StoreManagePlan.Controllers
                             var excelUpdateList = new List<Store>();
                             for (int row = 3; row <= rowCount; row++)
                             {
-                                var effDate = worksheet.Cells[row, 3];
+                                
                                 var itemOld =  _context.Store.Where(i => i.store_code == worksheet.Cells[row, 2].Value.ToString()).SingleOrDefault();
 
                                 var storeType = _context.StoreType.Where(i => i.store_type_code == worksheet.Cells[row, 1].Value.ToString()).SingleOrDefault();
 
 
                                 var storeName = worksheet.Cells[row, 3].Value.ToString();
+                                var startDate = worksheet.Cells[row, 4].Value.ToString();
+                                var endDate = worksheet.Cells[row, 5].Value.ToString();
 
 
                                 if (storeType == null)
@@ -271,7 +273,8 @@ namespace StoreManagePlan.Controllers
                                     itemOld.type_id = storeType.id;
                                     itemOld.store_code = itemOld.store_code;
                                     itemOld.store_name = storeName;
-                                    itemOld.update_date = _utility.CreateDate();
+                                    itemOld.start_date = startDate;
+                                    itemOld.end_date = endDate;
                                     excelUpdateList.Add(itemOld);
                                 }
                                 else
@@ -282,8 +285,8 @@ namespace StoreManagePlan.Controllers
                                         type_id = storeType.id,
                                         store_name = storeName,
                                         store_code = worksheet.Cells[row, 2].Value.ToString(),
-                                        create_date = _utility.CreateDate(),
-                                        update_date = _utility.CreateDate(),
+                                        start_date = startDate,
+                                        end_date = endDate,
                                     });
 
                                 }
@@ -364,8 +367,8 @@ namespace StoreManagePlan.Controllers
                 worksheet.Cells[1, 1].Value = "type code";
                 worksheet.Cells[1, 2].Value = "store code";
                 worksheet.Cells[1, 3].Value = "store name";
-                worksheet.Cells[1, 4].Value = "Create date";
-                worksheet.Cells[1, 5].Value = "Update date";
+                worksheet.Cells[1, 4].Value = "Start date";
+                worksheet.Cells[1, 5].Value = "End date";
                 // Add more columns as needed
 
                 // Data
@@ -376,8 +379,8 @@ namespace StoreManagePlan.Controllers
                     worksheet.Cells[i + 2, 1].Value = storeType.store_type_code;
                     worksheet.Cells[i + 2, 2].Value = data[i].store_code;
                     worksheet.Cells[i + 2, 3].Value = data[i].store_name;
-                    worksheet.Cells[i + 2, 4].Value = data[i].create_date;
-                    worksheet.Cells[i + 2, 5].Value = data[i].update_date;
+                    worksheet.Cells[i + 2, 4].Value = data[i].start_date;
+                    worksheet.Cells[i + 2, 5].Value = data[i].end_date;
                     // Add more columns as needed
                 }
 

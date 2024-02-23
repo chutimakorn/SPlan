@@ -1,9 +1,31 @@
-﻿@* @model IEnumerable<StoreManagePlan.Models.ItemFeature> *@
+﻿@model IEnumerable<StoreManagePlan.Models.PlanDetail>
 @using StoreManagePlan.Controllers
 
 @{
     ViewData["Title"] = "Index";
     var disable = "";
+
+    var arialSelectSummary = "true";
+    var arialSelectDetail = "false";
+    var modalSummary = "active show";
+    var modalDetail = "";
+
+    if (ViewBag.detail == "active")
+    {
+        arialSelectSummary = "false";
+        arialSelectDetail = "true";
+        modalSummary = "";
+        modalDetail = "active show";
+    }
+    else
+    {
+
+        arialSelectSummary = "true";
+        arialSelectDetail = "false";
+        modalSummary = "active show";
+        modalDetail = "";
+    }
+
 
 }
 
@@ -32,73 +54,38 @@
 
     <div class="mb-3" style="width:25%">
         <label for="defaultSelect" class="form-label">Period</label>
-        <select id="defaultSelect" class="form-select">
-            <option>W1 2024-01-08 2024-01-14</option>
-            <option value="1">W2 2024-01-15 2024-01-21</option>
-            <option value="2">W3 2024-01-22 2024-01-28</option>
+        <form asp-action="Index" method="get" id="index">
+            <input id="store" name="storeId" type="hidden" />
+            <input id="tab" name="TabNo" type="hidden" />
+            <select id="week" name="weekNo" class="form-select">
+                <option value="1">W1 2024-01-08 2024-01-14</option>
+                <option value="2">W2 2024-01-15 2024-01-21</option>
+                <option value="3">W3 2024-01-22 2024-01-28</option>
 
-        </select>
+            </select>
+        </form>
+
         <br />
         <label for="defaultSelect" class="form-label">Product Plan Status : Insufficient On Hand</label>
     </div>
     <div class="nav-align-top ">
         <ul class="nav nav-pills mb-3" role="tablist">
             <li class="nav-item">
-                <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="true">
+                <button type="button" class="nav-link @ViewBag.summary" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="@arialSelectSummary" id="summaryTab">
                     Summary
                 </button>
             </li>
             <li class="nav-item">
-                <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="false">
+                <button type="button" class="nav-link @ViewBag.detail" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="@arialSelectDetail" id="detailTab">
                     Detail
                 </button>
             </li>
 
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+            <div class="tab-pane fade @modalSummary" id="navs-pills-top-home" role="tabpanel">
 
 
-                <div class="card">
-                    <h5 class="card-header">Summary by Product</h5>
-                    <div class="table-responsive text-nowrap">
-                        <table class="table">
-                            <thead style="background-color:#80808038">
-                                <tr class="text-nowrap">
-
-                                    <th>Product</th>
-                                    <th style="text-align:right">Plan Quality</th>
-                                    <th style="text-align:right">%</th>
-
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>cake</th>
-                                    <th style="text-align:right">149.317</th>
-                                    <th style="text-align:right">24.85%</th>
-
-                                </tr>
-                                <tr>
-                                    <th>cookie</th>
-                                    <th style="text-align:right">105</th>
-                                    <th style="text-align:right">0.02%</th>
-
-                                </tr>
-                            </tbody>
-                            <tfoot class="table-border-bottom-0" style="background-color:#80808038">
-                                <tr>
-                                    <th>Grand Total</th>
-                                    <th style="text-align:right">600.810</th>
-                                    <th style="text-align:right">100%</th>
-
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-                <br />
                 <div class="card">
                     <h5 class="card-header">Summary by Store</h5>
                     <div class="table-responsive text-nowrap">
@@ -116,22 +103,22 @@
                             <tbody>
                                 <tr>
                                     <th>Hub</th>
-                                    <th style="text-align:right">87.317</th>
-                                    <th style="text-align:right">24.85%</th>
+                                    <th style="text-align:right">@ViewBag.hubQTY</th>
+                                    <th style="text-align:right">@ViewBag.hubPST%</th>
 
                                 </tr>
                                 <tr>
                                     <th>Spoks</th>
-                                    <th style="text-align:right">23</th>
-                                    <th style="text-align:right">0.02%</th>
+                                    <th style="text-align:right">@ViewBag.spokeQTY</th>
+                                    <th style="text-align:right">@ViewBag.spokePST%</th>
 
                                 </tr>
                             </tbody>
                             <tfoot class="table-border-bottom-0" style="background-color:#80808038">
                                 <tr>
                                     <th>Grand Total</th>
-                                    <th style="text-align:right">600.810</th>
-                                    <th style="text-align:right">100%</th>
+                                    <th style="text-align:right">@ViewBag.totalQTY</th>
+                                    <th style="text-align:right">@ViewBag.totalPST%</th>
 
                                 </tr>
                             </tfoot>
@@ -144,15 +131,27 @@
 
 
             </div>
-            <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
+            <div class="tab-pane fade @modalDetail" id="navs-pills-top-profile" role="tabpanel">
+
 
                 <div class="mb-3" style="width:25%">
+                    <form asp-action="SelectStore" method="post" id="storeSubmit">
+                        <input id="weekDetail" name="WeekNo" type="hidden" />
+                        <input id="tabDetail" name="TabNo" type="hidden" />
+                        <select id="storeDetail" name="storeId" class="form-select">
+                            <option value="0">Select Store</option>
+                            @{
+                                List<Store> store = ViewBag.store;
+                                foreach (var n in store)
+                                {
+                                    <option value="@n.id">@n.store_name</option>
+                                }
 
-                    <select id="defaultSelect" class="form-select">
-                        <option>Select Store</option>
-                        <option value="1">BIGC</option>
-                        <option value="2">LOTUS</option>
-                    </select>
+                            }
+
+                        </select>
+                    </form>
+
 
                 </div>
 
@@ -170,91 +169,46 @@
                                     <th rowspan="2" style="vertical-align: middle;">รายการ</th>
 
                                     <!-- Column 3 to 8 -->
-                                    <th colspan="6" class="text-center">Mon - 08</th>
-                                    <th colspan="6" class="text-center">Mon - 15</th>
-                                    <th colspan="6" class="text-center">Mon - 22</th>
-                                    <th colspan="6" class="text-center">Mon - 29</th>
+                                    <th class="text-center">Monday</th>
+                                    <th class="text-center">Tuesday</th>
+                                    <th class="text-center">Wednesday</th>
+                                    <th class="text-center">Thuesday</th>
+                                    <th class="text-center">Friday</th>
+                                    <th class="text-center">Saturday</th>
+                                    <th class="text-center">Sunday</th>
                                 </tr>
 
                                 <tr class="text-nowrap">
-                                    <!-- Column 3 -->
-                                    <th>RunRate</th>
 
-                                    <!-- Column 4 -->
-                                    <th>1P</th>
-
-                                    <!-- Column 5 -->
-                                    <th>InStore</th>
-
-                                    <!-- Column 6 -->
-                                    <th>Normal Uplift</th>
-
-                                    <!-- Column 7 -->
-                                    <th>Uplift Weighting</th>
-
-                                    <!-- Column 8 -->
                                     <th>Plan</th>
-
-                                    <!-- Column 9 -->
-                                    <th>RunRate</th>
-
-                                    <!-- Column 10 -->
-                                    <th>1P</th>
-
-                                    <!-- Column 11 -->
-                                    <th>InStore</th>
-
-                                    <!-- Column 12 -->
-                                    <th>Normal Uplift</th>
-
-                                    <!-- Column 13 -->
-                                    <th>Uplift Weighting</th>
-
-                                    <!-- Column 14 -->
                                     <th>Plan</th>
-
-                                    <!-- Column 15 -->
-                                    <th>RunRate</th>
-
-                                    <!-- Column 16 -->
-                                    <th>1P</th>
-
-                                    <!-- Column 17 -->
-                                    <th>InStore</th>
-
-                                    <!-- Column 18 -->
-                                    <th>Normal Uplift</th>
-
-                                    <!-- Column 19 -->
-                                    <th>Uplift Weighting</th>
-
-                                    <!-- Column 20 -->
                                     <th>Plan</th>
-
-                                    <!-- Column 21 -->
-                                    <th>RunRate</th>
-
-                                    <!-- Column 22 -->
-                                    <th>1P</th>
-
-                                    <!-- Column 23 -->
-                                    <th>InStore</th>
-
-                                    <!-- Column 24 -->
-                                    <th>Normal Uplift</th>
-
-                                    <!-- Column 25 -->
-                                    <th>Uplift Weighting</th>
-
-                                    <!-- Column 26 -->
+                                    <th>Plan</th>
+                                    <th>Plan</th>
+                                    <th>Plan</th>
                                     <th>Plan</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="26" class="text-center">No data</td>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
 
-                                </tr>
+
+                                        <td class="text-center">@item.item.sku_code</td>
+                                        <td class="text-center">@item.item.sku_name</td>
+                                        <td class="text-center">@item.plan_mon</td>
+                                        <td class="text-center">@item.plan_tues</td>
+                                        <td class="text-center">@item.plan_wed</td>
+                                        <td class="text-center">@item.plan_thu</td>
+                                        <td class="text-center">@item.plan_fri</td>
+                                        <td class="text-center">@item.plan_sat</td>
+                                        <td class="text-center">@item.plan_sun</td>
+
+
+
+                                    </tr>
+                                }
 
                             </tbody>
 
@@ -277,25 +231,30 @@
                 <label for="defaultSelect" class="form-label">Insufficient On Hand</label>
 
                 <br />
-                <form asp-action="Submit" method="post">
 
 
-                    <div class="mt-3 mb-3">
 
-                        <div class="d-flex justify-content-start">
-                            <div class="btn-group" style="margin-right:2%">
+                <div class="mt-3 mb-3">
+
+                    <div class="d-flex justify-content-start">
+                        <form asp-action="Calculate" method="post" style="margin-right:2%">
+                            <input name="weekNo" type="hidden" id="weekCal" />
+                            <div class="btn-group">
                                 <button type="submit" id="submit-btn" class="btn btn-secondary" @disable>&nbsp; Calculate</button>
 
                             </div>
+                        </form>
+                        <form asp-action="Submit" method="post">
                             <div class="btn-group">
 
                                 <button type="submit" id="submit-btn" class="btn btn-success" @disable>&nbsp; Submit</button>
 
                             </div>
-                        </div>
+                        </form>
                     </div>
+                </div>
 
-                </form>
+
             </div>
         </div>
 
@@ -350,3 +309,55 @@
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
 <script src="~/js/app/itemFeature.js"></script>
 
+<script>
+    $(document).ready(function () {
+
+        $("#tabDetail").val(@ViewBag.tabNo);
+        $("#tab").val(@ViewBag.tabNo);
+
+
+        $("#summaryTab").on("click", function () {
+            // ตั้งค่า id ของ element เป็น 0
+            $("#tab").val(0);
+            $("#tabDetail").val(0);
+        });
+
+        // เมื่อคลิกที่ปุ่ม Detail
+        $("#detailTab").on("click", function () {
+            // ตั้งค่า id ของ element เป็น 1
+            $("#tab").val(1);
+            $("#tabDetail").val(1);
+        });
+
+        $("#week").val(@ViewBag.weekNo);
+
+        // ตั้งค่าให้กับ input ที่มี id เป็น 'weekNo'
+        $("#weekNo").val(@ViewBag.weekNo);
+        $("#weekDetail").val(@ViewBag.weekNo);
+        $("#storeDetail").val(@ViewBag.storeId);
+        $("#store").val(@ViewBag.storeId);
+
+        // เมื่อมีการเลือกรายการใน dropdown
+        $("#week").change(function () {
+            // ดึงค่าที่ถูกเลือก
+            var selectedValue = $(this).val();
+
+            // นำค่าที่ถูกเลือกมาใส่ใน input ที่มี id เป็น 'weekNo'
+
+            $("#weekCal").val(selectedValue);
+            $("#weekDetail").val(selectedValue);
+            $("#index").submit();
+        });
+        $("#storeDetail").change(function () {
+            // ดึงค่าที่ถูกเลือก
+            var selectedValue = $(this).val();
+
+            // นำค่าที่ถูกเลือกมาใส่ใน input ที่มี id เป็น 'weekNo'
+
+
+            $("#store").val(selectedValue);
+            $("#storeSubmit").submit();
+
+        });
+    });
+</script>

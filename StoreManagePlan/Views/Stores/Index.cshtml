@@ -181,8 +181,8 @@
                                 {
                                     @foreach (var item in Model)
                                     {
-                                        var Cdate = resource.ConvertDate(item.create_date);
-                                        var Udate = resource.ConvertDate(item.update_date);
+                                        var Cdate = resource.ConvertDate(item.start_date);
+                                        var Udate = resource.ConvertDate(item.end_date);
                                         <tr>
                                             @*    <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td> *@
                                             <td>@item.store_code</td>

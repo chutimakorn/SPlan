@@ -21,6 +21,9 @@ namespace StoreManagePlan.Data
         public DbSet<ImportLog> ImportLog { get; set; }
         public DbSet<Bom> Bom { get; set; }
         public DbSet<StoreRelation> StoreRelation { get; set; }
+        public DbSet<SaleHistory> SaleHistory { get; set; }
+        public DbSet<Week> Week { get; set; }
+        public DbSet<PlanDetail> PlanDetail { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,7 +33,10 @@ namespace StoreManagePlan.Data
             modelBuilder.Entity<Store>().ToTable("Store");
             modelBuilder.Entity<StoreType>().ToTable("StoreType");
             modelBuilder.Entity<ImportLog>().ToTable("ImportLog");
+            modelBuilder.Entity<Week>().ToTable("Week");
+            modelBuilder.Entity<SaleHistory>().ToTable("SaleHistory");
             modelBuilder.Entity<Bom>().ToTable("Bom").HasKey(pf => new { pf.sku_id, pf.ingredient_sku });
+            modelBuilder.Entity<PlanDetail>().ToTable("PlanDetail");
         }
     }
 }
