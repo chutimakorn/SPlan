@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using OfficeOpenXml;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
 using StoreManagePlan.Repository;
@@ -428,6 +429,64 @@ namespace StoreManagePlan.Controllers
             {
                 return View();
             }
+        }
+
+        public IActionResult ExportToExcel(int weekNo, int storeId)
+        {
+
+            IQueryable<PlanDetail>? modelQuery = _context.PlanDetail
+                .Include(m => m.store)
+                .ThenInclude(m => m.store_type)
+                .Include(m => m.item)
+                .Where(m => m.week_no == weekNo);
+            if (storeId != 0)
+            {
+                modelQuery = modelQuery.Where(m => m.store_id == storeId);
+            }
+
+            var data = modelQuery.ToList();
+
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                // Header
+                worksheet.Cells[1, 1].Value = "store code";
+                worksheet.Cells[1, 2].Value = "sku code";
+                worksheet.Cells[1, 3].Value = "Plan(Mon.)";
+                worksheet.Cells[1, 4].Value = "Plan(Tue.)";
+                worksheet.Cells[1, 5].Value = "Plan(Wed.)";
+                worksheet.Cells[1, 6].Value = "Plan(Thu.)";
+                worksheet.Cells[1, 7].Value = "Plan(Fri.)";
+                worksheet.Cells[1, 8].Value = "Plan(Sat.)";
+                worksheet.Cells[1, 9].Value = "Plan(Sun.)";
+                // Add more columns as needed
+
+                // Data
+
+                for (var i = 0; i < data.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = data[i].store_id;
+                    worksheet.Cells[i + 2, 2].Value = data[i].sku_id;
+                    worksheet.Cells[i + 2, 3].Value = data[i].plan_mon;
+                    worksheet.Cells[i + 2, 4].Value = data[i].plan_tues;
+                    worksheet.Cells[i + 2, 5].Value = data[i].plan_wed;
+                    worksheet.Cells[i + 2, 6].Value = data[i].plan_thu;
+                    worksheet.Cells[i + 2, 7].Value = data[i].plan_fri;
+                    worksheet.Cells[i + 2, 8].Value = data[i].plan_sat;
+                    worksheet.Cells[i + 2, 9].Value = data[i].plan_sun;
+                    // Add more columns as needed
+                }
+
+                package.Save(); // Save the Excel package
+            }
+
+            stream.Position = 0;
+
+            // Set the content type and file name
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PlanDetail_List.xlsx");
         }
     }
 }
