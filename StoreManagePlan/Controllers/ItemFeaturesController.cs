@@ -443,14 +443,15 @@ namespace StoreManagePlan.Controllers
                 // Add more columns as needed
 
                 // Data
+
                 for (var i = 0; i < data.Count; i++)
                 {
 
                     var store = _context.Store.Where(m => m.id == data[i].store_id).SingleOrDefault();
                     var storeType = _context.Item.Where(m => m.id == data[i].item_id).SingleOrDefault();
 
-                    worksheet.Cells[i + 2, 1].Value = store.store_code;
-                    worksheet.Cells[i + 2, 2].Value = storeType.sku_code;
+                    worksheet.Cells[i + 2, 1].Value = store == null ? "" : store.store_code;
+                    worksheet.Cells[i + 2, 2].Value = storeType == null ? "" : storeType.sku_code;
                     worksheet.Cells[i + 2, 3].Value = data[i].minimum_feature;
                     worksheet.Cells[i + 2, 4].Value = data[i].maximum_feature;
                     worksheet.Cells[i + 2, 5].Value = data[i].default_feature;
