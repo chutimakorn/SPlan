@@ -21,10 +21,13 @@ namespace StoreManagePlan.Models
         public int plan_fri { get; set; }
         public int plan_sat { get; set; }
         public int plan_sun { get; set; }
+
+        [ForeignKey("week")]
         public int week_no { get; set; }
        
         public Store store { get; set; }
         public Item item { get; set; }
+        public Week week { get; set; }
     
     }
 }

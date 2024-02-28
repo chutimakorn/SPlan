@@ -343,6 +343,8 @@ namespace StoreManagePlan.Controllers
         }
 
 
+
+
         [HttpPost]
         public IActionResult SelectStore(int weekNo, int storeId,int TabNo)
         {
