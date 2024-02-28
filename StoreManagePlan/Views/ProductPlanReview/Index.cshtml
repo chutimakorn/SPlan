@@ -3,12 +3,13 @@
 
 @{
     ViewData["Title"] = "Index";
-   
+
 
     var arialSelectSummary = "true";
     var arialSelectDetail = "false";
     var modalSummary = "active show";
     var modalDetail = "";
+    var status_text = "INSUFFICIENT ON HAND";
 
     if (ViewBag.detail == "active")
     {
@@ -32,6 +33,22 @@
     int weekNo = ViewBag.weekNo;
 
     var statusPlan = weekList.Where(m => m.week_no == weekNo).Select(m => m.status).SingleOrDefault();
+
+    if(statusPlan == 1)
+    {
+        status_text = "SUBMITED";
+    }else if(statusPlan == 2)
+    {
+        status_text = "APPROVED";
+    }
+    else if (statusPlan == 3)
+    {
+        status_text = "REJECTED";
+    }
+    else
+    {
+        status_text = "INSUFFICIENT ON HAND";
+    }
 
 }
 
@@ -75,7 +92,7 @@
         </form>
 
         <br />
-        <label for="defaultSelect" class="form-label">Product Plan Status : Insufficient On Hand</label>
+        <label for="defaultSelect" class="form-label">Product Plan Status : @status_text</label>
     </div>
     <div class="nav-align-top ">
         <ul class="nav nav-pills mb-3" role="tablist">
@@ -144,7 +161,7 @@
 
 
                 <div class="mb-3" style="width:25%">
-                    <form asp-action="SelectStore" method="post" id="storeSubmit">
+                    <form asp-action="SelectStore" method="post" id="storeChange">
                         <input id="weekDetail" name="WeekNo" type="hidden" />
                         <input id="tabDetail" name="TabNo" type="hidden" />
                         <select id="storeDetail" name="storeId" class="form-select">
@@ -235,28 +252,31 @@
                 </div>
             </div>
             <div>
-                <label for="defaultSelect" class="form-label">Comment</label>
+              @*   <label for="defaultSelect" class="form-label">Comment</label>
                 <br />
-                <label for="defaultSelect" class="form-label">Insufficient On Hand</label>
+                <label for="defaultSelect" class="form-label">@status_text</label>
 
                 <br />
 
-
+ *@
 
                 <div class="mt-3 mb-3">
 
                     <div class="d-flex justify-content-start">
                         <form asp-action="Calculate" method="post" style="margin-right:2%">
                             <input name="weekNo" type="hidden" id="weekCal" />
+                            <input name="storeId" type="hidden" id="storeCal" />
                             <div class="btn-group">
-                                <button type="submit" id="submit-btn" class="btn btn-secondary" @(statusPlan == 1 ? "disabled" : "")>&nbsp; Calculate</button>
+                                <button type="submit" id="submit-btn" class="btn btn-secondary" @(statusPlan == 2 || statusPlan == 1? "disabled" : "")>&nbsp; Calculate</button>
 
                             </div>
                         </form>
                         <form asp-action="Submit" method="post">
+                            <input name="weekNo" type="hidden" id="weekSubmit" />
+                            <input name="storeId" type="hidden" id="storeSubmit" />
                             <div class="btn-group">
 
-                                <button type="submit" id="submit-btn" class="btn btn-success" @(statusPlan == 1 ? "disabled" : "")>&nbsp; Submit</button>
+                                <button type="submit" id="submit-btn" class="btn btn-success" @(statusPlan == 2 || statusPlan == 1 ? "disabled" : "")>&nbsp; Submit</button>
 
                             </div>
                         </form>
@@ -324,7 +344,7 @@
         $("#tabDetail").val(@ViewBag.tabNo);
         $("#tab").val(@ViewBag.tabNo);
 
-
+            
         $("#summaryTab").on("click", function () {
             // ตั้งค่า id ของ element เป็น 0
             $("#tab").val(0);
@@ -338,13 +358,18 @@
             $("#tabDetail").val(1);
         });
 
-        $("#week").val(@ViewBag.weekNo);
 
         // ตั้งค่าให้กับ input ที่มี id เป็น 'weekNo'
         $("#weekNo").val(@ViewBag.weekNo);
+        $("#week").val(@ViewBag.weekNo);
         $("#weekDetail").val(@ViewBag.weekNo);
         $("#storeDetail").val(@ViewBag.storeId);
         $("#store").val(@ViewBag.storeId);
+        $("#storeCal").val(@ViewBag.storeId);
+        $("#storeSubmit").val(@ViewBag.storeId);
+
+        $("#weekCal").val(@ViewBag.weekNo);
+        $("#weekSubmit").val(@ViewBag.weekNo);
 
         // เมื่อมีการเลือกรายการใน dropdown
         $("#week").change(function () {
@@ -355,6 +380,7 @@
 
             $("#weekCal").val(selectedValue);
             $("#weekDetail").val(selectedValue);
+            $("#weekSubmit").val(selectedValue);
             $("#index").submit();
         });
         $("#storeDetail").change(function () {
@@ -365,7 +391,9 @@
 
 
             $("#store").val(selectedValue);
-            $("#storeSubmit").submit();
+            $("#storeSubmit").val(selectedValue);
+            $("#storeCal").val(selectedValue);
+            $("#storeChange").submit();
 
         });
     });

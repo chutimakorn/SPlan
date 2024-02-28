@@ -9,6 +9,7 @@
     var arialSelectDetail = "false";
     var modalSummary = "active show";
     var modalDetail = "";
+    var status_text = "INSUFFICIENT ON HAND";
 
     if (ViewBag.detail == "active")
     {
@@ -32,6 +33,25 @@
     int weekNo = ViewBag.weekNo;
 
     var statusPlan = weekList.Where(m => m.week_no == weekNo).Select(m => m.status).SingleOrDefault();
+
+   
+
+    if (statusPlan == 1)
+    {
+        status_text = "SUBMITED";
+    }
+    else if (statusPlan == 2)
+    {
+        status_text = "APPROVED";
+    }
+    else if (statusPlan == 3)
+    {
+        status_text = "REJECTED";
+    }
+    else
+    {
+        status_text = "INSUFFICIENT ON HAND";
+    }
 
 }
 
@@ -75,7 +95,7 @@
         </form>
 
         <br />
-        <label for="defaultSelect" class="form-label">Product Plan Status : Insufficient On Hand</label>
+        <label for="defaultSelect" class="form-label">Product Plan Status : @status_text</label>
     </div>
     <div class="nav-align-top ">
         <ul class="nav nav-pills mb-3" role="tablist">
@@ -235,31 +255,35 @@
                 </div>
             </div>
             <div>
-                <label for="defaultSelect" class="form-label">Comment</label>
+               @*  <label for="defaultSelect" class="form-label">Comment</label>
                 <br />
                 <label for="defaultSelect" class="form-label">Insufficient On Hand</label>
 
                 <br />
-
+ *@
 
 
                 <div class="mt-3 mb-3">
 
                     <div class="d-flex justify-content-start">
-                        <form asp-action="Calculate" method="post" style="margin-right:2%">
-                            <input name="weekNo" type="hidden" id="weekCal" />
+                        <form asp-action="Approve" method="post" style="margin-right:2%">
+                            <input name="weekNo" type="hidden" id="weekApprove" />
+                            <input name="storeId" type="hidden" id="storeApprove" />
                             <div class="btn-group">
-                                <button type="submit" id="submit-btn" class="btn btn-secondary" @(statusPlan == 1 ? "disabled" : "")>&nbsp; Calculate</button>
+                                <button type="submit" id="submit-btn" class="btn btn-success" @(statusPlan == 1 ? "" : "disabled")>&nbsp; Approve</button>
 
                             </div>
                         </form>
-                        <form asp-action="Submit" method="post">
+                        <form asp-action="Reject" method="post">
+                            <input name="weekNo" type="hidden" id="weekReject" />
+                            <input name="storeId" type="hidden" id="storeReject" />
                             <div class="btn-group">
 
-                                <button type="submit" id="submit-btn" class="btn btn-success" @(statusPlan == 1 ? "disabled" : "")>&nbsp; Submit</button>
+                                <button type="submit" id="submit-btn" class="btn btn-danger" @(statusPlan == 1 ? "" : "disabled")>&nbsp; Reject</button>
 
                             </div>
                         </form>
+
                     </div>
                 </div>
 
@@ -338,13 +362,18 @@
             $("#tabDetail").val(1);
         });
 
-        $("#week").val(@ViewBag.weekNo);
 
         // ตั้งค่าให้กับ input ที่มี id เป็น 'weekNo'
         $("#weekNo").val(@ViewBag.weekNo);
+        $("#week").val(@ViewBag.weekNo);
         $("#weekDetail").val(@ViewBag.weekNo);
         $("#storeDetail").val(@ViewBag.storeId);
         $("#store").val(@ViewBag.storeId);
+        $("#storeApprove").val(@ViewBag.storeId);
+        $("#storeReject").val(@ViewBag.storeId);
+
+        $("#weekApprove").val(@ViewBag.weekNo);
+        $("#weekReject").val(@ViewBag.weekNo);
 
         // เมื่อมีการเลือกรายการใน dropdown
         $("#week").change(function () {
@@ -353,8 +382,9 @@
 
             // นำค่าที่ถูกเลือกมาใส่ใน input ที่มี id เป็น 'weekNo'
 
-            $("#weekCal").val(selectedValue);
+            $("#weekApprove").val(selectedValue);
             $("#weekDetail").val(selectedValue);
+            $("#weekReject").val(selectedValue);
             $("#index").submit();
         });
         $("#storeDetail").change(function () {
@@ -365,7 +395,9 @@
 
 
             $("#store").val(selectedValue);
-            $("#storeSubmit").submit();
+            $("#storeReject").val(selectedValue);
+            $("#storeApprove").val(selectedValue);
+            $("#storeChange").submit();
 
         });
     });
