@@ -1,0 +1,79 @@
+﻿@model StoreManagePlan.Models.PlanDetail
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>PlanDetail</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+            <div class="form-group">
+                <label asp-for="sku_id" class="control-label"></label>
+                <select asp-for="sku_id" class="form-control" asp-items="ViewBag.sku_id"></select>
+                <span asp-validation-for="sku_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="store_id" class="control-label"></label>
+                <select asp-for="store_id" class="form-control" asp-items="ViewBag.store_id"></select>
+                <span asp-validation-for="store_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_mon" class="control-label"></label>
+                <input asp-for="plan_mon" class="form-control" />
+                <span asp-validation-for="plan_mon" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_tues" class="control-label"></label>
+                <input asp-for="plan_tues" class="form-control" />
+                <span asp-validation-for="plan_tues" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_wed" class="control-label"></label>
+                <input asp-for="plan_wed" class="form-control" />
+                <span asp-validation-for="plan_wed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_thu" class="control-label"></label>
+                <input asp-for="plan_thu" class="form-control" />
+                <span asp-validation-for="plan_thu" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_fri" class="control-label"></label>
+                <input asp-for="plan_fri" class="form-control" />
+                <span asp-validation-for="plan_fri" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_sat" class="control-label"></label>
+                <input asp-for="plan_sat" class="form-control" />
+                <span asp-validation-for="plan_sat" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plan_sun" class="control-label"></label>
+                <input asp-for="plan_sun" class="form-control" />
+                <span asp-validation-for="plan_sun" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="week_no" class="control-label"></label>
+                <select asp-for="week_no" class="form-control" asp-items="ViewBag.week_no"></select>
+                <span asp-validation-for="week_no" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

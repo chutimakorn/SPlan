@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 using OfficeOpenXml;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
@@ -17,10 +18,13 @@ namespace StoreManagePlan.Controllers
         private readonly StoreManagePlanContext _context;
         private readonly IWebHostEnvironment _hostingEnvironment;
         public static string _menu = "ppr";
-        public ProductPlanReviewController(StoreManagePlanContext context, IUtility utility)
+        private readonly IConfiguration _configuration;
+
+        public ProductPlanReviewController(StoreManagePlanContext context, IUtility utility, IConfiguration configuration)
         {
             _context = context;
             this._utility = utility;
+            _configuration = configuration;
         }
 
 
@@ -34,6 +38,8 @@ namespace StoreManagePlan.Controllers
             ViewBag.storeId = storeId;
             ViewBag.tabNo = TabNo;
             ViewBag.store = _context.Store.ToList();
+            ViewBag.weekMaster = _context.Week.ToList();
+
             if (TabNo == 0)
             {
                 ViewBag.summary = "active";
@@ -45,8 +51,8 @@ namespace StoreManagePlan.Controllers
 
             if (weekNo == 0)
             {
-                weekNo = 1;
-                ViewBag.weekNo = 1;
+                weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                ViewBag.weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
             }
             else
             {
@@ -59,13 +65,16 @@ namespace StoreManagePlan.Controllers
                 modelQuery = modelQuery.Where(m => m.store_id == storeId);
             }
 
+           
 
+           
 
+           
 
 
             var model = modelQuery.Where(m => m.week_no == weekNo).ToList();
 
-          
+           
             var plan = _context.PlanDetail.Include(m => m.store).ThenInclude(m => m.store_type).Include(m => m.item).Where(m => m.week_no == weekNo).ToList();
 
             ViewBag.hubQTY = 0;
@@ -115,6 +124,7 @@ namespace StoreManagePlan.Controllers
             ViewBag.weekNo = weekNo;
             ViewBag.storeId = storeId;
             ViewBag.store = _context.Store.ToList();
+            ViewBag.weekMaster = _context.Week.ToList();
 
             var date = Convert.ToInt32(_utility.CreateDate());
             var storeList = _context.Store
@@ -343,6 +353,42 @@ namespace StoreManagePlan.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> Submit(int weekNo, int storeId)
+        {
+
+
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
+            ViewBag.menu = "ppr";
+            ViewBag.weekNo = weekNo;
+            ViewBag.storeId = storeId;
+            ViewBag.store = _context.Store.ToList();
+            ViewBag.weekMaster = _context.Week.ToList();
+
+
+            var weekMaster = _context.Week.Where(m => m.week_no == weekNo).SingleOrDefault();
+
+            //submit == 1
+            //approve == 2
+            //reject == 3
+            //default == 0 || null
+
+            weekMaster.status = 1;
+
+            _context.Update(weekMaster);
+
+            await _context.SaveChangesAsync();
+
+            IQueryable<PlanDetail>? modelQuery = _context.PlanDetail.Include(m => m.store).Include(m => m.item);
+            if (storeId != 0)
+            {
+                modelQuery = modelQuery.Where(m => m.store_id == storeId);
+            }
+
+            var model = modelQuery.Where(m => m.week_no == weekNo).ToList();
+            return View("Index", model);
+        }
+
 
 
         [HttpPost]
@@ -355,7 +401,9 @@ namespace StoreManagePlan.Controllers
             ViewBag.store = _context.Store.ToList();
             ViewBag.weekNo = weekNo;
             ViewBag.tabNo = TabNo;
-            if(TabNo == 0)
+            ViewBag.weekMaster = _context.Week.ToList();
+
+            if (TabNo == 0)
             {
                 ViewBag.summary = "active";
             }

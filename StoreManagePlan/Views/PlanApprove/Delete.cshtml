@@ -1,0 +1,81 @@
+﻿@model StoreManagePlan.Models.PlanDetail
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>PlanDetail</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_mon)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_mon)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_tues)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_tues)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_wed)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_wed)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_thu)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_thu)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_fri)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_fri)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_sat)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_sat)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_sun)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_sun)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.store)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.store.id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.item)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.item.id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.week)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.week.week_no)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
