@@ -1,5 +1,181 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<StoreManagePlan.Models.PlanDetailModel>
+@using StoreManagePlan.Controllers
+
 @{
+    ResourceController resource = new ResourceController();
+    ViewData["Title"] = "Index";
+    List<Week> weekList = new List<Week>(ViewBag.weekList);
+    List<Store> storeList = new List<Store>(ViewBag.storeList);
 }
+<header>
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+    <script src="~/js/app/planOfWeek.js"></script>
+</header>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <div class="bs-toast toast toast-placement-ex fade bg-success top-0 end-0 m-2" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกสำเร็จ.
+        </div>
+    </div>
+
+    <div class="bs-toast toast toast-placement-ex fade bg-danger top-0 end-0 m-2" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">แจ้งเตือน</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            บันทึกไม่สำเร็จ.
+        </div>
+    </div>
+    <form id="form1" asp-action="Index" method="get">
+
+        <div class="mb-3">
+
+            <div class="row">
+                <div class="col-5">
+                    <select id="html5-date-input-store" name="Store" class="form-select select-action">
+                        @{
+
+                            foreach (var item in storeList)
+                            {
+                                <option value="@item.id">@item.store_code - @item.store_name</option>
+                            }
+
+                        }
+                    </select>
+                </div>
+                <div class="col-5">
+                    <select id="html5-date-input-week" name="Week" class="form-select select-action">
+                        @{
+
+                            foreach (var item in weekList)
+                            {
+                                var dateStart = resource.ConvertDate(item.start_date);
+                                var dateEnd = resource.ConvertDate(item.end_date);
+                                <option value="@item.week_no">W @item.week_no - @dateStart - @dateEnd</option>
+                            }
+
+                        }
+                    </select>
+                </div>
+                <div class="col-2">
+                    <div class="btn-group">
+                        <button type="submit" id="export-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-download"></span>&nbsp; Export</button>
+                    </div>
+                </div>
+            </div>
+
+            
+
+        </div>
+@*         <div class="mb-3">
+            <div style="display: flex;width: 30%;">
+                <select id="defaultSelectSeller" name="SpokeID" class="form-select" onchange="submitForm()">
+                    <option value="0">Select Seller</option>
+                    @{
+                        List<Store> spokeList = ViewBag.storeSpoke;
+                        foreach (var spoke in spokeList)
+                        {
+                            <option value="@spoke.id">@spoke.store_name</option>
+                        }
+
+                    }
+
+                </select>
+                <div style="align-self: center;margin-left:10px">
+                    <input type="button" class="btn btn-outline-secondary" value="Clear" onclick="clearSeller()" />
+
+                </div>
+            </div>
+        </div> *@
+@*         <div class="mb-3" style="width:30%;display: flex;">
+
+            <input id="html5-date-input-start" type="date" name="start" class="form-select" style="margin-right: 10px" onchange="submitForm()" />
+
+
+            <input id="html5-date-input-end" type="date" name="end" class="form-select" onchange="submitForm()" />
+
+
+        </div> *@
+
+    </form>
+
+    <div class="nav-align-top ">
+
+
+        <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                <div class="card" style="padding:10px">
+                    <h5 class="card-header">แผนประจำสัปดาห์</h5>
+                    <div class="card-datatable table-responsive">
+                        <table id="table-data" class="table" style="text-align-last: left;">
+                            <thead style="background-color:#c1c1c138">
+                                <tr class="text-nowrap">
+                                    <th rowspan="2" colspan="1">Sku Code</th>
+                                    <th rowspan="2" colspan="1">Sku Name</th>
+                                    <th rowspan="1" colspan="7" class="text-center">Plan</th>
+                                </tr>
+                                <tr class="text-nowrap">
+                                    <th rowspan="1" colspan="1">Mon</th>
+                                    <th rowspan="1" colspan="1">Thues</th>
+                                    <th rowspan="1" colspan="1">Wen</th>
+                                    <th rowspan="1" colspan="1">Thur</th>
+                                    <th rowspan="1" colspan="1">Fri</th>
+                                    <th rowspan="1" colspan="1">Sat</th>
+                                    <th rowspan="1" colspan="1">Sun</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.sku_code</td>
+                                        <td>@item.sku_name</td>
+                                        <td>@item.plan_mon</td>
+                                        <td>@item.plan_tues</td>
+                                        <td>@item.plan_wed</td>
+                                        <td>@item.plan_thu</td>
+                                        <td>@item.plan_fri</td>
+                                        <td>@item.plan_sat</td>
+                                        <td>@item.plan_sun</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+@*                 <form asp-action="Delete" method="post">
+                    <input type="hidden" id="hiddenInputId" name="selectedID" />
+                    <div class="mt-3 mb-3">
+                        <div class="d-flex justify-content-start">
+                            <div class="btn-group">
+                                <button type="submit" id="delete-btn" class="btn btn-outline-danger"><span class="tf-icons bx bx-trash"></span>&nbsp; Delete</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </form> *@
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $('#html5-date-input-store').val("@ViewBag.store");
+        $('#html5-date-input-week').val("@ViewBag.week");
+
+    });
+
+</script>
