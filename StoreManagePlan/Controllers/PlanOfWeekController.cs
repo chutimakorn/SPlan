@@ -197,6 +197,22 @@ namespace StoreManagePlan.Controllers
                     })
             .ToList();
 
+            var total = data
+                .GroupBy(pd => 1) // Group all results into a single group
+            .Select(group => new PlanDetailModel
+            {
+                sku_code = "Total", // You can use any identifier for the total row
+                sku_name = "Total",
+                plan_mon = group.Sum(pd => pd.plan_mon),
+                plan_tues = group.Sum(pd => pd.plan_tues),
+                plan_wed = group.Sum(pd => pd.plan_wed),
+                plan_thu = group.Sum(pd => pd.plan_thu),
+                plan_fri = group.Sum(pd => pd.plan_fri),
+                plan_sat = group.Sum(pd => pd.plan_sat),
+                plan_sun = group.Sum(pd => pd.plan_sun),
+            })
+            .ToList().FirstOrDefault();
+
             var stream = new MemoryStream();
 
             using (var package = new ExcelPackage(stream))
@@ -231,10 +247,27 @@ namespace StoreManagePlan.Controllers
                     // Add more columns as needed
                 }
 
+                var cnt = data.Count;
+
+                if (cnt > 0)
+                {
+                    //total
+                    worksheet.Cells[cnt + 3, 1].Value = "Total";
+                    worksheet.Cells[cnt + 3, 3].Value = total.plan_mon;
+                    worksheet.Cells[cnt + 3, 4].Value = total.plan_tues;
+                    worksheet.Cells[cnt + 3, 5].Value = total.plan_wed;
+                    worksheet.Cells[cnt + 3, 6].Value = total.plan_thu;
+                    worksheet.Cells[cnt + 3, 7].Value = total.plan_fri;
+                    worksheet.Cells[cnt + 3, 8].Value = total.plan_sat;
+                    worksheet.Cells[cnt + 3, 9].Value = total.plan_sun;
+                }
+
+
+
                 _utility.MergeRowspanHeaders(worksheet, 1, 1, 2, 1); // Merge from row 1 to row 2 in column 1
                 _utility.MergeRowspanHeaders(worksheet, 1, 2, 2, 2);
                 _utility.MergeColspanHeaders(worksheet, 1, 3, 1, 9); // Merge from column 2 to column 3 in row 1
-
+                _utility.MergeColspanHeaders(worksheet, cnt + 3, 1, cnt + 3, 2);
                 package.Save(); // Save the Excel package
             }
 
