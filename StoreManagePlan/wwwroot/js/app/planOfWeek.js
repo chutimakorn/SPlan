@@ -1,18 +1,12 @@
 ﻿$(function () {
 
-    var tableData = new DataTable('#table-data', {
-        "lengthMenu": [
-            [10, 25, 50, -1],
-            [10, 25, 50, 'All']
-        ]
-    });
+    //var tableData = new DataTable('#table-data', {
+    //    "lengthMenu": [
+    //        [10, 25, 50, -1],
+    //        [10, 25, 50, 'All']
+    //    ]
+    //});
 
-    var tableLog = new DataTable('#table-log', {
-        "lengthMenu": [
-            [10, 25, 50, -1],
-            [10, 25, 50, 'All']
-        ]
-    });
 
     console.log("ready!");
 
@@ -44,4 +38,8 @@
         console.log("action!");
         document.getElementById("form1").submit();
     };
+
+    $('#printButton').click(function () {
+        window.print();
+    });
 });

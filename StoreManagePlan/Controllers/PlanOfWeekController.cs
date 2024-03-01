@@ -107,7 +107,24 @@ namespace StoreManagePlan.Controllers
                     })
             .ToList();
 
+            var total = resultList
+                .GroupBy(pd => 1) // Group all results into a single group
+            .Select(group => new PlanDetailModel
+            {
+                sku_code = "Total", // You can use any identifier for the total row
+                sku_name = "Total",
+                plan_mon = group.Sum(pd => pd.plan_mon),
+                plan_tues = group.Sum(pd => pd.plan_tues),
+                plan_wed = group.Sum(pd => pd.plan_wed),
+                plan_thu = group.Sum(pd => pd.plan_thu),
+                plan_fri = group.Sum(pd => pd.plan_fri),
+                plan_sat = group.Sum(pd => pd.plan_sat),
+                plan_sun = group.Sum(pd => pd.plan_sun),
+            })
+            .ToList().FirstOrDefault();
 
+
+            ViewBag.total = total;
 
             //List<PlanDetailModel> resultList = await _context.PlanDetail
             //        .Include(m => m.item)
