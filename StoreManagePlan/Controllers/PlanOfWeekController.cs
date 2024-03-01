@@ -23,10 +23,12 @@ namespace StoreManagePlan.Controllers
         private readonly StoreManagePlanContext _context;
         public static string _menu = "pof";
         private readonly IConfiguration _configuration;
-        public PlanOfWeekController(StoreManagePlanContext context, IConfiguration configuration)
+        private readonly IUtility _utility;
+        public PlanOfWeekController(StoreManagePlanContext context, IConfiguration configuration,IUtility utility)
         {
             _context = context;
             _configuration = configuration;
+            _utility = utility;
         }
         public async Task<IActionResult> Index(int Store,int Week)
         {
@@ -135,6 +137,96 @@ namespace StoreManagePlan.Controllers
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.menu = "pof";
             return View(resultList);
+        }
+
+        public IActionResult ExportToExcel(int Store, int Week)
+        {
+
+            List<PlanDetail> planSpoke =  _context.PlanDetail
+                    .Include(m => m.item)
+                    .Join(_context.StoreRelation,
+                        post => post.store_id,
+                        meta => meta.store_spoke_id,
+                        (post, meta) => new { Post = post, Meta = meta })
+                    .Where(m => (m.Meta.store_hub_id == Store) && m.Post.week_no == Week)
+                    .Select(m => m.Post)
+            .ToList();
+
+
+            List<PlanDetail> planHub =  _context.PlanDetail
+                    .Include(m => m.item)
+                    .Where(m => (m.store_id == Store) && m.week_no == Week)
+                    .Select(m => m)
+            .ToList();
+
+
+            List<PlanDetail> combinedList = planHub.Concat(planSpoke).ToList();
+
+            List<PlanDetailModel> data = combinedList
+                    .GroupBy(pd => new { pd.item.sku_code, pd.item.sku_name })
+                    .Select(group => new PlanDetailModel
+                    {
+                        //Key = new { group.Key.week_no, group.Key.store_id, group.Key.sku_id, group.Key.sku_name },
+                        //PlanDetails = group.ToList(),
+                        sku_code = group.Key.sku_code,
+                        sku_name = group.Key.sku_name,
+                        plan_mon = group.Sum(pd => pd.plan_mon),
+                        plan_tues = group.Sum(pd => pd.plan_tues),
+                        plan_wed = group.Sum(pd => pd.plan_wed),
+                        plan_thu = group.Sum(pd => pd.plan_thu),
+                        plan_fri = group.Sum(pd => pd.plan_fri),
+                        plan_sat = group.Sum(pd => pd.plan_sat),
+                        plan_sun = group.Sum(pd => pd.plan_sun),
+                    })
+            .ToList();
+
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+
+                // Header
+                worksheet.Cells[1, 1].Value = "Sku Code";
+                worksheet.Cells[1, 2].Value = "Sku Name";
+                worksheet.Cells[1, 3].Value = "Plan";
+                worksheet.Cells[2, 3].Value = "Mon";
+                worksheet.Cells[2, 4].Value = "Tue";
+                worksheet.Cells[2, 5].Value = "Wed";
+                worksheet.Cells[2, 6].Value = "Thu";
+                worksheet.Cells[2, 7].Value = "Fri";
+                worksheet.Cells[2, 8].Value = "Sat";
+                worksheet.Cells[2, 9].Value = "Sun";
+                // Add more columns as needed
+
+                // Data
+                for (var i = 0; i < data.Count; i++)
+                {
+                    worksheet.Cells[i + 3, 1].Value = data[i].sku_code;
+                    worksheet.Cells[i + 3, 2].Value = data[i].sku_name;
+                    worksheet.Cells[i + 3, 3].Value = data[i].plan_mon;
+                    worksheet.Cells[i + 3, 4].Value = data[i].plan_tues;
+                    worksheet.Cells[i + 3, 5].Value = data[i].plan_wed;
+                    worksheet.Cells[i + 3, 6].Value = data[i].plan_thu;
+                    worksheet.Cells[i + 3, 7].Value = data[i].plan_fri;
+                    worksheet.Cells[i + 3, 8].Value = data[i].plan_sat;
+                    worksheet.Cells[i + 3, 9].Value = data[i].plan_sun;
+                    // Add more columns as needed
+                }
+
+                _utility.MergeRowspanHeaders(worksheet, 1, 1, 2, 1); // Merge from row 1 to row 2 in column 1
+                _utility.MergeRowspanHeaders(worksheet, 1, 2, 2, 2);
+                _utility.MergeColspanHeaders(worksheet, 1, 3, 1, 9); // Merge from column 2 to column 3 in row 1
+
+                package.Save(); // Save the Excel package
+            }
+
+            stream.Position = 0;
+
+
+
+            // Set the content type and file name
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PlanOfWeek_List.xlsx");
         }
     }
 }

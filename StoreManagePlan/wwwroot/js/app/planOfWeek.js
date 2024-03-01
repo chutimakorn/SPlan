@@ -17,14 +17,16 @@
     console.log("ready!");
 
     $('#export-btn').click(function () {
+        var store = $('#html5-date-input-store').val();
+        var week = $('#html5-date-input-week').val();
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/StoreRelations/ExportToExcel", true);
+        xhr.open("POST", "/PlanOfWeek/ExportToExcel?Store=" + store + "&Week=" + week, true);
         xhr.responseType = "blob"; // Expecting a binary response
         xhr.onload = function () {
             var blob = new Blob([xhr.response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
             var link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
-            link.download = "StoreRelations.xlsx";
+            link.download = "PlanOfWeek.xlsx";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

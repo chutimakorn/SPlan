@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.SqlServer.Server;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using StoreManagePlan.Repository;
 using System.Globalization;
 
@@ -89,6 +90,25 @@ namespace StoreManagePlan.Repository
                 return decimal.TryParse(cell.Value.ToString(), out decimal result);
             }
             return false;
+        }
+        public void MergeRowspanHeaders(ExcelWorksheet worksheet, int startRow, int startColumn, int endRow, int endColumn)
+        {
+            using (var range = worksheet.Cells[startRow, startColumn, endRow, endColumn])
+            {
+                range.Merge = true;
+                range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
+        }
+
+        public void MergeColspanHeaders(ExcelWorksheet worksheet, int startRow, int startColumn, int endRow, int endColumn)
+        {
+            using (var range = worksheet.Cells[startRow, startColumn, endRow, endColumn])
+            {
+                range.Merge = true;
+                range.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
         }
     }
 }
