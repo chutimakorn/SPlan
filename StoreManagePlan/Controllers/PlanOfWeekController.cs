@@ -123,8 +123,29 @@ namespace StoreManagePlan.Controllers
             })
             .ToList().FirstOrDefault();
 
+            if (total == null)
+            {
+                PlanDetailModel plan = new PlanDetailModel
+                {
+                    sku_code = "Total",
+                    sku_name = "Total",
+                    plan_mon = 0,
+                    plan_tues = 0,
+                    plan_wed = 0,
+                    plan_thu = 0,
+                    plan_fri = 0,
+                    plan_sat = 0,
+                    plan_sun = 0,
+                };
 
-            ViewBag.total = total;
+
+                ViewBag.total = plan;
+            }
+            else
+            {
+                ViewBag.total = total;
+            }
+
 
             //List<PlanDetailModel> resultList = await _context.PlanDetail
             //        .Include(m => m.item)
