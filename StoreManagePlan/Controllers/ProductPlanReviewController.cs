@@ -51,8 +51,8 @@ namespace StoreManagePlan.Controllers
 
             if (weekNo == 0)
             {
-                weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
-                ViewBag.weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value) +1;
+                ViewBag.weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value) +1;
             }
             else
             {

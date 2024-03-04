@@ -13,6 +13,8 @@ namespace StoreManagePlan.Models
 
         public String store_code { get; set; }
         public String store_name { get; set; }
+        public String create_date { get; set; }
+        public String update_date { get; set; }
         public String start_date { get; set; }
         public String end_date { get; set; }
       
