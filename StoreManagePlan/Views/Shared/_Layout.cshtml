@@ -265,6 +265,28 @@
                             </a>
                         </li>
                     }
+
+                    @if(role == 1 || role == 2)
+                    {
+                        <li class="menu-item">
+                            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                <i class="menu-icon tf-icons bx bx-dock-top"></i>
+                                <div data-i18n="Account Settings">รายงานผล</div>
+                            </a>
+                            <ul class="menu-sub">
+                                <li class="menu-item">
+                                    <a class="menu-link">
+                                        <div data-i18n="Account">Plan Compliance</div>
+                                    </a>
+                                </li>
+                                <li class="menu-item">
+                                    <a class="menu-link">
+                                        <div data-i18n="Notifications">Plan Performance</div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    }
                     
                     @if (role == 1 || role == 3 || role == 4)
                     {
@@ -284,7 +306,7 @@
                         <li class="menu-item">
                             <a href="cards-basic.html" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
-                                <div data-i18n="Basic">พิมแผนการผลิต</div>
+                                <div data-i18n="Basic">พิมพ์แผนการผลิต</div>
                             </a>
                         </li>
                         <li class="menu-item">
@@ -296,7 +318,7 @@
                         <li class="menu-item">
                             <a href="cards-basic.html" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
-                                <div data-i18n="Basic">การโอนสินค้า(IBT Out)</div>
+                                <div data-i18n="Basic">โอนสินค้าออกไปให้สาขาอื่น</div>
                             </a>
                         </li>
                     }
@@ -306,29 +328,11 @@
                         <li class="menu-item">
                             <a href="cards-basic.html" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
-                                <div data-i18n="Basic">การโอนสินค้า(IBT In)</div>
+                                <div data-i18n="Basic">รับสินค้าจากสาขาที่ผลิต</div>
                             </a>
                         </li>
                     }
                   
-                
-                    @if(role == 1 || role == 2)
-                    {
-                        <!-- Forms & Tables -->
-                        <li class="menu-header small text-uppercase"><span class="menu-header-text">รายงานผล</span></li>
-                        <li class="menu-item">
-                            <a href="cards-basic.html" class="menu-link">
-                                <i class="menu-icon tf-icons bx bx-collection"></i>
-                                <div data-i18n="Basic">Plan Compliance</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="cards-basic.html" class="menu-link">
-                                <i class="menu-icon tf-icons bx bx-collection"></i>
-                                <div data-i18n="Basic">Plan Performance</div>
-                            </a>
-                        </li>
-                    }
                    
                 </ul>
             </aside>

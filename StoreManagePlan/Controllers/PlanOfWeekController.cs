@@ -36,7 +36,7 @@ namespace StoreManagePlan.Controllers
             ViewBag.week = Week;
             var newWeek = Week;
             var newStore = Store;
-            var weekList = _context.Week.ToList();
+            var weekList = _context.Week.Where(w => w.status == 2).ToList();
             var storeList = _context.Store.ToList();
             var storeTypeList = _context.StoreType.ToList();
 
@@ -46,8 +46,20 @@ namespace StoreManagePlan.Controllers
 
             if (newWeek == 0)
             {
-                newWeek = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
-                ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value) + 1;
+                var weekDefault = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
+                var weekfound = weekList.Where(w => w.status == weekDefault);
+
+                if (weekfound != null)
+                {
+                    newWeek = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
+                    ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value) + 1;
+                }
+                else
+                {
+                    newWeek = 0;
+                    ViewBag.week = 0;
+                }
+
             }
             else
             {
@@ -57,8 +69,8 @@ namespace StoreManagePlan.Controllers
             if (newStore == 0)
             {
                 var lastStore = storeList.FirstOrDefault();
-                newStore = lastStore.id;
-                ViewBag.store = lastStore.id;
+                newStore = lastStore == null ? 0 : lastStore.id;
+                ViewBag.store = lastStore == null ? 0 : lastStore.id;
             }
             else
             {
