@@ -80,8 +80,8 @@ namespace StoreManagePlan.Controllers
 
             storeManagePlanContext = storeManagePlanContext.Where(m => Convert.ToInt32(m.start_date)  >= Convert.ToInt32(start) && Convert.ToInt32(m.end_date) <= Convert.ToInt32(end));
 
-            ViewBag.storeHub = _context.Store.Include(m => m.store_type).Where(m => m.type_id == 6).ToList();
-            ViewBag.storeSpoke = _context.Store.Include(m => m.store_type).Where(m => m.type_id == 7).ToList();
+            ViewBag.storeHub = _context.Store.Include(m => m.store_type).Where(m => m.store_type.store_type_name.ToLower() == "hub").ToList();
+            ViewBag.storeSpoke = _context.Store.Include(m => m.store_type).Where(m => m.store_type.store_type_name.ToLower() == "spoke").ToList();
 
 
             return View(await storeManagePlanContext.ToListAsync());
@@ -121,10 +121,10 @@ namespace StoreManagePlan.Controllers
             // ดึง storeSpoke โดยไม่มี spokeInHub
             var storeSpokeWithoutInHub = _context.Store
                                             .Include(m => m.store_type)
-                                            .Where(m => m.type_id == 7 && !spokeInHub.Contains(m.id))
+                                            .Where(m => m.store_type.store_type_name.ToLower() == "spoke" && !spokeInHub.Contains(m.id))
                                             .ToList();
 
-            ViewBag.storeHub = _context.Store.Include(m => m.store_type).Where(m => m.type_id == 6).ToList();
+            ViewBag.storeHub = _context.Store.Include(m => m.store_type).Where(m => m.store_type.store_type_name.ToLower() == "hub").ToList();
             ViewBag.storeSpoke = storeSpokeWithoutInHub;
 
             return View();
@@ -185,10 +185,10 @@ namespace StoreManagePlan.Controllers
             // ดึง storeSpoke โดยไม่มี spokeInHub
             var storeSpokeWithoutInHub = _context.Store
                                             .Include(m => m.store_type)
-                                            .Where(m => m.type_id == 7 && !spokeInHub.Contains(m.id))
+                                            .Where(m => m.store_type.store_type_name.ToLower() == "spoke" && !spokeInHub.Contains(m.id))
                                             .ToList();
 
-            ViewBag.storeHub = _context.Store.Include(m => m.store_type).Where(m => m.type_id == 6).ToList();
+            ViewBag.storeHub = _context.Store.Include(m => m.store_type).Where(m => m.store_type.store_type_name.ToLower() == "hub").ToList();
             ViewBag.storeSpoke = storeSpokeWithoutInHub;
             return View();
         }

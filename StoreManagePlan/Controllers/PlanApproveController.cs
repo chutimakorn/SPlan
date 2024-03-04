@@ -93,11 +93,11 @@ namespace StoreManagePlan.Controllers
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // หาผลรวมของข้อมูลที่ store_type เป็น "HUB"
-                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_code == "3001")
+                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "hub")
                     .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // หาผลรวมของข้อมูลที่ store_type เป็น "SPOKE"
-                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_code == "3002")
+                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "spoke")
                     .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // คำนวณเป็น percent
@@ -170,11 +170,11 @@ namespace StoreManagePlan.Controllers
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // หาผลรวมของข้อมูลที่ store_type เป็น "HUB"
-                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_code == "3001")
+                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "hub")
                     .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // หาผลรวมของข้อมูลที่ store_type เป็น "SPOKE"
-                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_code == "3002")
+                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "spoke")
                     .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // คำนวณเป็น percent
@@ -244,11 +244,11 @@ namespace StoreManagePlan.Controllers
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // หาผลรวมของข้อมูลที่ store_type เป็น "HUB"
-                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_code == "3001")
+                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "hub")
                     .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // หาผลรวมของข้อมูลที่ store_type เป็น "SPOKE"
-                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_code == "3002")
+                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "spoke")
                     .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
 
                 // คำนวณเป็น percent
