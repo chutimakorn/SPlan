@@ -71,6 +71,7 @@
     // เมื่อคลิกที่ปุ่ม delete
     $("#delete-btn").on("click", function () {
         var selectedItems = [];
+        var selectedItemHead = [];
 
         $("input#defaultCheck:checked").each(function () {
             var skuCode = $(this).closest("tr").find("td:nth-child(2)").text(); // SKU Code
@@ -84,8 +85,21 @@
             selectedItems.push(selectedItem);
         });
 
+        $("input#skuCheckBox:checked").each(function () {
+            var skuCode = $(this).closest("tr").find("td:nth-child(2)").text(); // SKU Code
+            var ingredientSku = $(this).closest("tr").find("td:nth-child(3)").text(); // Ingredient SKU
+
+            var selectedItem = {
+                sku_id: skuCode,
+                ingredient_sku: ingredientSku
+            };
+
+            selectedItemHead.push(selectedItem);
+        });
+
         // นำรายการ SKU และ Ingredient SKU มาใส่ใน hidden input
         $("#hiddenInputId").val(JSON.stringify(selectedItems));
+        $("#selectedHeadGroup").val(JSON.stringify(selectedItemHead));
     });
 
 });

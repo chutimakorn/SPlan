@@ -148,7 +148,7 @@
                                              <tr>
                                                 @if (item == group.First())
                                                 {
-                                                 
+                                                    <td rowspan="@group.Count()"><input class="form-check-input" type="checkbox" value="" id="skuCheckBox"></td>
                                                     <td rowspan="@group.Count()">@item.Item.sku_code</td>
                                                     <td rowspan="@group.Count()">@item.Item.sku_name</td>
                                                     <td rowspan="@group.Count()">@item.min_batch_hub</td>
@@ -176,6 +176,7 @@
                 </div>
                 <form asp-action="Delete" method="post">
                     <input type="hidden" id="hiddenInputId" name="selected" />
+                    <input type="hidden" id="selectedHeadGroup" name="selectedHead" />
                     <div class="mt-3 mb-3">
                         <div class="d-flex justify-content-start">
                             <div class="btn-group">
@@ -267,38 +268,3 @@
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
 <script src="~/js/app/bomctrl.js"></script>
 
-@* <script>
-    $(document).ready(function () {
-
-        $("#checkAll").on("change", function () {
-            // หา Checkbox ทุกตัวใน tbody
-            var checkboxes = $("tbody input[type=checkbox]");
-
-            // ตั้งค่า Checked ของ Checkbox ทุกตัวตาม Checkbox ทั้งหมด
-            checkboxes.prop("checked", $(this).prop("checked"));
-        });
-
-        // เมื่อคลิกที่ Checkbox ใน tbody
-        $("tbody input[type=checkbox]").on("change", function () {
-            // ตรวจสอบว่า Checkbox ทั้งหมดควรติ๊กหรือไม่
-            var checkAllCheckbox = $("#checkAll");
-            checkAllCheckbox.prop("checked", $("tbody input[type=checkbox]:checked").length === checkboxes.length);
-        });
-
-        // เมื่อคลิกที่ปุ่ม delete
-        $("#deleteButton").on("click", function () {
-            // รวม SKU ที่ถูก check ใน checkbox
-            var selectedSkus = [];
-            $("input[type=checkbox]:checked").each(function () {
-                var sku = $(this).closest("tr").find("td:eq(0)").text(); // แก้ตำแหน่ง column ตามต้องการ
-                selectedSkus.push(sku);
-            });
-
-            // นำรายการ SKU มาใส่ใน hidden input
-            $("#hiddenInputId").val(selectedSkus.join(','));
-
-            // แสดง alert เพื่อตรวจสอบผลลัพธ์
-            alert("Selected SKUs: " + $("#hiddenInputId").val());
-        });
-    });
-</script> *@
