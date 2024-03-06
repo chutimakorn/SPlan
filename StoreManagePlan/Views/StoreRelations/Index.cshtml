@@ -38,7 +38,7 @@
                 <select id="defaultSelectProducer" name="hubID" class="form-select" onchange="submitForm()" >
                     <option value="0">Select Producer</option>
                     @{
-                        List<Store> hubList = ViewBag.hubID;
+                        List<Store> hubList = ViewBag.storeHub;
                         foreach (var hub in hubList)
                         {
                             <option value="@hub.id">@hub.store_name</option>

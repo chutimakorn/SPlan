@@ -73,14 +73,30 @@ namespace StoreManagePlan.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(string selected)
+        public async Task<IActionResult> Delete(string selected,string selectedHead)
         {
-            if (selected == null || selected == "")
+            if (selected == null || selected == "" && selectedHead == null || selectedHead == "")
             {
                 return RedirectToAction(nameof(Index));
             }
 
-            List<ItemSelect> itemList = JsonConvert.DeserializeObject<List<ItemSelect>>(selected);
+          
+                List<ItemSelect> itemList = JsonConvert.DeserializeObject<List<ItemSelect>>(selected);
+                List<ItemSelect> itemHead = JsonConvert.DeserializeObject<List<ItemSelect>>(selectedHead);
+              
+            foreach(var item in itemHead)
+            {
+                //get item id
+                var itemID = _context.Item.Where(m => m.sku_code == item.sku_id).Select(m => m.id).SingleOrDefault();
+
+                var itemFeatureModel1 = _context.Bom.Include(m => m.Item).Where(m => m.sku_id == itemID && m.ingredient_sku == item.ingredient_sku).SingleOrDefault();
+                if (itemFeatureModel1 != null)
+                {
+                    _context.Bom.Remove(itemFeatureModel1);
+                }
+
+            }
+
 
 
 
@@ -88,19 +104,21 @@ namespace StoreManagePlan.Controllers
             foreach (var item in itemList)
             {
 
+                //check delete by headGroup before
+                var checkDelete = itemHead.Where(m => m.sku_id == item.sku_id).SingleOrDefault();
 
-                //get item id
-                var itemID = _context.Item.Where(m => m.sku_code == item.sku_id).Select(m => m.id).SingleOrDefault();
-
-                var itemFeatureModel = _context.Bom.Include(m => m.Item).Where(m => m.sku_id == itemID && m.ingredient_sku == item.ingredient_sku).SingleOrDefault();
-                if (itemFeatureModel != null)
+                if(checkDelete == null)
                 {
-                    _context.Bom.Remove(itemFeatureModel);
+                    //get item id
+                    var itemID = _context.Item.Where(m => m.sku_code == item.sku_id).Select(m => m.id).SingleOrDefault();
+
+                    var itemFeatureModel2 = _context.Bom.Include(m => m.Item).Where(m => m.sku_id == itemID && m.ingredient_sku == item.ingredient_sku).SingleOrDefault();
+                    if (itemFeatureModel2 != null)
+                    {
+                        _context.Bom.Remove(itemFeatureModel2);
+                    }
                 }
-
             }
-
-
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

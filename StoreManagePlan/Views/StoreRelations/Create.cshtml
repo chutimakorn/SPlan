@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <form asp-action="Create" id="form1" method="post">
+   
         <div class="mb-3" style="width:30%">
             <div><span style="color:red">*</span>Producer</div>
             <select id="defaultSelect" name="hubID" class="form-select">
@@ -80,14 +80,27 @@
                 <select name="to[]" id="multiselect_to" class="form-control" size="8" multiple="multiple"></select>
             </div>
         </div>
-        <div class="row mt-3">
-            <div class="col-xs-2">
-                <button type="submit" id="submit" class="btn btn-block btn-sm btn-primary">submit</button>
-            </div>
-        </div>
-        <input name="listSpoke" id="listSpoke" type="hidden" />
+    <div class="mb-3" style="width:30%;display: flex;">
 
-    </form>
+        <form asp-action="Create" id="form1" method="post">
+            <div class="row mt-3">
+                <div class="col-xs-2">
+                    <button type="submit" id="submit" class="btn btn-block btn-sm btn-primary">submit</button>
+                </div>
+            </div>
+            <input name="listSpoke" id="listSpoke" type="hidden" />
+
+        </form>
+        <form asp-action="Index">
+            <div class="row mt-3" style="padding-left:10px;">
+                <div class="col-xs-2">
+                    <button type="submit" id="submit" class="btn btn-block btn-sm btn-secondary">cancel</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+  
 
 </div>
 
