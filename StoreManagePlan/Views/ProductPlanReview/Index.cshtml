@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <div class="mb-3" style="width:25%">
+    <div class="mb-3 col-3">
         <label for="defaultSelect" class="form-label">Period</label>
         <form asp-action="Index" method="get" id="index">
             <input id="store" name="storeId" type="hidden" />
@@ -92,7 +92,10 @@
         </form>
 
         <br />
-        <label for="defaultSelect" class="form-label">Product Plan Status : @status_text</label>
+        <div style="display:flex">
+            <label for="defaultSelect" class="form-label">Product Plan Status : </label>
+            <label for="defaultSelect" id="cal-label" class="form-label" style="display:flex; align-items:center; margin-left:5px">@status_text</label>
+        </div>
     </div>
     <div class="nav-align-top ">
         <ul class="nav nav-pills mb-3" role="tablist">
@@ -267,7 +270,7 @@
                             <input name="weekNo" type="hidden" id="weekCal" />
                             <input name="storeId" type="hidden" id="storeCal" />
                             <div class="btn-group">
-                                <button type="submit" id="submit-btn" class="btn btn-secondary" @(statusPlan == 2 || statusPlan == 1? "disabled" : "")>&nbsp; Calculate</button>
+                                <button type="submit" id="calculate-btn" class="btn btn-secondary" @(statusPlan == 2 || statusPlan == 1? "disabled" : "")>&nbsp; Calculate</button>
 
                             </div>
                         </form>

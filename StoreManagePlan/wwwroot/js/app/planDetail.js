@@ -43,4 +43,22 @@
         };
         xhr.send(formData);
     }); 
+
+    $("#calculate-btn").click(function () {
+        //$("#cal-label").text("Product Plan Status : Calculating...");
+
+        var newText = document.createTextNode(" Calculating");
+
+        var newDiv = $("<div>")
+            .addClass("spinner-border spinner-border-sm text-primary")
+            .css('margin-left', '5px')
+            .attr('role', 'status')
+            .html("");
+
+        var newSpan = $("<span>").text("Loading...").addClass("visually-hidden");
+
+        //// Append the text and div to the parent div
+        $("#cal-label").empty().append(newText, newDiv.append(newSpan));
+
+    });
 });
