@@ -73,16 +73,29 @@
         var selectedItems = [];
         var selectedItemHead = [];
 
-        $("input#defaultCheck:checked").each(function () {
-            var skuCode = $(this).closest("tr").find("td:nth-child(2)").text(); // SKU Code
-            var ingredientSku = $(this).closest("tr").find("td:nth-child(3)").text(); // Ingredient SKU
+        var selectedIngredients = [];
 
-            var selectedItem = {
-                sku_id: skuCode,
-                ingredient_sku: ingredientSku
+        $("input#defaultCheck:checked").each(function () {
+            //var skuCode = $(this).closest("tr").find("td:nth-child(2)").text(); // SKU Code
+            //var ingredientSku = $(this).closest("tr").find("td:nth-child(3)").text(); // Ingredient SKU
+
+
+            //var selectedItem = {
+            //    sku_id: skuCode,
+            //    ingredient_sku: ingredientSku
+            //};
+
+            //selectedItems.push(selectedItem);
+
+            var ingredient_sku = $(this).data('ingredient-sku');
+            var sku_code = $(this).data('sku-code');
+
+            var Ingredient = {
+                sku_id: sku_code,
+                ingredient_sku: ingredient_sku
             };
 
-            selectedItems.push(selectedItem);
+            selectedIngredients.push(Ingredient);
         });
 
         $("input#skuCheckBox:checked").each(function () {
@@ -98,7 +111,7 @@
         });
 
         // นำรายการ SKU และ Ingredient SKU มาใส่ใน hidden input
-        $("#hiddenInputId").val(JSON.stringify(selectedItems));
+        $("#hiddenInputId").val(JSON.stringify(selectedIngredients));
         $("#selectedHeadGroup").val(JSON.stringify(selectedItemHead));
     });
 

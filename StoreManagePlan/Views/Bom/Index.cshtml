@@ -115,7 +115,7 @@
                             <thead style="background-color:#80808038">
                                 <tr class="text-nowrap">
 
-                                  
+                                    <th></th>
                                     <th>SKU Code</th>
                                     <th>SKU Name</th>
                                     <th>Min batch hub</th>
@@ -155,8 +155,8 @@
                                                     <td rowspan="@group.Count()">@item.min_batch_non_hub</td>
                                                     <td rowspan="@group.Count()">@item.batch_uom</td>
                                                 }
-                                                
-                                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck"></td>
+
+                                                <td scope="row"><input class="form-check-input" type="checkbox" value="" id="defaultCheck" data-ingredient-sku="@item.ingredient_sku" data-sku-code="@item.Item.sku_code"></td>
                                                 <td hidden>@item.Item.sku_code</td>
                                                 <td>@item.ingredient_sku</td>
                                                 <td>@item.ingredient_name</td>                                                                                            
