@@ -15,6 +15,7 @@ using System.Text.Json;
 using Elfie.Serialization;
 using System.Globalization;
 using System.Xml.Linq;
+using System.Collections;
 
 namespace StoreManagePlan.Controllers
 {
@@ -37,7 +38,7 @@ namespace StoreManagePlan.Controllers
             var newWeek = Week;
             var newStore = Store;
             var weekList = _context.Week.Where(w => w.status == 2).ToList();
-            var storeList = _context.Store.ToList();
+            var storeList = _context.Store.Include(m => m.store_type).Where(s=> s.store_type.store_type_name == "Hub").ToList();
             var storeTypeList = _context.StoreType.ToList();
 
             ViewBag.weekList = weekList;
@@ -47,12 +48,18 @@ namespace StoreManagePlan.Controllers
             if (newWeek == 0)
             {
                 var weekDefault = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
-                var weekfound = weekList.Where(w => w.status == weekDefault);
+                var weekfound = weekList.Where(w => w.status == weekDefault && w.status == 2).FirstOrDefault();
 
                 if (weekfound != null)
                 {
                     newWeek = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
                     ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value) + 1;
+                }
+                else if(weekList.Count > 0)
+                {
+                    var currentWeek = weekList.OrderByDescending(w => w.week_no).FirstOrDefault();
+                    newWeek = currentWeek.week_no;
+                    ViewBag.week = currentWeek.week_no;
                 }
                 else
                 {
@@ -310,6 +317,50 @@ namespace StoreManagePlan.Controllers
 
             // Set the content type and file name
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PlanOfWeek_List.xlsx");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Approve(int? selectedStore,int? selectedWeek)
+        {
+
+            if (selectedStore == null || selectedStore == 0)
+            {
+                return Json(new { success = false, message = "กรุณาเลือก Store" });
+            }
+
+            if (selectedWeek == null || selectedWeek == 0)
+            {
+                return Json(new { success = false, message = "กรุณาเลือกสัปดาห์" });
+            }
+
+            try
+            {
+                var stores = await _context.PlanDetail.Where(w => w.week_no == selectedWeek && w.store_id == selectedStore).ToListAsync();
+                if (stores.Count == 0 )
+                {
+                    return Json(new { success = false, message = "ไม่พบข้อมูล" });
+                }
+
+                foreach (var item in stores)
+                {
+                    // Attach the entity to the context
+                    item.approve = true;
+                    _context.PlanDetail.Attach(item);
+
+                    // Update the specific properties
+                    _context.Entry(item).Property(e => e.approve).IsModified = true;
+                }
+
+                await _context.SaveChangesAsync();
+
+                var result = new { success = true, message = "success" };
+
+                return Json(result);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

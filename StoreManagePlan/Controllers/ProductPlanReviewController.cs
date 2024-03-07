@@ -617,29 +617,33 @@ namespace StoreManagePlan.Controllers
 
                 // Header
                 worksheet.Cells[1, 1].Value = "store code";
-                worksheet.Cells[1, 2].Value = "sku code";
-                worksheet.Cells[1, 3].Value = "Plan(Mon.)";
-                worksheet.Cells[1, 4].Value = "Plan(Tue.)";
-                worksheet.Cells[1, 5].Value = "Plan(Wed.)";
-                worksheet.Cells[1, 6].Value = "Plan(Thu.)";
-                worksheet.Cells[1, 7].Value = "Plan(Fri.)";
-                worksheet.Cells[1, 8].Value = "Plan(Sat.)";
-                worksheet.Cells[1, 9].Value = "Plan(Sun.)";
+                worksheet.Cells[1, 2].Value = "store name";
+                worksheet.Cells[1, 3].Value = "sku code";
+                worksheet.Cells[1, 4].Value = "sku name";
+                worksheet.Cells[1, 5].Value = "Plan(Mon.)";
+                worksheet.Cells[1, 6].Value = "Plan(Tue.)";
+                worksheet.Cells[1, 7].Value = "Plan(Wed.)";
+                worksheet.Cells[1, 8].Value = "Plan(Thu.)";
+                worksheet.Cells[1, 9].Value = "Plan(Fri.)";
+                worksheet.Cells[1, 10].Value = "Plan(Sat.)";
+                worksheet.Cells[1, 11].Value = "Plan(Sun.)";
                 // Add more columns as needed
 
                 // Data
 
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].store_id;
-                    worksheet.Cells[i + 2, 2].Value = data[i].sku_id;
-                    worksheet.Cells[i + 2, 3].Value = data[i].plan_mon;
-                    worksheet.Cells[i + 2, 4].Value = data[i].plan_tues;
-                    worksheet.Cells[i + 2, 5].Value = data[i].plan_wed;
-                    worksheet.Cells[i + 2, 6].Value = data[i].plan_thu;
-                    worksheet.Cells[i + 2, 7].Value = data[i].plan_fri;
-                    worksheet.Cells[i + 2, 8].Value = data[i].plan_sat;
-                    worksheet.Cells[i + 2, 9].Value = data[i].plan_sun;
+                    worksheet.Cells[i + 2, 1].Value = data[i].store.store_code;
+                    worksheet.Cells[i + 2, 2].Value = data[i].store.store_name;
+                    worksheet.Cells[i + 2, 3].Value = data[i].item.sku_code;
+                    worksheet.Cells[i + 2, 4].Value = data[i].item.sku_name;
+                    worksheet.Cells[i + 2, 5].Value = data[i].plan_mon;
+                    worksheet.Cells[i + 2, 6].Value = data[i].plan_tues;
+                    worksheet.Cells[i + 2, 7].Value = data[i].plan_wed;
+                    worksheet.Cells[i + 2, 8].Value = data[i].plan_thu;
+                    worksheet.Cells[i + 2, 9].Value = data[i].plan_fri;
+                    worksheet.Cells[i + 2, 10].Value = data[i].plan_sat;
+                    worksheet.Cells[i + 2, 11].Value = data[i].plan_sun;
                     // Add more columns as needed
                 }
 

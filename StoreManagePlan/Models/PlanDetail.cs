@@ -28,6 +28,8 @@ namespace StoreManagePlan.Models
         public Store store { get; set; }
         public Item item { get; set; }
         public Week week { get; set; }
-    
+
+        public bool? approve { get; set; }
+
     }
 }

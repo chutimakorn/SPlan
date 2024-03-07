@@ -42,4 +42,35 @@
     $('#printButton').click(function () {
         window.print();
     });
+
+    $('#submitButton').click(function () {
+        event.preventDefault();
+        var week = $("#html5-date-input-week").val();
+        var store = $("#html5-date-input-store").val();
+
+        var formData = new FormData();
+        formData.append('selectedStore', store);
+        formData.append('selectedWeek', week);
+        $.ajax({
+            url: '/PlanOfWeek/Approve', // Update the URL based on your actual URL structure
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+
+                if (data.success) {
+                    $('#import-success').toast('show');
+                    
+                }
+                else {
+                    $("#import-not-success .toast-body").text("อนุมัติไม่สำเร็จ ข้อความ: "+data.message);
+                    $('#import-not-success').toast('show');
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    });
 });
