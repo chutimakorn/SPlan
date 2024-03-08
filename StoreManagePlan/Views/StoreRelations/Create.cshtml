@@ -60,7 +60,7 @@
                         List<Store> spokeList = ViewBag.storeSpoke;
                         foreach (var spoke in spokeList)
                         {
-                            <option value="@spoke.id">@spoke.store_name</option>
+                            <option value="@spoke.id">@spoke.store_code - @spoke.store_name</option>
                         }
 
                     }
