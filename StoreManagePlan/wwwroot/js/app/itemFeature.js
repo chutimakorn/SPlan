@@ -20,6 +20,28 @@
         $('#import-modal').modal('show');
     });
 
+    $('#delete-btn').click(function () {
+        var selectedItems = [];
+        $("input#defaultCheck:checked").each(function () {
+            var storeCode = $(this).closest("tr").find("td:nth-child(2)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            var skuCode = $(this).closest("tr").find("td:nth-child(4)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            var selectedItem = {
+                store_code: storeCode,
+                sku_code: skuCode
+            };
+            selectedItems.push(selectedItem);
+        });
+
+        if (selectedItems.length === 0) {
+            $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
+            $('#import-not-success').toast('show');
+            return;
+        }
+
+
+        $('#delete-modal').modal('show');
+    });
+
     $('#export-btn').click(function () {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/ItemFeatures/ExportToExcel", true);
@@ -66,9 +88,12 @@
         });
     });
 
+
+    var checkboxes = $("tbody input[type=checkbox]");
+
     $("#checkAll").on("change", function () {
         // หา Checkbox ทุกตัวใน tbody
-        var checkboxes = $("tbody input[type=checkbox]");
+        checkboxes = $("tbody input[type=checkbox]");
 
         // ตั้งค่า Checked ของ Checkbox ทุกตัวตาม Checkbox ทั้งหมด
         checkboxes.prop("checked", $(this).prop("checked"));
@@ -76,14 +101,14 @@
 
     // เมื่อคลิกที่ Checkbox ใน tbody
     $("tbody input[type=checkbox]").on("change", function () {
-        var checkboxes = $("tbody input[type=checkbox]");
+        checkboxes = $("tbody input[type=checkbox]");
         // ตรวจสอบว่า Checkbox ทั้งหมดควรติ๊กหรือไม่
         var checkAllCheckbox = $("#checkAll");
         checkAllCheckbox.prop("checked", $("tbody input[type=checkbox]:checked").length === checkboxes.length);
     });
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#delete-btn").on("click", function () {
+    $("#delete-item").on("click", function () {
         var selectedItems = [];
         $("input#defaultCheck:checked").each(function () {
             var storeCode = $(this).closest("tr").find("td:nth-child(2)").text(); // แก้ตำแหน่ง column ตามต้องการ

@@ -19,6 +19,57 @@
         $('#import-modal').modal('show');
     });
 
+    $('#delete-btn').click(function () {
+        var selectedItems = [];
+        var selectedItemHead = [];
+
+        var selectedIngredients = [];
+
+        $("input#defaultCheck:checked").each(function () {
+            //var skuCode = $(this).closest("tr").find("td:nth-child(2)").text(); // SKU Code
+            //var ingredientSku = $(this).closest("tr").find("td:nth-child(3)").text(); // Ingredient SKU
+
+
+            //var selectedItem = {
+            //    sku_id: skuCode,
+            //    ingredient_sku: ingredientSku
+            //};
+
+            //selectedItems.push(selectedItem);
+
+            var ingredient_sku = $(this).data('ingredient-sku');
+            var sku_code = $(this).data('sku-code');
+
+            var Ingredient = {
+                sku_id: sku_code,
+                ingredient_sku: ingredient_sku
+            };
+
+            selectedIngredients.push(Ingredient);
+        });
+
+        $("input#skuCheckBox:checked").each(function () {
+            var skuCode = $(this).closest("tr").find("td:nth-child(2)").text(); // SKU Code
+            var ingredientSku = $(this).closest("tr").find("td:nth-child(3)").text(); // Ingredient SKU
+
+            var selectedItem = {
+                sku_id: skuCode,
+                ingredient_sku: ingredientSku
+            };
+
+            selectedItemHead.push(selectedItem);
+        });
+
+        if (selectedItemHead.length === 0 && selectedIngredients.length === 0) {
+            $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
+            $('#import-not-success').toast('show');
+            return;
+        }
+
+
+        $('#delete-modal').modal('show');
+    });
+
     $('#export-btn').click(function () {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/Bom/ExportToExcel", true);
@@ -69,7 +120,7 @@
 
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#delete-btn").on("click", function () {
+    $("#delete-item").on("click", function () {
         var selectedItems = [];
         var selectedItemHead = [];
 

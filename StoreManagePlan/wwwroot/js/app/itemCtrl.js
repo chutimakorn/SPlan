@@ -19,6 +19,23 @@
         $('#import-modal').modal('show');
     });
 
+    $('#delete-btn').click(function () {
+        var selectedSkus = [];
+        $("input#defaultCheck:checked").each(function () {
+            var sku = $(this).closest("tr").find("td:eq(1)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            selectedSkus.push(sku);
+        });
+
+        if (selectedSkus.length === 0) {
+            $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
+            $('#import-not-success').toast('show');
+            return;
+        }
+
+
+        $('#delete-modal').modal('show');
+    });
+
     $('#export-btn').click(function () {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/Item/ExportToExcel", true);
@@ -66,10 +83,10 @@
             }
         });
     });
-
+    var checkboxes = $("tbody input[type=checkbox]");
     $("#checkAll").on("change", function () {
         // หา Checkbox ทุกตัวใน tbody
-        var checkboxes = $("tbody input[type=checkbox]");
+        checkboxes = $("tbody input[type=checkbox]");
 
         // ตั้งค่า Checked ของ Checkbox ทุกตัวตาม Checkbox ทั้งหมด
         checkboxes.prop("checked", $(this).prop("checked"));
@@ -83,7 +100,7 @@
     });
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#delete-btn").on("click", function () {
+    $("#delete-item").on("click", function () {
         // รวม SKU ที่ถูก check ใน checkbox
         var selectedSkus = [];
         $("input#defaultCheck:checked").each(function () {

@@ -16,8 +16,18 @@
     });
 
     console.log("ready!");
-    $('#import-btn').click(function () {
-        $('#import-modal').modal('show');
+    $('#delete-btn').click(function () {
+        var checkedCheckboxes = $('input#defaultCheck:checked'); 
+        var selectedIds = checkedCheckboxes.map(function () {
+            return this.value; 
+        }).get().join(',');
+
+        if (selectedIds == "") {
+            return;
+        }
+
+
+        $('#delete-modal').modal('show');
     });
 
     $('#export-btn').click(function () {

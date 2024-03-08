@@ -19,6 +19,23 @@
         $('#import-modal').modal('show');
     });
 
+    $('#delete-btn').click(function () {
+        var selected = [];
+        $("input#defaultCheck:checked").each(function () {
+            var sku = $(this).closest("tr").find("td:eq(1)").text(); // แก้ตำแหน่ง column ตามต้องการ
+            selected.push(sku);
+        });
+
+        if (selected.length === 0) {
+            $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
+            $('#import-not-success').toast('show');
+            return;
+        }
+
+
+        $('#delete-modal').modal('show');
+    });
+
     $('#export-btn').click(function () {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "/StoreTypes/ExportToExcel", true);
@@ -82,7 +99,7 @@
     });
 
     // เมื่อคลิกที่ปุ่ม delete
-    $("#delete-btn").on("click", function () {
+    $("#delete-item").on("click", function () {
         // รวม SKU ที่ถูก check ใน checkbox
         var selected = [];
         $("input#defaultCheck:checked").each(function () {

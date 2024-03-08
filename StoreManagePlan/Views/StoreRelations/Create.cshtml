@@ -43,10 +43,10 @@
         </div>
         <div class="mb-3" style="width:30%;display: flex;">
 
-            <input id="html5-date-input" type="date" name="start" class="form-select" style="margin-right: 10px" />
+            <input id="html5-date-start" type="date" name="start" class="form-select" style="margin-right: 10px" />
 
 
-            <input id="html5-date-input" type="date" name="end" class="form-select" />
+            <input id="html5-date-end" type="date" name="end" class="form-select" />
 
 
         </div>
@@ -89,7 +89,9 @@
                 </div>
             </div>
             <input name="listSpoke" id="listSpoke" type="hidden" />
-
+            <input name="hubID" id="hubID" type="hidden" />
+            <input name="start" id="start" type="hidden" />
+            <input name="end" id="end" type="hidden" />
         </form>
         <form asp-action="Index">
             <div class="row mt-3" style="padding-left:10px;">
@@ -109,45 +111,13 @@
 <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="~/js/multiselect.min.js"></script>
+<script src="~/js/app/storerelationCreate.js"></script>
 
 
 <script type="text/javascript">
     jQuery(document).ready(function ($) {
-     
         $('#multiselect').multiselect();
-        var values = [];
-
-        $('#submit').click(function (e) {
-
-
-            // ตรวจสอบการเลือกรายการใน dropdown และ multiselect_to
-            if ($('#defaultSelect').val() === '0') {
-                    e.preventDefault()
-                // $("#import-not-success .toast-body").text("กรุณาเลือกสิ่งที่ต้องการลบ");
-                 jQuery('#import-not-success').toast('show');
-                //alert('กรุณาเลือก Producer');
-            
-                return;
-            }
-
-
-
-            // ดำเนินการ submit เมื่อผู้ใช้เลือกรายการครบถ้วน
-            var x = document.getElementById("multiselect_to");
-            if (x.length === 0) {
-
-                alert('กรุณาเลือก Selected Seller อย่างน้อย 1 รายการ');
-                e.preventDefault()
-                return;
-            }
-            for (var i = 0; i < x.length; i++) {
-                values.push(x.options[i].value);
-            }
-            var resultString = values.join(', ');
-            $('#listSpoke').val(resultString);
-            // $('#form1').submit();
-
-        });
+        
     });
 </script>
 
