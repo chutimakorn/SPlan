@@ -37,7 +37,7 @@ namespace StoreManagePlan.Controllers
         }
 
         public async Task<IActionResult> Index(string searchTerm)
-        {
+       {
             ViewBag.menu = "bom";
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
 
@@ -83,18 +83,24 @@ namespace StoreManagePlan.Controllers
           
                 List<ItemSelect> itemList = JsonConvert.DeserializeObject<List<ItemSelect>>(selected);
                 List<ItemSelect> itemHead = JsonConvert.DeserializeObject<List<ItemSelect>>(selectedHead);
-              
-            foreach(var item in itemHead)
+
+            foreach (var item in itemHead)
             {
-                //get item id
-                var itemID = _context.Item.Where(m => m.sku_code == item.sku_id).Select(m => m.id).SingleOrDefault();
+                // Get item id
+                var itemID = _context.Item
+                                    .Where(m => m.sku_code == item.sku_id)
+                                    .Select(m => m.id)
+                                    .SingleOrDefault();
 
-                var itemFeatureModel1 = _context.Bom.Include(m => m.Item).Where(m => m.sku_id == itemID && m.ingredient_sku == item.ingredient_sku).SingleOrDefault();
-                if (itemFeatureModel1 != null)
+                // Find and remove entries in Bom with matching sku_id
+                var itemsToRemove = _context.Bom
+                                            .Where(m => m.sku_id == itemID)
+                                            .ToList();
+
+                if (itemsToRemove.Any())
                 {
-                    _context.Bom.Remove(itemFeatureModel1);
+                    _context.Bom.RemoveRange(itemsToRemove);
                 }
-
             }
 
 

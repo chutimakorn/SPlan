@@ -64,6 +64,10 @@ namespace StoreManagePlan.Controllers
             {
                 modelQuery = modelQuery.Where(m => m.store_id == storeId);
             }
+            else
+            {
+                modelQuery = modelQuery.Where(m => m.store_id == 0);
+            }
 
 
 
@@ -87,7 +91,7 @@ namespace StoreManagePlan.Controllers
             if (plan.Count() != 0)
             {
                 // เลือกข้อมูลสำหรับ week_no
-                var weekThreeData = model.Where(m => m.week_no == weekNo).ToList();
+                var weekThreeData = plan.Where(m => m.week_no == weekNo).ToList();
 
                 // หาผลรวมของข้อมูลทั้งหมดใน week_no นั้น
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
@@ -164,7 +168,7 @@ namespace StoreManagePlan.Controllers
             if (plan.Count() != 0)
             {
                 // เลือกข้อมูลสำหรับ week_no
-                var weekThreeData = model.Where(m => m.week_no == weekNo).ToList();
+                var weekThreeData = plan.Where(m => m.week_no == weekNo).ToList();
 
                 // หาผลรวมของข้อมูลทั้งหมดใน week_no นั้น
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
@@ -238,7 +242,7 @@ namespace StoreManagePlan.Controllers
             if (plan.Count() != 0)
             {
                 // เลือกข้อมูลสำหรับ week_no
-                var weekThreeData = model.Where(m => m.week_no == weekNo).ToList();
+                var weekThreeData = plan.Where(m => m.week_no == weekNo).ToList();
 
                 // หาผลรวมของข้อมูลทั้งหมดใน week_no นั้น
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
@@ -297,6 +301,41 @@ namespace StoreManagePlan.Controllers
             }
 
             var model = modelQuery.Where(m => m.week_no == weekNo).ToList();
+            var plan = _context.PlanDetail.Include(m => m.store).ThenInclude(m => m.store_type).Include(m => m.item).Where(m => m.week_no == weekNo).ToList();
+
+            ViewBag.hubQTY = 0;
+            ViewBag.spokeQTY = 0;
+            ViewBag.spokePST = 0;
+            ViewBag.hubPST = 0;
+            ViewBag.totalQTY = 0;
+            ViewBag.totalPST = 0;
+
+            if (plan.Count() != 0)
+            {
+                // เลือกข้อมูลสำหรับ week_no
+                var weekThreeData = plan.Where(m => m.week_no == weekNo).ToList();
+
+                // หาผลรวมของข้อมูลทั้งหมดใน week_no นั้น
+                var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
+
+                // หาผลรวมของข้อมูลที่ store_type เป็น "HUB"
+                var hubSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "hub")
+                    .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
+
+                // หาผลรวมของข้อมูลที่ store_type เป็น "SPOKE"
+                var spokeSum = weekThreeData.Where(m => m.store.store_type.store_type_name.ToLower() == "spoke")
+                    .Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
+
+                // คำนวณเป็น percent
+                var hubPercent = ((double)hubSum / totalSum * 100).ToString("N2");
+                var spokePercent = ((double)spokeSum / totalSum * 100).ToString("N2");
+                ViewBag.hubQTY = hubSum;
+                ViewBag.spokeQTY = spokeSum;
+                ViewBag.spokePST = spokePercent;
+                ViewBag.hubPST = hubPercent;
+                ViewBag.totalQTY = totalSum;
+                ViewBag.totalPST = 100;
+            }
             return View("Index", model);
         }
 

@@ -31,10 +31,12 @@ namespace StoreManagePlan.Controllers
             _configuration = configuration;
             _utility = utility;
         }
-        public async Task<IActionResult> Index(int Store,int Week)
+        
+        public async Task<IActionResult> Index(int Store,int Week,string type)
         {
             ViewBag.store = Store;
             ViewBag.week = Week;
+            ViewBag.type = type;
             var newWeek = Week;
             var newStore = Store;
             var weekList = _context.Week.Where(w => w.status == 2).ToList();
@@ -45,70 +47,50 @@ namespace StoreManagePlan.Controllers
             ViewBag.storeList = storeList;
             ViewBag.storeTypeList = storeTypeList;
 
-            if (newWeek == 0)
-            {
-                var weekDefault = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
-                var weekfound = weekList.Where(w => w.status == weekDefault && w.status == 2).FirstOrDefault();
 
-                if (weekfound != null)
+
+            var planDetail = _context.PlanDetail.Include(m => m.store).Include(m => m.item).Where(m => m.store_id == Store && m.week_no == Week);
+
+            if(type != "all" && type != null)
+            {
+                var getStoreTypeID = _context.StoreType.Where(m => m.store_type_name == type).Select(m => m.id).SingleOrDefault();
+                if (getStoreTypeID == null)
                 {
-                    newWeek = Convert.ToInt32(_configuration.GetSection("DefaultWeek").Value) + 1;
-                    ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value) + 1;
+                    getStoreTypeID = 0;
                 }
-                else if(weekList.Count > 0)
-                {
-                    var currentWeek = weekList.OrderByDescending(w => w.week_no).FirstOrDefault();
-                    newWeek = currentWeek.week_no;
-                    ViewBag.week = currentWeek.week_no;
-                }
-                else
-                {
-                    newWeek = 0;
-                    ViewBag.week = 0;
-                }
-
-            }
-            else
+                planDetail = planDetail.Where(m => m.store.type_id == getStoreTypeID);
+            }else if(type == null)
             {
-                ViewBag.week = newWeek;
+                planDetail = planDetail.Where(m => m.store.type_id == 0);
             }
 
-            if (newStore == 0)
-            {
-                var lastStore = storeList.FirstOrDefault();
-                newStore = lastStore == null ? 0 : lastStore.id;
-                ViewBag.store = lastStore == null ? 0 : lastStore.id;
-            }
-            else
-            {
-                ViewBag.store = newStore;
-            }
+            var all = planDetail.ToList();
+
+            //var storeRela = _context.StoreRelation.Where(m => m.store_hub_id == Store).ToList();
+
+            //List<PlanDetailModel> planLsit = new List<PlanDetailModel>();
+            //foreach (var item in all)
+            //{
+            //    PlanDetailModel plan = new PlanDetailModel();
+            //    plan.sku_code = item.item.sku_code;
+            //    plan.sku_name = item.item.sku_name;
+            //    plan.plan_mon = item.plan_mon;
+            //    plan.plan_tues = item.plan_tues;
+            //    plan.plan_wed = item.plan_wed;
+            //    plan.plan_thu = item.plan_thu;
+            //    plan.plan_fri = item.plan_fri;
+            //    plan.plan_sat = item.plan_sat;
+            //    plan.plan_sun = item.plan_sun;
+
+
+            //}
 
 
 
 
 
-            List<PlanDetail> planSpoke = await _context.PlanDetail
-                    .Include(m => m.item)
-                    .Join(_context.StoreRelation,
-                        post => post.store_id,
-                        meta => meta.store_spoke_id,
-                        (post, meta) => new { Post = post, Meta = meta })
-                    .Where(m => (m.Meta.store_hub_id == newStore) && m.Post.week_no == newWeek)
-                    .Select(m => m.Post)
-            .ToListAsync();
 
-
-            List<PlanDetail> planHub = await _context.PlanDetail
-                    .Include(m => m.item)
-                    .Where(m => (m.store_id == newStore) && m.week_no == newWeek)
-                    .Select(m => m)
-            .ToListAsync();
-
-
-            List<PlanDetail> combinedList = planHub.Concat(planSpoke).ToList();
-
-            List<PlanDetailModel> resultList = combinedList
+            List<PlanDetailModel> resultList = all
                     .GroupBy(pd => new { pd.item.sku_code, pd.item.sku_name })
                     .Select(group => new PlanDetailModel
                     {
@@ -166,29 +148,7 @@ namespace StoreManagePlan.Controllers
             }
 
 
-            //List<PlanDetailModel> resultList = await _context.PlanDetail
-            //        .Include(m => m.item)
-            //        .Join(_context.StoreRelation,
-            //            post => post.store_id,
-            //            meta => meta.store_spoke_id,
-            //            (post, meta) => new { Post = post, Meta = meta })
-            //        .Where(m => (m.Meta.store_hub_id == newStore || m.Post.store_id == newStore) && m.Post.week_no == newWeek)
-            //        .GroupBy(pd => new { pd.Post.item.sku_code, pd.Post.item.sku_name})
-            //        .Select(group => new PlanDetailModel
-            //        {
-            //            //Key = new { group.Key.week_no, group.Key.store_id, group.Key.sku_id, group.Key.sku_name },
-            //            //PlanDetails = group.ToList(),
-            //            sku_code = group.Key.sku_code,
-            //            sku_name = group.Key.sku_name,
-            //            plan_mon = group.Sum(pd => pd.Post.plan_mon),
-            //            plan_tues = group.Sum(pd => pd.Post.plan_tues),
-            //            plan_wed = group.Sum(pd => pd.Post.plan_wed),
-            //            plan_thu = group.Sum(pd => pd.Post.plan_thu),
-            //            plan_fri = group.Sum(pd => pd.Post.plan_fri),
-            //            plan_sat = group.Sum(pd => pd.Post.plan_sat),
-            //            plan_sun = group.Sum(pd => pd.Post.plan_sun),
-            //        })
-            //.ToListAsync();
+         
 
 
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);

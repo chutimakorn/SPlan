@@ -306,24 +306,28 @@ namespace StoreManagePlan.Controllers
 
                 // Header
                 
-                worksheet.Cells[1, 1].Value = "Producer";
-                worksheet.Cells[1, 2].Value = "Seller";
-                worksheet.Cells[1, 3].Value = "Start";
-                worksheet.Cells[1, 4].Value = "End";
-                worksheet.Cells[1, 5].Value = "Create date";
-                worksheet.Cells[1, 6].Value = "Upate date";
+                worksheet.Cells[1, 1].Value = "Producer code";
+                worksheet.Cells[1, 2].Value = "Producer";
+                worksheet.Cells[1, 3].Value = "Seller code";
+                worksheet.Cells[1, 4].Value = "Seller";
+                worksheet.Cells[1, 5].Value = "Start";
+                worksheet.Cells[1, 6].Value = "End";
+                worksheet.Cells[1, 7].Value = "Create date";
+                worksheet.Cells[1, 8].Value = "Upate date";
 
                 // Add more columns as needed
 
                 // Data
                 for (var i = 0; i < data.Count; i++)
                 {
-                    worksheet.Cells[i + 2, 1].Value = data[i].StoreHub.store_name;
-                    worksheet.Cells[i + 2, 2].Value = data[i].StoreSpoke.store_name;
-                    worksheet.Cells[i + 2, 3].Value = data[i].start_date;
-                    worksheet.Cells[i + 2, 4].Value = data[i].end_date;
-                    worksheet.Cells[i + 2, 5].Value = data[i].create_date;
-                    worksheet.Cells[i + 2, 6].Value = data[i].update_date;
+                    worksheet.Cells[i + 2, 1].Value = data[i].StoreHub.store_code;
+                    worksheet.Cells[i + 2, 2].Value = data[i].StoreHub.store_name;
+                    worksheet.Cells[i + 2, 3].Value = data[i].StoreSpoke.store_code;
+                    worksheet.Cells[i + 2, 4].Value = data[i].StoreSpoke.store_name;
+                    worksheet.Cells[i + 2, 5].Value = data[i].start_date;
+                    worksheet.Cells[i + 2, 6].Value = data[i].end_date;
+                    worksheet.Cells[i + 2, 7].Value = data[i].create_date;
+                    worksheet.Cells[i + 2, 8].Value = data[i].update_date;
                     // Add more columns as needed
                 }
 

@@ -33,7 +33,7 @@
                     List<Store> hubList = ViewBag.storeHub;
                     foreach (var hub in hubList)
                     {
-                        <option value="@hub.id">@hub.store_name</option>
+                        <option value="@hub.id">@hub.store_code - @hub.store_name</option>
                     }
 
                 }

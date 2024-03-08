@@ -76,7 +76,7 @@
         <div class="mb-3">
 
             <div class="row">
-                <div class="col-6">
+                <div class="col-3">
                     <div class="row">
                         <label class="col-sm-2 col-form-label" for="html5-date-input-store">Store</label>
                         <div class="col-sm-10">
@@ -93,13 +93,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-3">
                     <div class="row">
                         <label class="col-sm-2 col-form-label" for="html5-date-input-week">Week</label>
                         <div class="col-sm-10">
                             <select id="html5-date-input-week" name="Week" class="form-select select-action">
                                 @{
-
+                                    <option value="0">กรุณาเลือกสัปดาห์ที่ต้องการ</option>
                                     foreach (var item in weekList)
                                     {
                                         var dateStart = resource.ConvertDate(item.start_date);
@@ -113,6 +113,27 @@
                     </div>
                     
                 </div>
+                <div class="col-6">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label" for="html5-date-input-type">Choose Type</label>
+                        <div class="col-sm-10">
+                            <select id="html5-date-input-type" name="type" class="form-select select-action">
+
+
+
+                                <option value="no">กรุณาเลือกประเภท</option>
+                                <option value="Hub">Hub</option>
+                                <option value="Spoke">Spoke</option>
+                                <option value="all">Hub & Spoke</option>
+
+
+
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
                @*  <div class="col-2">
                     <div class="btn-group">
                         <button type="button" id="export-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-download"></span>&nbsp; Export</button>
@@ -258,6 +279,7 @@
     $(document).ready(function () {
         $('#html5-date-input-store').val("@ViewBag.store");
         $('#html5-date-input-week').val("@ViewBag.week");
+        $('#html5-date-input-type').val("@ViewBag.type");
 
         // $("#selectedStore").val(@ViewBag.store);
         // $("#selectedWeek").val(@ViewBag.week);

@@ -133,8 +133,8 @@
                                     var dateEnd = resource.ConvertDate(item.end_date);
                                     <tr>
                                         <td style="width:10%"><input class="form-check-input" type="checkbox" value="@item.id" id="defaultCheck"></td>
-                                        <td>@item.StoreHub.store_name</td>
-                                        <td>@item.StoreSpoke.store_name</td>
+                                        <td>@item.StoreHub.store_code - @item.StoreHub.store_name</td>
+                                        <td>@item.StoreSpoke.store_code - @item.StoreSpoke.store_name</td>
                                         <td>@dateStart</td>
                                         <td>@dateEnd</td>
 

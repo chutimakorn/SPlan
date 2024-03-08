@@ -64,6 +64,10 @@ namespace StoreManagePlan.Controllers
             {
                 modelQuery = modelQuery.Where(m => m.store_id == storeId);
             }
+            else
+            {
+                modelQuery = modelQuery.Where(m => m.store_id == 0);
+            }
 
            
 
@@ -87,7 +91,7 @@ namespace StoreManagePlan.Controllers
             if (plan.Count() != 0)
             {
                 // เลือกข้อมูลสำหรับ week_no
-                var weekThreeData = model.Where(m => m.week_no == weekNo).ToList();
+                var weekThreeData = plan.Where(m => m.week_no == weekNo).ToList();
 
                 // หาผลรวมของข้อมูลทั้งหมดใน week_no นั้น
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);
@@ -510,7 +514,7 @@ namespace StoreManagePlan.Controllers
             if (plan.Count() != 0)
             {
                 // เลือกข้อมูลสำหรับ week_no
-                var weekThreeData = model.Where(m => m.week_no == weekNo).ToList();
+                var weekThreeData = plan.Where(m => m.week_no == weekNo).ToList();
 
                 // หาผลรวมของข้อมูลทั้งหมดใน week_no นั้น
                 var totalSum = weekThreeData.Sum(m => m.plan_mon + m.plan_tues + m.plan_wed + m.plan_thu + m.plan_fri + m.plan_sat + m.plan_sun);

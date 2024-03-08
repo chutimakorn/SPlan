@@ -164,7 +164,7 @@
 
 
                 <div class="mb-3" style="width:25%">
-                    <form asp-action="SelectStore" method="post" id="storeSubmit">
+                    <form asp-action="SelectStore" method="post" id="storeChange">
                         <input id="weekDetail" name="WeekNo" type="hidden" />
                         <input id="tabDetail" name="TabNo" type="hidden" />
                         <select id="storeDetail" name="storeId" class="form-select">
@@ -173,7 +173,7 @@
                                 List<Store> store = ViewBag.store;
                                 foreach (var n in store)
                                 {
-                                    <option value="@n.id">@n.store_name</option>
+                                    <option value="@n.id">@n.store_code - @n.store_name</option>
                                 }
 
                             }
@@ -395,8 +395,8 @@
 
 
             $("#store").val(selectedValue);
-            $("#storeReject").val(selectedValue);
-            $("#storeApprove").val(selectedValue);
+            $("#storeSubmit").val(selectedValue);
+            $("#storeCal").val(selectedValue);
             $("#storeChange").submit();
 
         });
