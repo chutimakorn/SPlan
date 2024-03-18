@@ -604,8 +604,8 @@ namespace StoreManagePlan.Controllers
             IQueryable<PlanDetail>? modelQuery = _context.PlanDetail
                 .Include(m => m.store)
                 .ThenInclude(m => m.store_type)
-                .Include(m => m.item)
-                .Where(m => m.week_no == weekNo);
+                .Include(m => m.item);
+             
             if (storeId != 0)
             {
                 modelQuery = modelQuery.Where(m => m.store_id == storeId);

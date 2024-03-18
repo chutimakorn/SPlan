@@ -1,0 +1,59 @@
+﻿@model IEnumerable<StoreManagePlan.Models.PlanActually>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.day_of_week)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.plan_actually)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.approve)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.planDetail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.reason)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.day_of_week)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.plan_actually)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.approve)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.planDetail.id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.reason.id)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
