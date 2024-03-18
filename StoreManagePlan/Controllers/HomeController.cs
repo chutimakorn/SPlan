@@ -66,7 +66,7 @@ namespace StoreManagePlan.Controllers
 
             HttpContext.Response.Cookies.Append("Role", role.ToString(), cookieOptions);
 
-            return RedirectToAction("Index", "Bom");
+            return RedirectToAction("Landing", "Home");
 
         }
 
@@ -79,6 +79,10 @@ namespace StoreManagePlan.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        public IActionResult Landing()
+        {
+            return View();
         }
     }
 }
