@@ -1,0 +1,48 @@
+﻿@model StoreManagePlan.Models.PlanActually
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>PlanActually</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.day_of_week)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.day_of_week)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.plan_actually)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.plan_actually)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.approve)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.approve)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.planDetail)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.planDetail.id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.reason)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.reason.id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
