@@ -38,6 +38,7 @@
     var menuPPR = "";
     var menuPAP = "";
     var menuPOW = "";
+    var menuPAC = "";
 
     //ตัว active menu
     if(ViewBag.menu == "home")
@@ -75,6 +76,11 @@
     }else if (ViewBag.menu == "pow")
     {
         menuPOW = "active";
+      
+    }
+    else if (ViewBag.menu == "pac")
+    {
+        menuPAC = "active";
       
     }
     else if (ViewBag.menu == "storeRelates")
@@ -309,8 +315,8 @@
                                 <div data-i18n="Basic">พิมพ์แผนการผลิต</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="cards-basic.html" class="menu-link">
+                        <li class="menu-item" @menuPOW>
+                            <a asp-controller="PlanActually" asp-action="Index" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
                                 <div data-i18n="Basic">บันทึกสินค้าที่ผลิตได้จริง</div>
                             </a>

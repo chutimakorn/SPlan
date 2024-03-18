@@ -7,16 +7,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StoreManagePlan.Data;
 using StoreManagePlan.Models;
+using StoreManagePlan.Repository;
 
 namespace StoreManagePlan.Controllers
 {
     public class PlanActuallyController : Controller
     {
         private readonly StoreManagePlanContext _context;
+        IUtility _utility;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        public static string _menu = "pac";
+        private readonly IConfiguration _configuration;
 
-        public PlanActuallyController(StoreManagePlanContext context)
+
+        public PlanActuallyController(StoreManagePlanContext context, IUtility utility, IConfiguration configuration)
         {
             _context = context;
+            this._utility = utility;
+            _configuration = configuration;
         }
 
         // GET: PlanActuallies
