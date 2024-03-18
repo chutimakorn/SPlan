@@ -48,49 +48,84 @@ namespace StoreManagePlan.Controllers
             ViewBag.storeTypeList = storeTypeList;
 
 
+            List<PlanDetail> planList = new List<PlanDetail>();
+            var planDetail = _context.PlanDetail.Include(m => m.store).Include(m => m.item).Where(m => m.week_no == Week);
 
-            var planDetail = _context.PlanDetail.Include(m => m.store).Include(m => m.item).Where(m => m.store_id == Store && m.week_no == Week);
-
-            if(type != "all" && type != null)
+            if(type != null && type != "no")
             {
-                var getStoreTypeID = _context.StoreType.Where(m => m.store_type_name == type).Select(m => m.id).SingleOrDefault();
-                if (getStoreTypeID == null)
+            
+                if (type == "Hub")
                 {
-                    getStoreTypeID = 0;
+                    planList = planDetail.Where(m => m.store_id == Store).ToList();
+
                 }
-                planDetail = planDetail.Where(m => m.store.type_id == getStoreTypeID);
-            }else if(type == null)
+                else if(type == "Spoke")
+                {
+
+                   var storeRela = _context.StoreRelation.Where(m => m.store_hub_id == Store).ToList();
+
+                    foreach(var spoke in storeRela)
+                    {
+                        var spokeInPlan = planDetail.Where(m => m.store_id == spoke.store_spoke_id).ToList();
+
+                        foreach(var item in spokeInPlan)
+                        {
+                            PlanDetail plan = new PlanDetail();
+                            plan = item;
+
+                            planList.Add(plan);
+                        }
+
+                    }
+
+
+
+                }
+                //type == "all"
+                else
+                {
+                    var storeRela = _context.StoreRelation.Where(m => m.store_hub_id == Store).ToList();
+
+                    foreach (var spoke in storeRela)
+                    {
+                        var spokeInPlan = planDetail.Where(m => m.store_id == spoke.store_spoke_id).ToList();
+
+                        foreach (var item in spokeInPlan)
+                        {
+                            PlanDetail plan = new PlanDetail();
+                            plan = item;
+
+                            planList.Add(plan);
+                        }
+
+                    }
+
+                    var hubPlan = planDetail.Where(m => m.store_id == Store).ToList();
+
+                    foreach(var hub in hubPlan)
+                    {
+                        PlanDetail plan = new PlanDetail();
+                        plan = hub;
+                        planList.Add(plan);
+                    }
+
+                }
+
+
+
+
+            }
+            else
             {
-                planDetail = planDetail.Where(m => m.store.type_id == 0);
+                planList = planDetail.Where(m => m.store.type_id == 0).ToList();
             }
 
-            var all = planDetail.ToList();
-
-            //var storeRela = _context.StoreRelation.Where(m => m.store_hub_id == Store).ToList();
-
-            //List<PlanDetailModel> planLsit = new List<PlanDetailModel>();
-            //foreach (var item in all)
-            //{
-            //    PlanDetailModel plan = new PlanDetailModel();
-            //    plan.sku_code = item.item.sku_code;
-            //    plan.sku_name = item.item.sku_name;
-            //    plan.plan_mon = item.plan_mon;
-            //    plan.plan_tues = item.plan_tues;
-            //    plan.plan_wed = item.plan_wed;
-            //    plan.plan_thu = item.plan_thu;
-            //    plan.plan_fri = item.plan_fri;
-            //    plan.plan_sat = item.plan_sat;
-            //    plan.plan_sun = item.plan_sun;
-
-
-            //}
 
 
 
 
 
-
-            List<PlanDetailModel> resultList = all
+            List<PlanDetailModel> resultList = planList
                     .GroupBy(pd => new { pd.item.sku_code, pd.item.sku_name })
                     .Select(group => new PlanDetailModel
                     {
