@@ -60,8 +60,8 @@ namespace StoreManagePlan.Controllers
 
             List<DailyProductModel> products = new List<DailyProductModel>();
 
-            //products = this.GetDailyProduct(week,storeId, DayNo);
-            products = this.GetDailyProduct(3, 52, 1);
+            products = this.GetDailyProduct(week,storeId, DayNo);
+            //products = this.GetDailyProduct(3, 52, 1);
 
 
             return View(products);
