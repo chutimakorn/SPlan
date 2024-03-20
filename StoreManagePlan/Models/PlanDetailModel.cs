@@ -16,5 +16,6 @@ namespace StoreManagePlan.Models
         public int plan_fri { get; set; }
         public int plan_sat { get; set; }
         public int plan_sun { get; set; }
+        public string type { get; set; }
     }
 }

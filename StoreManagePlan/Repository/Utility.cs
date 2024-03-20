@@ -2,6 +2,7 @@
 using Microsoft.SqlServer.Server;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using StoreManagePlan.Models;
 using StoreManagePlan.Repository;
 using System.Globalization;
 

@@ -39,6 +39,7 @@
     var menuPAP = "";
     var menuPOW = "";
     var menuPAC = "";
+    var menuDYP = "";
 
     //ตัว active menu
     if(ViewBag.menu == "home")
@@ -88,7 +89,12 @@
         menuStoreRelate = "active";
 
     }
-    else
+    else if (ViewBag.menu == "dyp")
+    {
+        menuDYP = "active";
+
+    }
+    else if (ViewBag.menu == "storeType")
     {
         menuStoreType = "active";
         menuMasterOpen = "open";
@@ -155,7 +161,7 @@
 
             <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
                 <div class="app-brand demo">
-                    <a href="index.html" class="app-brand-link">
+                    <a href="/home/landing" class="app-brand-link">
                         <span class="app-brand-logo demo">
                             <svg width="25"
                                  viewBox="0 0 25 42"
@@ -309,8 +315,8 @@
                                 <div data-i18n="Basic">แผนประจำสัปดาห์</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="cards-basic.html" class="menu-link">
+                        <li class="menu-item" @menuDYP>
+                            <a asp-controller="DailyPlan" asp-action="Index" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
                                 <div data-i18n="Basic">พิมพ์แผนการผลิต</div>
                             </a>

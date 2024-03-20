@@ -82,6 +82,8 @@ namespace StoreManagePlan.Controllers
         }
         public IActionResult Landing()
         {
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
+            ViewBag.menu = "landing";
             return View();
         }
     }

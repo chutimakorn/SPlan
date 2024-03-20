@@ -1,0 +1,221 @@
+﻿@model IEnumerable<StoreManagePlan.Models.DailyProductModel>
+@using StoreManagePlan.Controllers
+
+@{
+    ViewData["Title"] = "Index";
+    ResourceController resource = new ResourceController();
+    List<Week> weekList = ViewBag.weekMaster;
+    List<Store> storeList = ViewBag.store;
+}
+
+<header>
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+    <style type="text/css" media="print">
+        /* @@page { size: landscape; } */
+        @@media print {
+            body {
+                visibility: hidden;
+            }
+
+            .section-to-print {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+
+            .bg-1 {
+                background-color: #fffaae
+            }
+
+            .bg-2 {
+                background-color: #f8c5d7
+            }
+
+            .bg-3 {
+                background-color: #cbfff0
+            }
+
+            .bg-4 {
+                background-color: #ffcfa7
+            }
+
+            .bg-5 {
+                background-color: #c7ebff
+            }
+
+            .bg-6 {
+                background-color: #cfccff
+            }
+
+            .bg-7 {
+                background-color: #fcb1b1
+            }
+            .
+        }
+    </style>
+</header>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="py-3">
+        แผนงานประจำวัน (รายวัน)
+    </h4>
+    <div class="bs-toast toast toast-placement-ex fade bg-success top-0 end-0 m-2" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            อนุมัติสำเร็จ.
+        </div>
+    </div>
+
+    <div class="bs-toast toast toast-placement-ex fade bg-danger top-0 end-0 m-2" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">แจ้งเตือน</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+        </div>
+    </div>
+    <form id="form1" asp-action="Index" method="get">
+
+        <div class="mb-3">
+
+            <div class="row">
+                <div class="col-4">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label" for="html5-input-store">Store</label>
+                        <div class="col-sm-10">
+                            <select id="html5-input-store" name="storeId" class="form-select select-action">
+                                <option value="0">กรุณาเลือกสาขาที่ต้องการ</option>
+                                @{
+
+                                    foreach (var item in storeList)
+                                    {
+                                        <option value="@item.id">@item.store_code - @item.store_name</option>
+                                    }
+
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label" for="html5-input-week">Week</label>
+                        <div class="col-sm-10">
+                            <select id="html5-input-week" name="weekNo" class="form-select select-action">
+                                <option value="0">กรุณาเลือกสัปดาห์ที่ต้องการ</option>
+                                @foreach (var week in weekList)
+                                {
+                                    <option value="@week.week_no">W @week.week_no  @resource.ConvertDate(week.start_date) @resource.ConvertDate(week.end_date)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-4">
+                    <div class="row">
+                        <label class="col-sm-6 col-form-label" for="html5-input-day">Choose Day Of Week</label>
+                        <div class="col-sm-6">
+                            <select id="html5-input-day" name="DayNo" class="form-select select-action">
+
+
+
+                                <option value="0">กรุณาเลือกวัน</option>
+                                <option value="1">จันทร์</option>
+                                <option value="2">อังคาร</option>
+                                <option value="3">พุธ</option>
+                                <option value="4">พฤหัส</option>
+                                <option value="5">ศุกร์</option>
+                                <option value="6">เสาร์</option>
+                                <option value="7">อาทิตย์</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+    <div class="nav-align-top ">
+
+
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="nav-align-top mb-4">
+                    <ul class="nav nav-pills mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link @ViewBag.tab_product" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="true">สินค้า</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link @ViewBag.tab_ingredient" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="false" tabindex="-1">วัตถุดิบ</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                            <div class="table-responsive text-nowrape">
+                                <table id="printTable" class="table" style="text-align-last: left;">
+                                    <thead style="background-color:#c1c1c138">
+                                        <tr class="text-nowrap">
+                                            <th>สินค้า</th>
+                                            <th style="text-align-last: right;">จำนวนสำหรับ Hub</th>
+                                            <th style="text-align-last: right;">จำนวนสำหรับ Spoke</th>
+                                            <th style="text-align-last: right;">จำนวนรวม</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model)
+                                        {
+                                            <tr>
+                                                <td>@item.ProductName</td>
+                                                <td style="text-align-last: right;">@item.HubAmt</td>
+                                                <td style="text-align-last: right;">@item.SpokeAmt</td>
+                                                <td style="text-align-last: right;">@item.TotalAmt</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
+                            <p>
+                                Donut dragée jelly pie halvah. Danish gingerbread bonbon cookie wafer candy oat cake ice cream. Gummies
+                                halvah
+                                tootsie roll muffin biscuit icing dessert gingerbread. Pastry ice cream cheesecake fruitcake.
+                            </p>
+                            <p class="mb-0">
+                                Jelly-o jelly beans icing pastry cake cake lemon drops. Muffin muffin pie tiramisu halvah cotton candy
+                                liquorice caramels.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $('#html5-input-store').val("@ViewBag.storeId");
+        $('#html5-input-week').val("@ViewBag.weekNo");
+        $('#html5-input-day').val("@ViewBag.day");
+
+    });
+
+</script>
+
