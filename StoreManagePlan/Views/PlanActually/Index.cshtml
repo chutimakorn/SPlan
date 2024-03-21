@@ -1,6 +1,15 @@
-﻿<header>
+﻿@model IEnumerable<StoreManagePlan.Controllers.PlanActuallyController.Plan>
+@using StoreManagePlan.Controllers
+
+@{
+    ResourceController resource = new ResourceController();
+    ViewData["Title"] = "Index";
+    List<Week> weekList = ViewBag.weekMaster;
+    List<Store> storeList = ViewBag.store;
+  }
+
+<header>
     <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
-    <script src="~/js/app/planOfWeek.js"></script>
     <style type="text/css" media="print">
         /* @@page { size: landscape; } */
         @@media print {
@@ -72,6 +81,13 @@
         </div>
     </div>
     <form id="form1" asp-action="Index" method="get">
+      
+     
+        <input type="hidden" name="storeID" value="@ViewBag.storeID" />
+        <input type="hidden" name="week" value="@ViewBag.week" />
+        <input type="hidden" name="value" value="@ViewBag.value" />
+        <input type="hidden" name="day" value="@ViewBag.day" />
+        <input type="hidden" name="cycle" value="@ViewBag.cycle" />
 
         <div class="mb-3">
 
@@ -80,8 +96,12 @@
                     <div class="row">
                         <label class="col-sm-2 col-form-label" for="html5-date-input-store">สาขา</label>
                         <div class="col-sm-10">
-                            <select id="html5-date-input-store" name="Store" class="form-select select-action">
+                            <select id="storeSelect"  class="form-select select-action">
                                 <option value="0">กรุณาเลือกสาขาที่ต้องการ</option>
+                                @foreach (var item in storeList)
+                                {
+                                    <option value="@item.id">@item.store_code - @item.store_name</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -90,8 +110,12 @@
                     <div class="row">
                         <label class="col-sm-2 col-form-label" for="html5-date-input-week">สัปดาห์</label>
                         <div class="col-sm-10">
-                            <select id="html5-date-input-week" name="Week" class="form-select select-action">
+                            <select id="weekSelect" class="form-select select-action">
                                 <option value="0">กรุณาเลือกสัปดาห์ที่ต้องการ</option>
+                                @foreach (var week in weekList)
+                                {
+                                    <option value="@week.week_no">W @week.week_no  @resource.ConvertDate(week.start_date) @resource.ConvertDate(week.end_date)</option>
+                                }
                             </select>
                         </div>
                     </div>
@@ -101,7 +125,7 @@
                     <div class="row">
                         <label class="col-sm-3 col-form-label" for="html5-date-input-type">วันในสัปดาห์</label>
                         <div class="col-sm-9">
-                            <select id="html5-date-input-type" name="type" class="form-select select-action">
+                            <select id="daySelect"  class="form-select select-action">
 
 
 
@@ -122,13 +146,13 @@
                     <div class="row">
                         <label class="col-sm-3 col-form-label" for="html5-date-input-type">รอบการผลิต</label>
                         <div class="col-sm-9">
-                            <select id="html5-date-input-type" name="type" class="form-select select-action">
+                            <select id="typeSelect" class="form-select select-action">
 
 
 
-                                <option value="0">กรุณาเลือกวัน</option>
-                                <option value="1">เช้า</option>
-                                <option value="2">บ่าย</option>
+                                <option value="">กรุณาเลือกวัน</option>
+                                <option value="Hub">เช้า</option>
+                                <option value="Spoke">บ่าย</option>
                                 
                             </select>
                         </div>
@@ -146,35 +170,7 @@
 
 
         </div>
-        @*         <div class="mb-3">
-        <div style="display: flex;width: 30%;">
-        <select id="defaultSelectSeller" name="SpokeID" class="form-select" onchange="submitForm()">
-        <option value="0">Select Seller</option>
-        @{
-        List<Store> spokeList = ViewBag.storeSpoke;
-        foreach (var spoke in spokeList)
-        {
-        <option value="@spoke.id">@spoke.store_name</option>
-        }
-
-        }
-
-        </select>
-        <div style="align-self: center;margin-left:10px">
-        <input type="button" class="btn btn-outline-secondary" value="Clear" onclick="clearSeller()" />
-
-        </div>
-        </div>
-        </div> *@
-        @*         <div class="mb-3" style="width:30%;display: flex;">
-
-        <input id="html5-date-input-start" type="date" name="start" class="form-select" style="margin-right: 10px" onchange="submitForm()" />
-
-
-        <input id="html5-date-input-end" type="date" name="end" class="form-select" onchange="submitForm()" />
-
-
-        </div> *@
+      
 
     </form>
 
@@ -200,36 +196,53 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>00000</td>
-                                    <td>ขนมปังแนยสด</td>
-                                    <td>23</td>
-                                    <td><input type="number" step="0.001" /></td>
-                                    <td>
-                                        <select id="smallSelect" class="form-select form-select-sm">
-                                            <option>กรุณาเลือก เหตุผล</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <div class="input-group">
-                                            <button style="margin:5px" class="btn btn-xs btn-outline-info" id="getData" data-bs-toggle="modal" data-bs-target="#modalScrollable" data-nameSKU="2003 cookie" data-id="1" type="button">จัดของ</button>
-                                            <form asp-action="Submit" method="post">
-                                                <input type="hidden" name="id" value="" />
-                                                <button class="btn btn-xs btn-outline-success"  style="height: -webkit-fill-available;margin:5px" type="button">
-                                                    ยืนยัน
-                                                </button>
-                                            </form>
-                                            <form asp-action="Cancel" method="get">
-                                                <input type="hidden" name="id" value="" />
-                                                <button class="btn btn-xs btn-outline-danger" style="height: -webkit-fill-available;margin:5px" type="button">ยกเลิก</button>
-                                            </form>
-                                           
-                                        </div>
-                                    </td>
-                                </tr>
+
+                                @foreach (var m in Model.ToList())
+                                {
+                                    <tr>
+                                        <td>@m.sku_code</td>
+                                        <td>@m.sku_name</td>
+                                        <td>@m.value</td>
+                                        <td><input type="number" step="0.001" id="skuInput" value="@m.value" /></td>
+                                        <td>
+                                            <select id="reasonSelect" class="form-select form-select-sm">
+                                                <option value="0">กรุณาเลือก เหตุผล</option>
+                                                <option value="1">one</option>
+                                                <option value="2">Two</option>
+                                                <option value="3">Three</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <button style="margin:5px" class="btn btn-xs btn-outline-info" id="getData" data-bs-toggle="modal" data-bs-target="#modalScrollable" data-store="" data-week="" data-day="" data-type="" type="button">จัดของ</button>
+                                                <form asp-action="Submit" method="post">
+                                                    <input type="hidden" name="skuId" value="@m.Id" />
+                                                    <input type="hidden" name="reason" value="" />
+                                                    <input type="hidden" name="storeID" value="" />
+                                                    <input type="hidden" name="weekNo" value="" />
+                                                    <input type="hidden" name="value" value="" />
+                                                    <input type="hidden" name="dayOfWeek" value="" />
+                                                    <input type="hidden" name="type" value="" />
+                                                    <button class="btn btn-xs btn-outline-success" style="margin:5px" type="button">
+                                                        ยืนยัน
+                                                    </button>
+                                                </form>
+                                                <form asp-action="Cancel" method="post">
+                                                    <input type="hidden" name="skuId" value="@m.Id" />
+                                                    <input type="hidden" name="reason" value="" />
+                                                    <input type="hidden" name="storeID" value="" />
+                                                    <input type="hidden" name="weekNo" value="" />
+                                                    <input type="hidden" name="value" value="" />
+                                                    <input type="hidden" name="dayOfWeek" value="" />
+                                                    <button class="btn btn-xs btn-outline-danger" style="margin:5px" type="button">ยกเลิก</button>
+                                                </form>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                   
+                              
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -289,6 +302,77 @@
 
 <script>
     $(document).ready(function () {
+        $('#storeSelect').val(@ViewBag.storeID);
+        $('#weekSelect').val(@ViewBag.week);
+        $('#daySelect').val(@ViewBag.day);
+        $('#typeSelect').val(@ViewBag.cycle);
+        $('#skuInput').val(@ViewBag.value);
+        $('#getData').data('store', @ViewBag.storeID);
+        $('#getData').data('week', @ViewBag.week);
+        $('#getData').data('type', @ViewBag.cycle);
+      
+        // เมื่อเลือก storeSelect
+        $('#storeSelect').change(function () {
+            var storeId = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-store
+            $('#getData').data('store', storeId);
+            // อัพเดทค่าใน input hidden ชื่อ storId
+        
+            $('input[name="storeID"]').val(storeId);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อเลือก weekSelect
+        $('#weekSelect').change(function () {
+            var weekNo = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-week
+            $('#getData').data('week', weekNo);
+            // อัพเดทค่าใน input hidden ชื่อ weekNo
+            $('input[name="weekNo"]').val(weekNo);
+            $('input[name="week"]').val(weekNo);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อเลือก daySelect
+        $('#daySelect').change(function () {
+            var dayOfWeek = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-day
+            $('#getData').data('day', dayOfWeek);
+            // อัพเดทค่าใน input hidden ชื่อ dayOfWeek
+            $('input[name="dayOfWeek"]').val(dayOfWeek);
+            $('input[name="day"]').val(dayOfWeek);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อเลือก typeSelect
+        $('#typeSelect').change(function () {
+            var type = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-type
+            $('#getData').data('type', type);
+            // อัพเดทค่าใน input hidden ชื่อ type
+            $('input[name="type"]').val(type);
+            $('input[name="cycle"]').val(type);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อใส่ค่าใน skuInput
+        $('#skuInput').on('input', function () {
+            var value = $(this).val();
+            // อัพเดทค่าใน input hidden ชื่อ value
+            $('input[name="value"]').val(value);
+          
+        });
+
+
+        // เมื่อเลือกเหตุผลใน select
+        $('select#reasonSelect').change(function () {
+            // หาค่าเหตุผลที่ถูกเลือก
+            var selectedReason = $(this).val();
+            // หา input hidden ในแถวที่เป็นพ่อของ select ที่ถูกเลือก
+            var hiddenInput = $(this).closest('tr').find('input[name="reason"]');
+            // ใส่ค่าเหตุผลที่ถูกเลือกลงใน input hidden
+            hiddenInput.val(selectedReason);
+        });
 
         $('#getData').click(function () {
             // ดึงค่า ID จาก value ในปุ่ม
@@ -319,4 +403,7 @@
             });
         });
     });
+
+
+  
 </script>

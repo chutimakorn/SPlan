@@ -8,9 +8,13 @@ namespace StoreManagePlan.Models
         [Key]
         public int id { get; set; }
 
-        [ForeignKey("planDetail")]
-        public int plan_detail_id { get; set; }
+        [ForeignKey("store")]
+        public int store_id { get; set; }
+        [ForeignKey("item")]
+        public int sku_id { get; set; }
 
+        [ForeignKey("week")]
+        public int week_no { get; set; }
         public int day_of_week { get; set; }
        
         public int plan_actually { get; set; }
@@ -22,7 +26,9 @@ namespace StoreManagePlan.Models
 
 
 
-        public PlanDetail planDetail { get; set; }
+        public Store store { get; set; }
+        public Week week { get; set; }
+        public Item  item { get; set; }
         public Reason reason { get; set; }
 
     }
