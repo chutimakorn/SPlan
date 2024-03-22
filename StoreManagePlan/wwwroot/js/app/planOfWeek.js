@@ -47,10 +47,12 @@
         event.preventDefault();
         var week = $("#html5-date-input-week").val();
         var store = $("#html5-date-input-store").val();
+        var type = $("#html5-date-input-type").val();
 
         var formData = new FormData();
         formData.append('selectedStore', store);
         formData.append('selectedWeek', week);
+        formData.append('type', type);
         $.ajax({
             url: '/PlanOfWeek/Approve', // Update the URL based on your actual URL structure
             type: 'POST',

@@ -63,7 +63,17 @@ namespace StoreManagePlan.Controllers
             IQueryable<Plan> summedPlanDetail;
             if(day != 0 && storeID != 0 && week != 0 && (cycle != null && cycle != ""))
             {
-                planDetailApprove = planDetailApprove.Where(m => m.store_id == storeID && m.week_no == week && m.store.store_type.store_type_name == cycle);
+                if(cycle == "Hub")
+                {
+                    planDetailApprove = planDetailApprove.Where(m => m.store_id == storeID && m.week_no == week );
+
+                }
+                else
+                {
+                    var spoke = _context.StoreRelation.Where(m => m.store_hub_id == storeID).Select(m => m.store_spoke_id).ToList();
+                    planDetailApprove = planDetailApprove.Where(m => spoke.Contains(m.store_id) && m.week_no == week && m.store.store_type.store_type_name == cycle);
+
+                }
 
                 switch (day)
                 {
@@ -151,17 +161,149 @@ namespace StoreManagePlan.Controllers
             return View(plan);
         }
 
-        public ActionResult SkuDetail(int id)
+        public ActionResult GetSkuDetail(int store,int day,int week,string type,int skuid,int valueInput)
         {
-            // ตัวอย่างข้อมูลที่จะส่งกลับ
-            var skuDetails = new List<object>
-            {
-                new { store = "Store A", quantity = 10 },
-                new { store = "Store B", quantity = 15 },
-                new { store = "Store C", quantity = 20 }
-            };
+            var planDetailApprove = _context.PlanDetail.Include(m => m.item)
+                                                       .Include(m => m.store).ThenInclude(m => m.store_type)
+                                                       .Include(m => m.week)
+                                                       .Where(m => m.approve == true);
 
-            return Json(skuDetails);
+
+            List<Plan> plan = new List<Plan>();
+            // Sum plandetail by day with sku_name
+            IQueryable<Plan> summedPlanDetail;
+            if (day != 0 && store != 0 && week != 0 && (type != null && type != ""))
+            {
+                if (type == "Hub")
+                {
+                    planDetailApprove = planDetailApprove.Where(m => m.store_id == store && m.week_no == week && m.sku_id == skuid);
+
+                }
+                else
+                {
+                    var spoke = _context.StoreRelation.Where(m => m.store_hub_id == store).Select(m => m.store_spoke_id).ToList();
+                    planDetailApprove = planDetailApprove.Where(m => spoke.Contains(m.store_id) && m.week_no == week && m.store.store_type.store_type_name == type && m.sku_id == skuid);
+
+                }
+
+                switch (day)
+                {
+                    case 1:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_mon)
+                                                              });
+                        break;
+                    case 2:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_tues)
+                                                              });
+                        break;
+                    case 3:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_wed)
+                                                              });
+                        break;
+                    case 4:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_thu)
+                                                              });
+                        break;
+                    case 5:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_fri)
+                                                              });
+                        break;
+                    case 6:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_sat)
+                                                              });
+                        break;
+                    case 7:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
+                                                              .Select(g => new Plan
+                                                              {
+
+                                                                  sku_code = g.Key.store_code,
+                                                                  sku_name = g.Key.store_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_sun)
+                                                              });
+                        break;
+                    default:
+                        // Handle invalid day value
+                        return BadRequest("Invalid day value.");
+                }
+
+
+
+                plan = summedPlanDetail.ToList();
+                var totalValue = summedPlanDetail.Sum(item => item.value);
+                foreach (var item in plan)
+                {
+                    var ratio = (double)item.value / totalValue;
+                    var newValue = (int)Math.Ceiling(ratio * valueInput); // นำ valueInput มาคูณด้วยอัตราส่วนและปัดขึ้น
+                    item.value = newValue;
+                }
+
+                // หาค่าเกิน
+                var excess = plan.Sum(item => item.value) - valueInput;
+                if (excess > 0)
+                {
+                    // เรียงลำดับ plan โดยใช้ LINQ
+                    var orderedPlan = plan.OrderBy(item => item.value);
+                    // ลดค่าของ item.value ของตัวที่น้อยสุดลง 1
+                    foreach (var item in orderedPlan)
+                    {
+                        if (excess <= 0)
+                            break;
+
+                        item.value--;
+                        excess--;
+                    }
+                }
+            }
+
+
+
+
+            // ตัวอย่างข้อมูลที่จะส่งกลับ
+            //var skuDetails = new List<object>
+            //{
+            //    new { store = "Store A", quantity = 10 },
+            //    new { store = "Store B", quantity = 15 },
+            //    new { store = "Store C", quantity = 20 }
+            //};
+
+            return Json(plan);
         }
 
         // GET: PlanActuallies/Details/5

@@ -315,7 +315,7 @@ namespace StoreManagePlan.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Approve(int? selectedStore,int? selectedWeek)
+        public async Task<IActionResult> Approve(int? selectedStore,int? selectedWeek, string type)
         {
 
             if (selectedStore == null || selectedStore == 0)
@@ -330,21 +330,70 @@ namespace StoreManagePlan.Controllers
 
             try
             {
-                var stores = await _context.PlanDetail.Where(w => w.week_no == selectedWeek && w.store_id == selectedStore).ToListAsync();
-                if (stores.Count == 0 )
+                if (type == "Spoke")
                 {
-                    return Json(new { success = false, message = "ไม่พบข้อมูล" });
-                }
+                    var spoke = _context.StoreRelation.Where(m => m.store_hub_id == selectedStore).ToList();
+                    foreach (var s in spoke)
+                    {
+                        var stores = await _context.PlanDetail.Where(w => w.week_no == selectedWeek && w.store_id == s.store_spoke_id).ToListAsync();
+                        if (stores.Count == 0)
+                        {
+                            return Json(new { success = false, message = "ไม่พบข้อมูล" });
+                        }
 
-                foreach (var item in stores)
+                        foreach (var item in stores)
+                        {
+                            // Attach the entity to the context
+                            item.approve = true;
+                            _context.PlanDetail.Attach(item);
+
+                            // Update the specific properties
+                            _context.Entry(item).Property(e => e.approve).IsModified = true;
+                        }
+
+                    }
+                }
+                else if (type == "Hub")
                 {
-                    // Attach the entity to the context
-                    item.approve = true;
-                    _context.PlanDetail.Attach(item);
+                    var stores = await _context.PlanDetail.Where(w => w.week_no == selectedWeek && w.store_id == selectedStore).ToListAsync();
+                    if (stores.Count == 0)
+                    {
+                        return Json(new { success = false, message = "ไม่พบข้อมูล" });
+                    }
 
-                    // Update the specific properties
-                    _context.Entry(item).Property(e => e.approve).IsModified = true;
+                    foreach (var item in stores)
+                    {
+                        // Attach the entity to the context
+                        item.approve = true;
+                        _context.PlanDetail.Attach(item);
+
+                        // Update the specific properties
+                        _context.Entry(item).Property(e => e.approve).IsModified = true;
+                    }
                 }
+                else if (type == "all")
+                {
+                    var stores = await _context.PlanDetail.Where(w => w.week_no == selectedWeek).ToListAsync();
+                    if (stores.Count == 0)
+                    {
+                        return Json(new { success = false, message = "ไม่พบข้อมูล" });
+                    }
+
+                    foreach (var item in stores)
+                    {
+                        // Attach the entity to the context
+                        item.approve = true;
+                        _context.PlanDetail.Attach(item);
+
+                        // Update the specific properties
+                        _context.Entry(item).Property(e => e.approve).IsModified = true;
+                    }
+                }
+                else
+                {
+
+                }
+           
 
                 await _context.SaveChangesAsync();
 
