@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +29,139 @@ namespace StoreManagePlan.Controllers
             _configuration = configuration;
         }
 
-        // GET: PlanActuallies
-        public async Task<IActionResult> Index()
+        public class Plan
         {
-            var storeManagePlanContext = _context.PlanActually.Include(p => p.planDetail).Include(p => p.reason);
-            return View(await storeManagePlanContext.ToListAsync());
+            public int Id { get; set; }
+            public int plandetail_Id { get; set; }
+            public string sku_code { get; set; }
+            public string sku_name { get; set; }
+            public int value { get; set; }
+        
+        }
+
+        // GET: PlanActuallies
+        public async Task<IActionResult> Index(int storeID,int week,int day,string cycle,int value)
+        {
+            ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
+            ViewBag.storeID = storeID;
+            ViewBag.week = week;
+            ViewBag.day = day;
+            ViewBag.cycle = cycle;
+            ViewBag.value = value;
+            ViewBag.store = _context.Store.Include(m => m.store_type).Where(n => n.store_type.store_type_name == "Hub").ToList();
+            ViewBag.weekMaster = _context.Week.ToList();
+
+            var planDetailApprove = _context.PlanDetail.Include(m => m.item)
+                                                       .Include(m => m.store).ThenInclude(m => m.store_type)
+                                                       .Include(m => m.week)
+                                                       .Where(m => m.approve == true);
+
+           
+
+            List<Plan> plan = new List<Plan>();
+            // Sum plandetail by day with sku_name
+            IQueryable<Plan> summedPlanDetail;
+            if(day != 0 && storeID != 0 && week != 0 && (cycle != null && cycle != ""))
+            {
+                planDetailApprove = planDetailApprove.Where(m => m.store_id == storeID && m.week_no == week && m.store.store_type.store_type_name == cycle);
+
+                switch (day)
+                {
+                    case 1:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,                                                             
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_mon)
+                                                              });
+                        break;
+                    case 2:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_tues)
+                                                              });
+                        break;
+                    case 3:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_wed)
+                                                              });
+                        break;
+                    case 4:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_thu)
+                                                              });
+                        break;
+                    case 5:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_fri)
+                                                              });
+                        break;
+                    case 6:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_sat)
+                                                              });
+                        break;
+                    case 7:
+                        summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
+                                                              .Select(g => new Plan
+                                                              {
+                                                                  Id = g.Key.sku_id,
+                                                                  sku_code = g.Key.sku_code,
+                                                                  sku_name = g.Key.sku_name, // Add sku_name
+                                                                  value = g.Sum(m => m.plan_sun)
+                                                              });
+                        break;
+                    default:
+                        // Handle invalid day value
+                        return BadRequest("Invalid day value.");
+                }
+
+                plan = summedPlanDetail.ToList();
+            }
+         
+
+
+            
+            return View(plan);
+        }
+
+        public ActionResult SkuDetail(int id)
+        {
+            // ตัวอย่างข้อมูลที่จะส่งกลับ
+            var skuDetails = new List<object>
+            {
+                new { store = "Store A", quantity = 10 },
+                new { store = "Store B", quantity = 15 },
+                new { store = "Store C", quantity = 20 }
+            };
+
+            return Json(skuDetails);
         }
 
         // GET: PlanActuallies/Details/5
@@ -43,7 +173,7 @@ namespace StoreManagePlan.Controllers
             }
 
             var planActually = await _context.PlanActually
-                .Include(p => p.planDetail)
+               
                 .Include(p => p.reason)
                 .FirstOrDefaultAsync(m => m.id == id);
             if (planActually == null)
@@ -75,7 +205,7 @@ namespace StoreManagePlan.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["plan_detail_id"] = new SelectList(_context.PlanDetail, "id", "id", planActually.plan_detail_id);
+        
             ViewData["reason_id"] = new SelectList(_context.Set<Reason>(), "id", "id", planActually.reason_id);
             return View(planActually);
         }
@@ -93,7 +223,6 @@ namespace StoreManagePlan.Controllers
             {
                 return NotFound();
             }
-            ViewData["plan_detail_id"] = new SelectList(_context.PlanDetail, "id", "id", planActually.plan_detail_id);
             ViewData["reason_id"] = new SelectList(_context.Set<Reason>(), "id", "id", planActually.reason_id);
             return View(planActually);
         }
@@ -130,7 +259,7 @@ namespace StoreManagePlan.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["plan_detail_id"] = new SelectList(_context.PlanDetail, "id", "id", planActually.plan_detail_id);
+      
             ViewData["reason_id"] = new SelectList(_context.Set<Reason>(), "id", "id", planActually.reason_id);
             return View(planActually);
         }
@@ -144,7 +273,7 @@ namespace StoreManagePlan.Controllers
             }
 
             var planActually = await _context.PlanActually
-                .Include(p => p.planDetail)
+            
                 .Include(p => p.reason)
                 .FirstOrDefaultAsync(m => m.id == id);
             if (planActually == null)
