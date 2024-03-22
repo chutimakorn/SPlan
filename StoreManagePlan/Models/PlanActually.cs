@@ -21,8 +21,7 @@ namespace StoreManagePlan.Models
 
         [ForeignKey("reason")]
         public int reason_id { get; set; }
-        public int approve { get; set; }
-
+      
 
 
 
@@ -33,3 +32,5 @@ namespace StoreManagePlan.Models
 
     }
 }
+
+

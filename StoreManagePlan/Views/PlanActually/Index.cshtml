@@ -200,6 +200,7 @@
                                 @foreach (var m in Model.ToList())
                                 {
                                     <tr>
+                                        <td id="skuIDTable" hidden>@m.Id</td>
                                         <td>@m.sku_code</td>
                                         <td>@m.sku_name</td>
                                         <td id="realValue">@m.value</td>
@@ -259,15 +260,16 @@
                 </div>
 
                 <div class="row mt-4">
-                    <form style="width:fit-content" asp-action="SubmitAll" method="post">
+                    <form style="width:fit-content" asp-action="SubmitAll" id="submitAll" method="post">
                         <div class="btn-group">
-
-                            <button type="button" id="printButton" class="btn btn-success"><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
+                            <input id="typeSubmitAllBtn" name="type" value="@ViewBag.cycle" hidden/>
+                            <input id="dataSubmitAllBtn" name="json" value="@ViewBag.cycle" hidden />
+                            <button type="button" id="submitAllBtn" class="btn btn-success"><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
                         </div>
                     </form>
                     <form style="width:fit-content" asp-action="CancelAll" method="post">
                         <div class="btn-group">
-                            <button type="button" id="submitButton" class="btn btn-danger"><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
+                            <button type="button" id="cancel" class="btn btn-danger"><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
                         </div>
                     </form>
 
@@ -466,6 +468,44 @@
                 }
             });
         });
+
+
+
+        $('#submitAllBtn').click(function () {
+          
+
+            var data = [];
+            // วนลูปผ่านแต่ละแถวในตาราง
+            $("tbody tr").each(function () {
+                var value = $(this).find("#skuInput").val(); // ดึงข้อมูล value
+                var skuId = $(this).find("#skuIDTable").text(); // ดึงข้อมูล skuID
+                var reason = $(this).find("#reasonSelect").val(); // ดึงข้อมูล reason (ถ้าต้องการ)
+
+                // เก็บข้อมูลในรูปแบบของอ็อบเจ็กต์
+                var row = {
+                    store_id: @ViewBag.storeID,
+                    week_no: @ViewBag.week,
+                    day_of_week: @ViewBag.day,
+                    reason_id: reason,
+                    sku_id: skuId,
+                    plan_actually: value
+                };
+                // เพิ่มอ็อบเจ็กต์ลงในอาร์เรย์
+                data.push(row);
+            });
+
+            // // สร้างฟิลด์ซ่อนเพื่อส่งข้อมูล JSON ไปยังแอ็คชัน SubmitAll
+            // $('<input>').attr({
+            //     type: 'hidden',
+            //     name: 'jsonData',
+            //     value: JSON.stringify(data)
+            // }).appendTo($(this));
+
+            // ส่งข้อมูลไปยังแอ็คชัน SubmitAll
+           $('#dataSubmitAllBtn').val(JSON.stringify(data));
+           $('#submitAll').submit();
+        });
+
 
        
     });
