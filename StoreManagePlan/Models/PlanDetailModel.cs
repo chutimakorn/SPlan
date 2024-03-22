@@ -8,6 +8,7 @@ namespace StoreManagePlan.Models
         public string? sku_code { get; set; }
         public string? sku_name { get; set; }
         public int store_id { get; set; }
+        public int sku_id { get; set; }
 
         public int plan_mon { get; set; }
         public int plan_tues { get; set; }

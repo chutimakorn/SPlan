@@ -6,6 +6,7 @@
     ResourceController resource = new ResourceController();
     List<Week> weekList = ViewBag.weekMaster;
     List<Store> storeList = ViewBag.store;
+    List<Bom> Boms = ViewBag.boms;
 }
 
 <header>
@@ -25,39 +26,23 @@
                 top: 0;
                 width: 100%;
                 box-shadow: none;
+                font-size:10px;
             }
+        }
 
-            .bg-1 {
-                background-color: #fffaae
-            }
-
-            .bg-2 {
-                background-color: #f8c5d7
-            }
-
-            .bg-3 {
-                background-color: #cbfff0
-            }
-
-            .bg-4 {
-                background-color: #ffcfa7
-            }
-
-            .bg-5 {
-                background-color: #c7ebff
-            }
-
-            .bg-6 {
-                background-color: #cfccff
-            }
-
-            .bg-7 {
-                background-color: #fcb1b1
-            }
-            .
+    </style>
+    <style>
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
         }
     </style>
 </header>
+<button id="btn-back-to-top" class="btn btn-xl rounded-pill btn-icon btn-primary" type="button">
+    <i class="bx bx-lg bx-chevron-up"></i>
+</button>
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="py-3">
         แผนงานประจำวัน (รายวัน)
@@ -144,7 +129,7 @@
 
             </div>
         </div>
-
+        <input type="hidden" id="hiddenInputTab" name="TabNo" />
     </form>
 
     <div class="nav-align-top ">
@@ -155,22 +140,23 @@
                 <div class="nav-align-top mb-4">
                     <ul class="nav nav-pills mb-3" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button type="button" class="nav-link @ViewBag.tab_product" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="true">สินค้า</button>
+                            <button type="button" class="nav-link @ViewBag.tab_product" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-home" aria-controls="navs-pills-top-home" aria-selected="true" id="itemTab">สินค้า</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button type="button" class="nav-link @ViewBag.tab_ingredient" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="false" tabindex="-1">วัตถุดิบ</button>
+                            <button type="button" class="nav-link @ViewBag.tab_ingredient" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-profile" aria-controls="navs-pills-top-profile" aria-selected="false" tabindex="-1" id="detailTab">วัตถุดิบ</button>
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                        <div class="tab-pane fade @ViewBag.tab_product_active" id="navs-pills-top-home" role="tabpanel">
                             <div class="table-responsive text-nowrape">
-                                <table id="printTable" class="table" style="text-align-last: left;">
+                                <table id="item-table" class="table" style="text-align-last: left;">
                                     <thead style="background-color:#c1c1c138">
                                         <tr class="text-nowrap">
                                             <th>สินค้า</th>
                                             <th style="text-align-last: right;">จำนวนสำหรับ Hub</th>
                                             <th style="text-align-last: right;">จำนวนสำหรับ Spoke</th>
                                             <th style="text-align-last: right;">จำนวนรวม</th>
+                                            <th style="text-align-last: right;">หน่วย</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -181,6 +167,7 @@
                                                 <td style="text-align-last: right;">@item.HubAmt</td>
                                                 <td style="text-align-last: right;">@item.SpokeAmt</td>
                                                 <td style="text-align-last: right;">@item.TotalAmt</td>
+                                                <td style="text-align-last: right;">@item.Unit</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -188,17 +175,47 @@
                                     </tfoot>
                                 </table>
                             </div>
+                            <div class="row mt-4">
+                                <div class="btn-group" style="width: fit-content;">
+
+                                    <button type="button" id="printButton" class="btn btn-secondary"><span class="tf-icons bx bx-printer"></span>&nbsp; Print</button>
+                                </div>
+
+                            </div>
                         </div>
-                        <div class="tab-pane fade" id="navs-pills-top-profile" role="tabpanel">
-                            <p>
-                                Donut dragée jelly pie halvah. Danish gingerbread bonbon cookie wafer candy oat cake ice cream. Gummies
-                                halvah
-                                tootsie roll muffin biscuit icing dessert gingerbread. Pastry ice cream cheesecake fruitcake.
-                            </p>
-                            <p class="mb-0">
-                                Jelly-o jelly beans icing pastry cake cake lemon drops. Muffin muffin pie tiramisu halvah cotton candy
-                                liquorice caramels.
-                            </p>
+                        <div class="tab-pane fade @ViewBag.tab_ingredient_active" id="navs-pills-top-profile" role="tabpanel">
+                            <div class="table-responsive text-nowrape">
+                                <table id="boms" class="table" style="text-align-last: left;">
+                                    <thead style="background-color:#c1c1c138">
+                                        <tr class="text-nowrap">
+                                            <th>Ingredient Sku</th>
+                                            <th>วัตถุดิบ</th>
+                                            <th style="text-align-last: right;">จำนวนรวม</th>
+                                            <th style="text-align-last: right;">หน่วย</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Boms)
+                                        {
+                                            <tr>
+                                                <td>@item.ingredient_sku</td>
+                                                <td>@item.ingredient_name</td>
+                                                <td style="text-align-last: right;">@Math.Round(Convert.ToDecimal(item.weight_hub), 2)</td>
+                                                <td style="text-align-last: right;">@item.weight_uom</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                    </tfoot>
+                                </table>
+                                <div class="row mt-4" style="width: fit-content;">
+                                    <div class="btn-group">
+       
+                                        <button type="button" id="printButton2" class="btn btn-secondary"><span class="tf-icons bx bx-printer"></span>&nbsp; Print</button>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -215,7 +232,16 @@
         $('#html5-input-store').val("@ViewBag.storeId");
         $('#html5-input-week').val("@ViewBag.weekNo");
         $('#html5-input-day').val("@ViewBag.day");
+        $('#hiddenInputTab').val("@ViewBag.TabNo");
 
+
+        $("#itemTab").on("click", function () {
+            $("#hiddenInputTab").val(0);
+        });
+
+        $("#detailTab").on("click", function () {
+            $("#hiddenInputTab").val(1);
+        });
     });
 
 </script>
