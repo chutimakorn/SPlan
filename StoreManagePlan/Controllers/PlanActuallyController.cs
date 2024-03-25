@@ -37,12 +37,15 @@ namespace StoreManagePlan.Controllers
             public int plandetail_Id { get; set; }
             public string sku_code { get; set; }
             public string sku_name { get; set; }
+            public int reason { get; set; }
             public int value { get; set; }
-        
+            public int Actualvalue { get; set; }
+            public int approve { get; set; }
+
         }
 
         // GET: PlanActuallies
-        public async Task<IActionResult> Index(int storeID,int week,int day,string cycle,int value)
+        public async Task<IActionResult> Index(int storeID, int week, int day, string cycle, int value)
         {
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.storeID = storeID;
@@ -58,24 +61,30 @@ namespace StoreManagePlan.Controllers
                                                        .Include(m => m.week)
                                                        .Where(m => m.approve == true);
 
-           
+
 
             List<Plan> plan = new List<Plan>();
             // Sum plandetail by day with sku_name
             IQueryable<Plan> summedPlanDetail;
-            if(day != 0 && storeID != 0 && week != 0 && (cycle != null && cycle != ""))
+            if (day != 0 && storeID != 0 && week != 0 && (cycle != null && cycle != ""))
             {
-                if(cycle == "Hub")
+                var actuallyPlan = _context.PlanActually.Where(m => m.week_no == week);
+                if (cycle == "Hub")
                 {
-                    planDetailApprove = planDetailApprove.Where(m => m.store_id == storeID && m.week_no == week );
+
+                    planDetailApprove = planDetailApprove.Where(m => m.store_id == storeID && m.week_no == week);
+                    actuallyPlan = actuallyPlan.Where(m => m.store_id == storeID);
 
                 }
                 else
                 {
                     var spoke = _context.StoreRelation.Where(m => m.store_hub_id == storeID).Select(m => m.store_spoke_id).ToList();
                     planDetailApprove = planDetailApprove.Where(m => spoke.Contains(m.store_id) && m.week_no == week && m.store.store_type.store_type_name == cycle);
+                    actuallyPlan = actuallyPlan.Where(m => spoke.Contains(m.store_id));
 
                 }
+
+
 
                 switch (day)
                 {
@@ -84,10 +93,16 @@ namespace StoreManagePlan.Controllers
                                                               .Select(g => new Plan
                                                               {
                                                                   Id = g.Key.sku_id,
-                                                                  sku_code = g.Key.sku_code,                                                             
+                                                                  sku_code = g.Key.sku_code,
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_mon)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                          .Select(g => new PlanActually
+                                                          {
+                                                              sku_id = g.Key.sku_id,
+                                                              plan_actually = g.Sum(m => m.plan_actually)
+                                                          });
                         break;
                     case 2:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -98,6 +113,12 @@ namespace StoreManagePlan.Controllers
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_tues)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                          .Select(g => new PlanActually
+                                                          {
+                                                              sku_id = g.Key.sku_id,
+                                                              plan_actually = g.Sum(m => m.plan_actually)
+                                                          });
                         break;
                     case 3:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -108,6 +129,12 @@ namespace StoreManagePlan.Controllers
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_wed)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                          .Select(g => new PlanActually
+                                                          {
+                                                              sku_id = g.Key.sku_id,
+                                                              plan_actually = g.Sum(m => m.plan_actually)
+                                                          });
                         break;
                     case 4:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -118,6 +145,12 @@ namespace StoreManagePlan.Controllers
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_thu)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                          .Select(g => new PlanActually
+                                                          {
+                                                              sku_id = g.Key.sku_id,
+                                                              plan_actually = g.Sum(m => m.plan_actually)
+                                                          });
                         break;
                     case 5:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -128,6 +161,12 @@ namespace StoreManagePlan.Controllers
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_fri)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                             .Select(g => new PlanActually
+                                                             {
+                                                                 sku_id = g.Key.sku_id,
+                                                                 plan_actually = g.Sum(m => m.plan_actually)
+                                                             });
                         break;
                     case 6:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -138,6 +177,12 @@ namespace StoreManagePlan.Controllers
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_sat)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                           .Select(g => new PlanActually
+                                                           {
+                                                               sku_id = g.Key.sku_id,
+                                                               plan_actually = g.Sum(m => m.plan_actually)
+                                                           });
                         break;
                     case 7:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -148,6 +193,12 @@ namespace StoreManagePlan.Controllers
                                                                   sku_name = g.Key.sku_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_sun)
                                                               });
+                        actuallyPlan = actuallyPlan.Where(m => m.day_of_week == day).GroupBy(m => new { m.sku_id })
+                                                             .Select(g => new PlanActually
+                                                             {
+                                                                 sku_id = g.Key.sku_id,
+                                                                 plan_actually = g.Sum(m => m.plan_actually)
+                                                             });
                         break;
                     default:
                         // Handle invalid day value
@@ -155,15 +206,42 @@ namespace StoreManagePlan.Controllers
                 }
 
                 plan = summedPlanDetail.ToList();
+
+                var checkAllSubmit = true;
+
+                if (actuallyPlan.ToList().Count() > 0)
+                {
+                    foreach (var n in plan)
+                    {
+
+                        var valueresult = actuallyPlan.Where(m => m.sku_id == n.Id).SingleOrDefault();
+                        n.Actualvalue = valueresult.plan_actually;
+                        n.reason = valueresult.reason_id;
+                        
+                    }
+                }
+                else
+                {
+                    foreach (var n in plan)
+                    {
+
+
+                        n.Actualvalue = n.value;
+                       
+                    }
+                    checkAllSubmit = false;
+                }
+
             }
-         
 
-
+           
             
+
+
             return View(plan);
         }
 
-        public ActionResult GetSkuDetail(int store,int day,int week,string type,int skuid,int valueInput)
+        public ActionResult GetSkuDetail(int store, int day, int week, string type, int skuid, int valueInput)
         {
             var planDetailApprove = _context.PlanDetail.Include(m => m.item)
                                                        .Include(m => m.store).ThenInclude(m => m.store_type)
@@ -194,7 +272,7 @@ namespace StoreManagePlan.Controllers
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.store.store_code, m.store.store_name })
                                                               .Select(g => new Plan
                                                               {
-                                                                  
+
                                                                   sku_code = g.Key.store_code,
                                                                   sku_name = g.Key.store_name, // Add sku_name
                                                                   value = g.Sum(m => m.plan_mon)
@@ -454,34 +532,9 @@ namespace StoreManagePlan.Controllers
             return plan;
         }
 
+     
 
-        // GET: PlanActuallies/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var planActually = await _context.PlanActually
-               
-                .Include(p => p.reason)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (planActually == null)
-            {
-                return NotFound();
-            }
-
-            return View(planActually);
-        }
-
-        // GET: PlanActuallies/Create
-        public IActionResult Create()
-        {
-            ViewData["plan_detail_id"] = new SelectList(_context.PlanDetail, "id", "id");
-            ViewData["reason_id"] = new SelectList(_context.Set<Reason>(), "id", "id");
-            return View();
-        }
 
         // POST: PlanActuallies/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -499,7 +552,7 @@ namespace StoreManagePlan.Controllers
                 {
                     PlanActually = PlanActually.Where(m => m.store_id == n.store_id);
                     var checkUpate = PlanActually.SingleOrDefault();
-                    if(checkUpate != null)
+                    if (checkUpate != null)
                     {
 
                         var result = GetPlan(n.store_id, n.day_of_week, n.week_no, type, n.sku_id, n.plan_actually);
@@ -514,14 +567,15 @@ namespace StoreManagePlan.Controllers
 
 
                             _context.Update(checkUpate);
+
                         }
 
-                     
+
                     }
                     else
                     {
                         var result = GetPlan(n.store_id, n.day_of_week, n.week_no, type, n.sku_id, n.plan_actually);
-                        foreach(var z in result)
+                        foreach (var z in result)
                         {
                             var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
                             PlanActually plan = new PlanActually();
@@ -532,162 +586,70 @@ namespace StoreManagePlan.Controllers
 
 
                             _context.Add(plan);
+
                         }
 
-                       
+
                     }
 
                 }
                 else
                 {
-                    var spoke = _context.StoreRelation.Where(m => m.store_hub_id == n.store_id).Select(m => m.store_spoke_id).ToList();
 
-                    foreach(var spokeid in spoke)
+                    var result = GetPlan(n.store_id, n.day_of_week, n.week_no, type, n.sku_id, n.plan_actually);
+
+
+
+                    foreach (var z in result)
                     {
-                        PlanActually = PlanActually.Where(m => m.store_id == spokeid);
-                  
-                        var checkUpate = PlanActually.SingleOrDefault();
-                        if (checkUpate != null)
+                        var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
+                        PlanActually = PlanActually.Where(m => m.store_id == getstoreId);
+                        var checkUpdate = PlanActually.SingleOrDefault();
+                        if (checkUpdate != null)
                         {
-                            var result = GetPlan(n.store_id, n.day_of_week, n.week_no, type, n.sku_id, n.plan_actually);
+                            checkUpdate.plan_actually = z.value;
+                            checkUpdate.reason_id = n.reason_id;
 
 
-
-                            foreach (var z in result)
-                            {
-                                var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
-
-
-                                checkUpate.plan_actually = z.value;
-                                checkUpate.reason_id = n.reason_id;
-
-
-                                _context.Update(checkUpate);
-                            }
+                            _context.Update(checkUpdate);
                         }
                         else
                         {
-                            var result = GetPlan(n.store_id, n.day_of_week, n.week_no, type, n.sku_id, n.plan_actually);
-
-                            foreach (var z in result)
-                            {
-                                var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
-                                PlanActually plan = new PlanActually();
-                                plan = n;
-                                plan.store_id = getstoreId;
-                                plan.plan_actually = z.value;
+                            PlanActually plan = new PlanActually();
+                            plan.sku_id = n.sku_id;
+                            plan.week_no = n.week_no;
+                            plan.day_of_week = n.day_of_week;
+                            plan.store_id = getstoreId;
+                            plan.plan_actually = z.value;
+                            plan.approve = 1;
 
 
 
-                                _context.Add(plan);
-                            }
+                            _context.Add(plan);
                         }
+
+
+                      
+
                     }
+
+                  
+
+
                 }
 
-                    
+
             }
 
-               
-
-            
-                await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
 
-        // GET: PlanActuallies/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var planActually = await _context.PlanActually.FindAsync(id);
-            if (planActually == null)
-            {
-                return NotFound();
-            }
-            ViewData["reason_id"] = new SelectList(_context.Set<Reason>(), "id", "id", planActually.reason_id);
-            return View(planActually);
-        }
-
-        // POST: PlanActuallies/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,plan_detail_id,day_of_week,plan_actually,reason_id,approve")] PlanActually planActually)
-        {
-            if (id != planActually.id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(planActually);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PlanActuallyExists(planActually.id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-      
-            ViewData["reason_id"] = new SelectList(_context.Set<Reason>(), "id", "id", planActually.reason_id);
-            return View(planActually);
-        }
-
-        // GET: PlanActuallies/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var planActually = await _context.PlanActually
-            
-                .Include(p => p.reason)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (planActually == null)
-            {
-                return NotFound();
-            }
-
-            return View(planActually);
-        }
-
-        // POST: PlanActuallies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var planActually = await _context.PlanActually.FindAsync(id);
-            if (planActually != null)
-            {
-                _context.PlanActually.Remove(planActually);
-            }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PlanActuallyExists(int id)
-        {
-            return _context.PlanActually.Any(e => e.id == id);
-        }
+
+
+ 
     }
 }

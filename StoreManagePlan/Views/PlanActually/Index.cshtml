@@ -204,9 +204,9 @@
                                         <td>@m.sku_code</td>
                                         <td>@m.sku_name</td>
                                         <td id="realValue">@m.value</td>
-                                        <td><input type="number" step="1"   id="skuInput" value="@m.value" /></td>
+                                        <td><input type="number" step="1" id="skuInput" value="@m.Actualvalue" /></td>
                                         <td>
-                                            <select id="reasonSelect" class="form-select form-select-sm" disabled="true">
+                                            <select id="reasonSelect" class="form-select form-select-sm" disabled="true" asp-for="@m.reason">
                                                 <option value="0">กรุณาเลือก เหตุผล</option>
                                                 <option value="1">one</option>
                                                 <option value="2">Two</option>
@@ -215,28 +215,7 @@
                                         </td>
                                         <td>
                                             <div class="input-group">
-                                                <button style="margin:5px" class="btn btn-xs btn-outline-info" id="getData" data-bs-toggle="modal" data-bs-target="#modalScrollable" data-store="@ViewBag.storeID" data-week="@ViewBag.week" data-day="@ViewBag.day" data-type="@ViewBag.cycle" data-skuid="@m.Id" data-name="@m.sku_code @m.sku_name" type="button">จัดของ</button>
-                                                <form asp-action="Submit" method="post">
-                                                    <input type="hidden" name="skuId" value="@m.Id" />
-                                                    <input type="hidden" name="reason" value="" />
-                                                    <input type="hidden" name="storeID" value="" />
-                                                    <input type="hidden" name="weekNo" value="" />
-                                                    <input type="hidden" name="value" value="" />
-                                                    <input type="hidden" name="dayOfWeek" value="" />
-                                                    <input type="hidden" name="type" value="" />
-                                                    <button class="btn btn-xs btn-outline-success" style="margin:5px" type="button">
-                                                        ยืนยัน
-                                                    </button>
-                                                </form>
-                                                <form asp-action="Cancel" method="post">
-                                                    <input type="hidden" name="skuId" value="@m.Id" />
-                                                    <input type="hidden" name="reason" value="" />
-                                                    <input type="hidden" name="storeID" value="" />
-                                                    <input type="hidden" name="weekNo" value="" />
-                                                    <input type="hidden" name="value" value="" />
-                                                    <input type="hidden" name="dayOfWeek" value="" />
-                                                    <button class="btn btn-xs btn-outline-danger" style="margin:5px" type="button">ยกเลิก</button>
-                                                </form>
+                                                <button style="margin:5px" class="btn btn-xs btn-outline-info" id="getData" data-bs-toggle="modal" data-bs-target="#modalScrollable" data-store="@ViewBag.storeID" data-week="@ViewBag.week" data-day="@ViewBag.day" data-type="@ViewBag.cycle" data-skuid="@m.Id" data-name="@m.sku_code @m.sku_name" type="button">จัดของ</button>                                             
 
                                             </div>
                                         </td>
@@ -267,11 +246,11 @@
                             <button type="button" id="submitAllBtn" class="btn btn-success"><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
                         </div>
                     </form>
-                    <form style="width:fit-content" asp-action="CancelAll" method="post">
-                        <div class="btn-group">
-                            <button type="button" id="cancel" class="btn btn-danger"><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
-                        </div>
-                    </form>
+
+                    <div class="btn-group" style="width:fit-content">
+                        <button type="button" id="cancel" class="btn btn-danger"><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
+                    </div>
+
 
                 </div>
             </div>
@@ -413,6 +392,7 @@
             $('input[name="value"]').val(value);
           
         });
+
 
 
         // เมื่อเลือกเหตุผลใน select

@@ -5,23 +5,28 @@ namespace StoreManagePlan.Models
 {
     public class PlanActually
     {
-        [Key]
-        public int id { get; set; }
+     
 
+        [Key]
         [ForeignKey("store")]
         public int store_id { get; set; }
+        [Key]
         [ForeignKey("item")]
         public int sku_id { get; set; }
 
+        [Key]
         [ForeignKey("week")]
         public int week_no { get; set; }
+        [Key]
         public int day_of_week { get; set; }
        
+        public int plan_value { get; set; }
         public int plan_actually { get; set; }
 
         [ForeignKey("reason")]
         public int reason_id { get; set; }
-      
+        public int approve { get; set; }
+
 
 
 
