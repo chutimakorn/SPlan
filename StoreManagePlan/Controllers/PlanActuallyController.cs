@@ -53,7 +53,7 @@ namespace StoreManagePlan.Controllers
             ViewBag.week = week;
             ViewBag.day = day;
             ViewBag.cycle = cycle;
-           
+            ViewBag.menu = _menu;
             ViewBag.store = _context.Store.Include(m => m.store_type).Where(n => n.store_type.store_type_name == "Hub").ToList();
             ViewBag.weekMaster = _context.Week.ToList();
             ViewBag.reasonhight = _context.Reason.Where(m => m.menu == "pac" && m.type == 1).ToList();

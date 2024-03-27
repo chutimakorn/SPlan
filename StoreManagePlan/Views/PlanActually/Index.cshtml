@@ -199,9 +199,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-
+                                @if (Model.ToList().Count() == 0)
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center">No data</td>
+                                    </tr>
+                                }
                                 @foreach (var m in Model.ToList())
                                 {
+                                   
                                     <tr>
                                         <td id="skuIDTable" hidden>@m.Id</td>
                                         <td>@m.sku_code</td>
@@ -212,7 +218,7 @@
                                         <td>
                                             <select id="reasonSelect" class="form-select form-select-sm" disabled="true" asp-for="@m.reason">
                                                 <option value="0">กรุณาเลือก เหตุผล</option>
-                                                <option value="1">one</option>
+                                               
                                                 @foreach (var n in reason)
                                                 {
                                                     <option value="@n.id">@n.reason</option>
@@ -248,7 +254,7 @@
                 <div class="row mt-4">
                     <form style="width:fit-content" asp-action="SubmitAll" id="submitAll" method="post">
                         <input id="typeSubmitAllBtn" name="type" value="@ViewBag.cycle" hidden />
-                        <input id="dataSubmitAllBtn" name="json" value="@ViewBag.cycle" hidden />
+                        <input id="dataSubmitAllBtn" name="json" value="" hidden />
                     </form>
                     <div class="btn-group" style="width:fit-content">
                         
@@ -295,9 +301,6 @@
             });
         }
 
-        $('input[type="number"]').change(function () {
-
-        });
 
         function sumInput() {
             var sum = 0;
@@ -359,22 +362,7 @@
             // ตั้งค่าเริ่มต้นให้เป็นกรุณาเลือก เหตุผล
             reasonSelect.val('0');
             // เปรียบเทียบค่าจริงกับค่าที่ป้อน
-            if (realValue != inputValue) {
-                // ถ้าค่าไม่เท่ากันให้ปรับสถานะปุ่ม
-                $(this).closest('tr').find('select').prop('disabled', false);
-                $(this).closest('tr').find('button[type="button"]').prop('disabled', true);
-            } else {
-                // ถ้าค่าเท่ากันให้เอา disable ออก
-                $(this).closest('tr').find('select').prop('disabled', true).val("0")
-                $(this).closest('tr').find('button[type="button"]').prop('disabled', false);
-            }
-
-            // ตรวจสอบค่าของ reasonSelect
-            if ($(this).closest('tr').find('select').val() == '0') {
-                $(this).closest('tr').find('button[type="button"]').prop('disabled', true);
-            } else {
-                $(this).closest('tr').find('button[type="button"]').prop('disabled', false);
-            }
+           
             sumInput();
         });
 

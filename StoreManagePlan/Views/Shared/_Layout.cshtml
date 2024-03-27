@@ -35,11 +35,13 @@
     var menuStoreType = "";
     var menuStoreRelate = "";
     var menuMasterOpen = "";
+    var menuReportOpen = "";
     var menuPPR = "";
     var menuPAP = "";
     var menuPOW = "";
     var menuPAC = "";
     var menuDYP = "";
+    var menuPPC = "";
     var menuIBTO = "";
     //ตัว active menu
     if(ViewBag.menu == "home")
@@ -92,6 +94,12 @@
     else if (ViewBag.menu == "dyp")
     {
         menuDYP = "active";
+
+    }
+    else if (ViewBag.menu == "ppc")
+    {
+        menuPPC = "active";
+        menuReportOpen = "open";
 
     }
     else if (ViewBag.menu == "storeType")
@@ -284,14 +292,14 @@ else if (ViewBag.menu == "ibto")
 
                     @if(role == 1 || role == 2)
                     {
-                        <li class="menu-item">
+                        <li class="menu-item @menuReportOpen">
                             <a href="javascript:void(0);" class="menu-link menu-toggle">
                                 <i class="menu-icon tf-icons bx bx-dock-top"></i>
                                 <div data-i18n="Account Settings">รายงานผล</div>
                             </a>
                             <ul class="menu-sub">
-                                <li class="menu-item">
-                                    <a class="menu-link">
+                                <li class="menu-item" @menuPPC>
+                                    <a class="menu-link" asp-controller="PlanCompliance" asp-action="Index">
                                         <div data-i18n="Account">Plan Compliance</div>
                                     </a>
                                 </li>

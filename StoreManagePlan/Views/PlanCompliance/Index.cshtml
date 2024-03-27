@@ -1,0 +1,280 @@
+﻿@model IEnumerable<StoreManagePlan.Models.PlanActually>
+@using StoreManagePlan.Controllers
+
+@{
+    ResourceController resource = new ResourceController();
+    ViewData["Title"] = "Index";
+    List<Week> weekList = ViewBag.weekMaster;
+    List<Reason> reasonList = ViewBag.reason;
+
+}
+
+<header>
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+    <style type="text/css" media="print">
+        /* @@page { size: landscape; } */
+        @@media print {
+            body {
+                visibility: hidden;
+            }
+
+            .section-to-print {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+
+            .bg-1 {
+                background-color: #fffaae
+            }
+
+            .bg-2 {
+                background-color: #f8c5d7
+            }
+
+            .bg-3 {
+                background-color: #cbfff0
+            }
+
+            .bg-4 {
+                background-color: #ffcfa7
+            }
+
+            .bg-5 {
+                background-color: #c7ebff
+            }
+
+            .bg-6 {
+                background-color: #cfccff
+            }
+
+            .bg-7 {
+                background-color: #fcb1b1
+            }
+        }
+    </style>
+</header>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="py-3 mb-4">
+       Production Plan Compliance
+     </h4>
+    <div class="bs-toast toast toast-placement-ex fade bg-success top-0 end-0 m-2" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            อนุมัติสำเร็จ.
+        </div>
+    </div>
+
+    <div class="bs-toast toast toast-placement-ex fade bg-danger top-0 end-0 m-2" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">แจ้งเตือน</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+        </div>
+    </div>
+  
+
+
+
+    <form id="form1" asp-action="Index" method="get">
+
+
+        <div class="mb-3">
+
+            <div class="row">
+               
+                <div class="col-3">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label" for="html5-date-input-week">Period</label>
+                        <div class="col-sm-10">
+                            <select id="weekSelect" class="form-select select-action" name="week">
+                                <option value="0">กรุณาเลือกสัปดาห์ที่ต้องการ</option>
+                                @foreach (var week in weekList)
+                                {
+                                    <option value="@week.week_no">W @week.week_no  @resource.ConvertDate(week.start_date) @resource.ConvertDate(week.end_date)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+             
+              
+
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label" for="html5-date-input-week">Plan statu : Approved</label>
+                        
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+
+    </form>
+
+
+    <div class="nav-align-top ">
+
+
+        <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                <div class="mt-3 mb-3">
+                    <div class="d-flex justify-content-start">
+                        <div class="btn-group">
+                            
+                            <button type="submit" id="export-btn" class="btn btn-outline-secondary"><span class="tf-icons bx bx-download"></span>&nbsp; Export</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card section-to-print" id="forprint" style="padding:10px">
+                   
+                    <div class="table-responsive text-nowrap">
+                        <table id="Table" class="table" style="text-align-last: left;width: max-content;">
+                            <thead style="background-color:#c1c1c138">
+                                <tr class="text-nowrap">
+                                    <th>Plan week</th>
+                                    <th>Finished Date</th>
+                                    <th>PlanDayOfWeek</th>
+                                    <th>SKU</th>
+                                    <th>Description</th>
+                                    <th>Store ID</th>
+                                    <th>Store Name</th>
+                                    <th>Shift</th>
+                                    <th>Plan Qty</th>
+                                    <th>Actual FG Qty</th>
+                                    <th>Reason</th>
+                                  
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @foreach (var m in Model.ToList())
+                                {
+                                   var week = weekList.Where(n => n.week_no == m.week_no).SingleOrDefault();
+                                    var reason = reasonList.Where(n => n.id == m.reason_id).SingleOrDefault();
+                                    var reasonText = "";
+                                    if(reason != null)
+                                    {
+                                        reasonText = reason.reason;
+                                    }
+                                    <tr>
+                                        <td>@resource.ConvertDate(week.start_date) - @resource.ConvertDate(week.end_date)</td>
+                                        <td>@resource.ConvertDate(week.start_date)</td>
+                                        @if (m.day_of_week == 1)
+                                        {
+                                            <td>Monday</td>
+                                        }
+                                        else if (m.day_of_week == 1)
+                                        {
+                                            <td>Tuesday</td>
+                                        } 
+                                        else if (m.day_of_week == 1)
+                                        {
+                                            <td>Wednesday</td>
+                                        }
+                                        else if (m.day_of_week == 1)
+                                        {
+                                            <td>Thuesday</td>
+                                        } 
+                                        else if (m.day_of_week == 1)
+                                        {
+                                            <td>Friday</td>
+                                        }
+                                        else if (m.day_of_week == 1)
+                                        {
+                                            <td>Saturday</td>
+                                        }
+                                        else
+                                        {
+                                            <td>Sunday</td>
+                                        }
+
+                                        <td >@m.item.sku_code</td>
+                                        <td >@m.item.sku_name</td>
+                                        <td >@m.store.store_code</td>
+                                        <td >@m.store.store_name</td>
+                                        @if (m.store.store_type.store_type_name.ToLower() == "hub")
+                                        {
+                                            <td>เช้า</td>
+                                        }
+                                        else
+                                        {
+                                            <td>บ่าย</td>
+                                        }
+                                        <td >@m.plan_value</td>
+                                        <td >@m.plan_actually</td>
+                                        <td>@reasonText</td>
+
+                                       
+                                     
+                                    </tr>
+                              
+                               }
+
+                            </tbody>
+                           
+                        </table>
+                    </div>
+                </div>
+
+             
+            </div>
+        </div>
+
+
+    </div>
+   
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var tableData = new DataTable('#Table', {
+            "lengthMenu": [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All']
+            ]
+        });
+        $('#export-btn').click(function () {
+
+            var id = $('#weekSelect').val();
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/PlanCompliance/ExportToExcel/" + id, true);
+            xhr.responseType = "blob"; // Expecting a binary response
+            xhr.onload = function () {
+                var blob = new Blob([xhr.response], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                var link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "Plan_Compliance.xlsx";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+            xhr.send();
+        });
+
+        $('#weekSelect').val(@ViewBag.week);
+
+        $('#weekSelect').change(function () {
+          
+            document.getElementById("form1").submit();
+        });
+    });
+</script>
