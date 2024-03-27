@@ -574,7 +574,7 @@ namespace StoreManagePlan.Controllers
 
                             checkUpate.plan_actually = z.value;
                             checkUpate.reason_id = n.reason_id;
-
+                            checkUpate.plan_value = n.plan_value;
 
                             _context.Update(checkUpate);
 
@@ -589,9 +589,12 @@ namespace StoreManagePlan.Controllers
                         {
                             var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
                             PlanActually plan = new PlanActually();
-                            plan = n;
+                            plan.sku_id = n.sku_id;
+                            plan.week_no = n.week_no;
+                            plan.day_of_week = n.day_of_week;
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
+                            plan.plan_value = n.plan_value;
 
 
 
@@ -635,7 +638,7 @@ namespace StoreManagePlan.Controllers
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
                             plan.plan_value = n.plan_value;
-                            plan.approve = 1;
+                         
 
 
 

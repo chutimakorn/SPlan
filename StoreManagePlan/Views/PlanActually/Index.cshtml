@@ -185,7 +185,7 @@
         <div class="tab-content">
             <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
                 <div class="card section-to-print" id="forprint" style="padding:10px">
-                    <h6 class="">สถานะ : ยืนยันแล้ว</h6>
+                    <h6 class="">สถานะ : @(ViewBag.checkAllSubmit == 1 ? "ยืนยันเรียบร้อย" : "ยังไม่ยืนยัน")</h6>
                     <div class="table-responsive text-nowrap">
                         <table id="printTable" class="table" style="text-align-last: left;">
                             <thead style="background-color:#c1c1c138">
@@ -217,7 +217,7 @@
                                                 {
                                                     <option value="@n.id">@n.reason</option>
                                                 }
-                                               
+
                                             </select>
                                         </td>
                                         <td>
@@ -247,12 +247,13 @@
 
                 <div class="row mt-4">
                     <form style="width:fit-content" asp-action="SubmitAll" id="submitAll" method="post">
-                        <div class="btn-group">
-                            <input id="typeSubmitAllBtn" name="type" value="@ViewBag.cycle" hidden />
-                            <input id="dataSubmitAllBtn" name="json" value="@ViewBag.cycle" hidden />
-                            <button type="button" id="submitAllBtn" class="btn btn-success" @(ViewBag.checkAllSubmit == 0 || ViewBag.checkAllSubmit == 1 ? "disabled" : "")><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
-                        </div>
+                        <input id="typeSubmitAllBtn" name="type" value="@ViewBag.cycle" hidden />
+                        <input id="dataSubmitAllBtn" name="json" value="@ViewBag.cycle" hidden />
                     </form>
+                    <div class="btn-group" style="width:fit-content">
+                        
+                        <button type="button" id="submitAllBtn" class="btn btn-success" @(ViewBag.checkAllSubmit == 0 || ViewBag.checkAllSubmit == 1 ? "disabled" : "")><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
+                    </div>
 
                     <div class="btn-group" style="width:fit-content">
                         <button type="button" id="cancel" class="btn btn-danger" @(ViewBag.checkAllSubmit == 1 ? "" : "disabled")><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
@@ -274,10 +275,7 @@
                 </div>
                 <div class="modal-body">
                 </div>
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-primary" id="save-import">Print</button>
-                </div>
+              
             </div>
         </div>
     </div>
@@ -298,39 +296,7 @@
         }
 
         $('input[type="number"]').change(function () {
-            var inputValue = parseFloat($(this).val());
-            var realValue = parseFloat($("#realValue").text());
-            var reasonSelect = $("#reasonSelect");
 
-            // ตรวจสอบว่าค่าของ skuInput มากกว่า realValue หรือไม่
-            if (inputValue > realValue) {
-                // ใช้ data จาก ViewBag.reasonhight
-                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
-                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
-
-                @foreach (var reasonh in hight)
-                {
-
-        @:reasonSelect.append($('<option>', { value: '@reasonh.id', text: decodeUnicode('@reasonh.reason') }));
-                  
-                }
-               
-            } else {
-                            // ใช้ data จาก ViewBag.reasonrow
-                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
-                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
-             
-                @foreach (var reasonl in low)
-                {
-
-        @:reasonSelect.append($('<option>', { value: '@reasonl.id', text: decodeUnicode('@reasonl.reason') }));
-                  
-                }
-              
-            }
-
-            // ตั้งค่าเริ่มต้นให้เป็นกรุณาเลือก เหตุผล
-            reasonSelect.val('0');
         });
 
         function sumInput() {
@@ -360,17 +326,38 @@
             var realValue = $(this).closest('tr').find('#realValue').text();
             var inputValue = $(this).val();
 
-            $("tbody tr").each(function () {
-                var skuId = $(this).find("#skuIDTable").text(); // ดึงข้อมูล skuID
-                var reason = $(this).find("#reasonSelect").val(); // ดึงข้อมูล reason (ถ้าต้องการ)
-                var value = $(this).find("#skuInput").val(); // ดึงข้อมูล value
 
+            var reasonSelect = $(this).closest('tr').find("#reasonSelect");
 
+            // ตรวจสอบว่าค่าของ skuInput มากกว่า realValue หรือไม่
+            if (inputValue > realValue) {
+                // ใช้ data จาก ViewBag.reasonhight
+                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
 
+    @foreach (var reasonh in hight)
+    {
 
-            });
+        @:reasonSelect.append($('<option>', { value: '@reasonh.id', text: decodeUnicode('@reasonh.reason') }));
 
+    }
 
+                    } else {
+                // ใช้ data จาก ViewBag.reasonrow
+                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
+
+    @foreach (var reasonl in low)
+    {
+
+        @:reasonSelect.append($('<option>', { value: '@reasonl.id', text: decodeUnicode('@reasonl.reason') }));
+
+    }
+
+                    }
+
+            // ตั้งค่าเริ่มต้นให้เป็นกรุณาเลือก เหตุผล
+            reasonSelect.val('0');
             // เปรียบเทียบค่าจริงกับค่าที่ป้อน
             if (realValue != inputValue) {
                 // ถ้าค่าไม่เท่ากันให้ปรับสถานะปุ่ม
@@ -561,7 +548,7 @@
 
             // ถ้ามีข้อมูลที่ไม่ถูกต้อง
             if (!isValid) {
-                alert("มีสินค้าบางรายการที่ไม่ตรงเงื่อนไข โปรดตรวจสอบอีกครั้ง");
+                alert("กรุณาเลือกเหตุผลในการปรับจำนวนสินค้า");
                 return;
             } else {
                 var data = [];
