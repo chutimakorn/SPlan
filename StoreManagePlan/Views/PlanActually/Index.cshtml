@@ -6,7 +6,10 @@
     ViewData["Title"] = "Index";
     List<Week> weekList = ViewBag.weekMaster;
     List<Store> storeList = ViewBag.store;
-  }
+    List<Reason> hight = ViewBag.reasonhight;
+    List<Reason> low = ViewBag.resonlow;
+    List<Reason> reason = ViewBag.reson;
+}
 
 <header>
     <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
@@ -81,8 +84,8 @@
         </div>
     </div>
     <form id="form1" asp-action="Index" method="get">
-      
-     
+
+
         <input type="hidden" name="storeID" value="@ViewBag.storeID" />
         <input type="hidden" name="week" value="@ViewBag.week" />
         <input type="hidden" name="value" value="@ViewBag.value" />
@@ -96,7 +99,7 @@
                     <div class="row">
                         <label class="col-sm-2 col-form-label" for="html5-date-input-store">สาขา</label>
                         <div class="col-sm-10">
-                            <select id="storeSelect"  class="form-select select-action">
+                            <select id="storeSelect" class="form-select select-action">
                                 <option value="0">กรุณาเลือกสาขาที่ต้องการ</option>
                                 @foreach (var item in storeList)
                                 {
@@ -125,7 +128,7 @@
                     <div class="row">
                         <label class="col-sm-3 col-form-label" for="html5-date-input-type">วันในสัปดาห์</label>
                         <div class="col-sm-9">
-                            <select id="daySelect"  class="form-select select-action">
+                            <select id="daySelect" class="form-select select-action">
 
 
 
@@ -153,7 +156,7 @@
                                 <option value="">กรุณาเลือกวัน</option>
                                 <option value="Hub">เช้า</option>
                                 <option value="Spoke">บ่าย</option>
-                                
+
                             </select>
                         </div>
                     </div>
@@ -170,7 +173,7 @@
 
 
         </div>
-      
+
 
     </form>
 
@@ -204,25 +207,29 @@
                                         <td>@m.sku_code</td>
                                         <td>@m.sku_name</td>
                                         <td id="realValue">@m.value</td>
-                                        <td><input type="number" step="1" id="skuInput" value="@m.Actualvalue" /></td>
+                                        <td><input type="number" step="1" id="skuInput" value="@m.Actualvalue" @(ViewBag.checkAllSubmit == 0 || ViewBag.checkAllSubmit == 1 ? "disabled" : "") /></td>
+
                                         <td>
                                             <select id="reasonSelect" class="form-select form-select-sm" disabled="true" asp-for="@m.reason">
                                                 <option value="0">กรุณาเลือก เหตุผล</option>
                                                 <option value="1">one</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
+                                                @foreach (var n in reason)
+                                                {
+                                                    <option value="@n.id">@n.reason</option>
+                                                }
+                                               
                                             </select>
                                         </td>
                                         <td>
                                             <div class="input-group">
-                                                <button style="margin:5px" class="btn btn-xs btn-outline-info" id="getData" data-bs-toggle="modal" data-bs-target="#modalScrollable" data-store="@ViewBag.storeID" data-week="@ViewBag.week" data-day="@ViewBag.day" data-type="@ViewBag.cycle" data-skuid="@m.Id" data-name="@m.sku_code @m.sku_name" type="button">จัดของ</button>                                             
+                                                <button style="margin:5px" class="btn btn-xs btn-outline-info" id="getData" data-bs-toggle="modal" data-bs-target="#modalScrollable" data-store="@ViewBag.storeID" data-week="@ViewBag.week" data-day="@ViewBag.day" data-type="@ViewBag.cycle" data-skuid="@m.Id" data-name="@m.sku_code @m.sku_name" type="button">จัดของ</button>
 
                                             </div>
                                         </td>
                                     </tr>
                                 }
-                                   
-                              
+
+
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -241,14 +248,14 @@
                 <div class="row mt-4">
                     <form style="width:fit-content" asp-action="SubmitAll" id="submitAll" method="post">
                         <div class="btn-group">
-                            <input id="typeSubmitAllBtn" name="type" value="@ViewBag.cycle" hidden/>
+                            <input id="typeSubmitAllBtn" name="type" value="@ViewBag.cycle" hidden />
                             <input id="dataSubmitAllBtn" name="json" value="@ViewBag.cycle" hidden />
-                            <button type="button" id="submitAllBtn" class="btn btn-success"><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
+                            <button type="button" id="submitAllBtn" class="btn btn-success" @(ViewBag.checkAllSubmit == 0 || ViewBag.checkAllSubmit == 1 ? "disabled" : "")><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
                         </div>
                     </form>
 
                     <div class="btn-group" style="width:fit-content">
-                        <button type="button" id="cancel" class="btn btn-danger"><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
+                        <button type="button" id="cancel" class="btn btn-danger" @(ViewBag.checkAllSubmit == 1 ? "" : "disabled")><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
                     </div>
 
 
@@ -266,10 +273,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    
                 </div>
                 <div class="modal-footer">
-                    
+
                     <button type="button" class="btn btn-primary" id="save-import">Print</button>
                 </div>
             </div>
@@ -285,8 +291,49 @@
         $('#daySelect').val(@ViewBag.day);
         $('#typeSelect').val("@ViewBag.cycle");
 
+        function decodeUnicode(str) {
+            return str.replace(/&#x([0-9A-Fa-f]+);/g, function (match, hex) {
+                return String.fromCharCode(parseInt(hex, 16));
+            });
+        }
 
-        function sumInput(){
+        $('input[type="number"]').change(function () {
+            var inputValue = parseFloat($(this).val());
+            var realValue = parseFloat($("#realValue").text());
+            var reasonSelect = $("#reasonSelect");
+
+            // ตรวจสอบว่าค่าของ skuInput มากกว่า realValue หรือไม่
+            if (inputValue > realValue) {
+                // ใช้ data จาก ViewBag.reasonhight
+                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
+
+                @foreach (var reasonh in hight)
+                {
+
+        @:reasonSelect.append($('<option>', { value: '@reasonh.id', text: decodeUnicode('@reasonh.reason') }));
+                  
+                }
+               
+            } else {
+                            // ใช้ data จาก ViewBag.reasonrow
+                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
+             
+                @foreach (var reasonl in low)
+                {
+
+        @:reasonSelect.append($('<option>', { value: '@reasonl.id', text: decodeUnicode('@reasonl.reason') }));
+                  
+                }
+              
+            }
+
+            // ตั้งค่าเริ่มต้นให้เป็นกรุณาเลือก เหตุผล
+            reasonSelect.val('0');
+        });
+
+        function sumInput() {
             var sum = 0;
             $('input[type="number"]').each(function () {
                 sum += parseInt($(this).val() || 0); // หาผลรวมของ input value ทั้งหมด
@@ -312,6 +359,17 @@
         $('input[type="number"]').change(function () {
             var realValue = $(this).closest('tr').find('#realValue').text();
             var inputValue = $(this).val();
+
+            $("tbody tr").each(function () {
+                var skuId = $(this).find("#skuIDTable").text(); // ดึงข้อมูล skuID
+                var reason = $(this).find("#reasonSelect").val(); // ดึงข้อมูล reason (ถ้าต้องการ)
+                var value = $(this).find("#skuInput").val(); // ดึงข้อมูล value
+
+
+
+
+            });
+
 
             // เปรียบเทียบค่าจริงกับค่าที่ป้อน
             if (realValue != inputValue) {
@@ -347,7 +405,7 @@
             // อัพเดทค่าในปุ่ม id="getData" data-store
             $('#getData').data('store', storeId);
             // อัพเดทค่าใน input hidden ชื่อ storId
-        
+
             $('input[name="storeID"]').val(storeId);
             document.getElementById("form1").submit();
         });
@@ -390,7 +448,37 @@
             var value = $(this).val();
             // อัพเดทค่าใน input hidden ชื่อ value
             $('input[name="value"]').val(value);
-          
+
+            // var inputValue = parseFloat($(this).val());
+            // var realValue = parseFloat($("#realValue").text());
+            // var reasonSelect = $("#reasonSelect");
+
+            // // ตรวจสอบว่าค่าของ skuInput มากกว่า realValue หรือไม่
+            // if (inputValue > realValue) {
+            //     // ใช้ data จาก ViewBag.reasonhight
+            //     reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+            //     $.each(@ViewBag.reasonhight, function (index, item) {
+            //         reasonSelect.append($('<option>', {
+            //             value: item.value,
+            //             text: item.name
+            //         }));
+            //     });
+            // } else {
+            //     // ใช้ data จาก ViewBag.reasonrow
+            //     reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+            //     $.each(@ViewBag.reasonrow, function (index, item) {
+            //         reasonSelect.append($('<option>', {
+            //             value: item.value,
+            //             text: item.name
+            //         }));
+            //     });
+            // }
+
+            // // ตั้งค่าเริ่มต้นให้เป็นกรุณาเลือก เหตุผล
+            // reasonSelect.val('0');
+
+
+
         });
 
 
@@ -452,44 +540,94 @@
 
 
         $('#submitAllBtn').click(function () {
-          
 
-            var data = [];
-            // วนลูปผ่านแต่ละแถวในตาราง
-            $("tbody tr").each(function () {
-                var value = $(this).find("#skuInput").val(); // ดึงข้อมูล value
-                var skuId = $(this).find("#skuIDTable").text(); // ดึงข้อมูล skuID
-                var reason = $(this).find("#reasonSelect").val(); // ดึงข้อมูล reason (ถ้าต้องการ)
 
-                // เก็บข้อมูลในรูปแบบของอ็อบเจ็กต์
-                var row = {
-                    store_id: @ViewBag.storeID,
-                    week_no: @ViewBag.week,
-                    day_of_week: @ViewBag.day,
-                    reason_id: reason,
-                    sku_id: skuId,
-                    plan_actually: value
-                };
-                // เพิ่มอ็อบเจ็กต์ลงในอาร์เรย์
-                data.push(row);
+            var isValid = true;
+            // ตรวจสอบทุกแถวของตาราง
+            $("table tbody tr").each(function () {
+                var realValue = parseFloat($(this).find("#realValue").text());
+                var inputValue = parseFloat($(this).find("#skuInput").val());
+                var reasonValue = $(this).find("#reasonSelect").val();
+
+                // ตรวจสอบว่าค่าที่กรอกตรงกับค่าจริงหรือไม่
+                if (realValue !== inputValue) {
+                    if (reasonValue === "0") {
+                        isValid = false;
+                        return false; // หยุดการทำงานเมื่อพบข้อมูลที่ไม่ถูกต้อง
+                    }
+
+                }
             });
 
-            // // สร้างฟิลด์ซ่อนเพื่อส่งข้อมูล JSON ไปยังแอ็คชัน SubmitAll
-            // $('<input>').attr({
-            //     type: 'hidden',
-            //     name: 'jsonData',
-            //     value: JSON.stringify(data)
-            // }).appendTo($(this));
+            // ถ้ามีข้อมูลที่ไม่ถูกต้อง
+            if (!isValid) {
+                alert("มีสินค้าบางรายการที่ไม่ตรงเงื่อนไข โปรดตรวจสอบอีกครั้ง");
+                return;
+            } else {
+                var data = [];
+                // วนลูปผ่านแต่ละแถวในตาราง
+                $("tbody tr").each(function () {
+                    var value = $(this).find("#skuInput").val(); // ดึงข้อมูล value
+                    var skuId = $(this).find("#skuIDTable").text(); // ดึงข้อมูล skuID
+                    var reason = $(this).find("#reasonSelect").val(); // ดึงข้อมูล reason (ถ้าต้องการ)
+                    var realValue = $(this).find("#realValue").text(); // ดึงข้อมูล reason (ถ้าต้องการ)
 
-            // ส่งข้อมูลไปยังแอ็คชัน SubmitAll
-           $('#dataSubmitAllBtn').val(JSON.stringify(data));
-           $('#submitAll').submit();
+                    // เก็บข้อมูลในรูปแบบของอ็อบเจ็กต์
+                    var row = {
+                        store_id: @ViewBag.storeID,
+                        week_no: @ViewBag.week,
+                        day_of_week: @ViewBag.day,
+                        reason_id: reason,
+                        sku_id: skuId,
+                        plan_actually: value,
+                        plan_value: realValue
+                    };
+                    // เพิ่มอ็อบเจ็กต์ลงในอาร์เรย์
+                    data.push(row);
+                });
+
+                // // สร้างฟิลด์ซ่อนเพื่อส่งข้อมูล JSON ไปยังแอ็คชัน SubmitAll
+                // $('<input>').attr({
+                //     type: 'hidden',
+                //     name: 'jsonData',
+                //     value: JSON.stringify(data)
+                // }).appendTo($(this));
+
+                // ส่งข้อมูลไปยังแอ็คชัน SubmitAll
+                $('#dataSubmitAllBtn').val(JSON.stringify(data));
+                $('#submitAll').submit();
+            }
+
+
+
+
+        });
+
+        // เมื่อคลิกปุ่ม 'ยกเลิกทั้งหมด'
+        $("#cancel").click(function () {
+
+            $("tbody tr").each(function () {
+
+
+                var reasonValue = $(this).find("#reasonSelect").val();
+
+                $(this).find("#skuInput").prop("disabled", false);
+                if (reasonValue === "0") {
+                    $(this).find("#reasonSelect").prop("disabled", true);
+                } else {
+                    $(this).find("#reasonSelect").prop("disabled", false);
+                }
+
+            });
+
+            $("#submitAllBtn").prop("disabled", false); // ปรับ disable เป็น false
+            $(this).prop("disabled", true); // ปรับ disable เป็น true
         });
 
 
-       
+
     });
 
 
-  
+
 </script>

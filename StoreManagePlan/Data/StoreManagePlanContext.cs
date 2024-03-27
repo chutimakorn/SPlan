@@ -26,6 +26,7 @@ namespace StoreManagePlan.Data
         public DbSet<PlanDetail> PlanDetail { get; set; }
 
         public DbSet<PlanActually> PlanActually { get; set; } = default!;
+        public DbSet<Reason> Reason { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,7 @@ namespace StoreManagePlan.Data
             modelBuilder.Entity<SaleHistory>().ToTable("SaleHistory");
             modelBuilder.Entity<Bom>().ToTable("Bom").HasKey(pf => new { pf.sku_id, pf.ingredient_sku });
             modelBuilder.Entity<PlanDetail>().ToTable("PlanDetail");
+            modelBuilder.Entity<Reason>().ToTable("Reason");
             modelBuilder.Entity<PlanActually>().ToTable("PlanActually").HasKey(pf => new { pf.sku_id, pf.store_id, pf.week_no, pf.day_of_week });
         }
         

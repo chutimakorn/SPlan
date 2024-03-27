@@ -8,6 +8,8 @@ namespace StoreManagePlan.Models
         public int id { get; set; }
 
         public String reason { get; set; }
+        public int type { get; set; }
+        public String menu { get; set; }
      
     }
 }

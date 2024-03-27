@@ -11,6 +11,7 @@ using StoreManagePlan.Data;
 using StoreManagePlan.Models;
 using StoreManagePlan.Repository;
 using Newtonsoft.Json;
+using static System.Formats.Asn1.AsnWriter;
 
 
 namespace StoreManagePlan.Controllers
@@ -45,22 +46,26 @@ namespace StoreManagePlan.Controllers
         }
 
         // GET: PlanActuallies
-        public async Task<IActionResult> Index(int storeID, int week, int day, string cycle, int value)
+        public async Task<IActionResult> Index(int storeID, int week, int day, string cycle)
         {
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.storeID = storeID;
             ViewBag.week = week;
             ViewBag.day = day;
             ViewBag.cycle = cycle;
-            ViewBag.value = value;
+           
             ViewBag.store = _context.Store.Include(m => m.store_type).Where(n => n.store_type.store_type_name == "Hub").ToList();
             ViewBag.weekMaster = _context.Week.ToList();
+            ViewBag.reasonhight = _context.Reason.Where(m => m.menu == "pac" && m.type == 1).ToList();
+            ViewBag.resonlow = _context.Reason.Where(m => m.menu == "pac" && m.type == 0).ToList();
+            ViewBag.reson = _context.Reason.Where(m => m.menu == "pac").ToList();
 
             var planDetailApprove = _context.PlanDetail.Include(m => m.item)
                                                        .Include(m => m.store).ThenInclude(m => m.store_type)
                                                        .Include(m => m.week)
                                                        .Where(m => m.approve == true);
 
+            var checkAllSubmit = 0;
 
 
             List<Plan> plan = new List<Plan>();
@@ -69,11 +74,13 @@ namespace StoreManagePlan.Controllers
             if (day != 0 && storeID != 0 && week != 0 && (cycle != null && cycle != ""))
             {
                 var actuallyPlan = _context.PlanActually.Where(m => m.week_no == week);
+                var reasonPlan = _context.PlanActually.Where(m => m.week_no == week);
                 if (cycle == "Hub")
                 {
 
                     planDetailApprove = planDetailApprove.Where(m => m.store_id == storeID && m.week_no == week);
                     actuallyPlan = actuallyPlan.Where(m => m.store_id == storeID);
+                    reasonPlan = reasonPlan.Where(m => m.store_id == storeID);
 
                 }
                 else
@@ -81,10 +88,10 @@ namespace StoreManagePlan.Controllers
                     var spoke = _context.StoreRelation.Where(m => m.store_hub_id == storeID).Select(m => m.store_spoke_id).ToList();
                     planDetailApprove = planDetailApprove.Where(m => spoke.Contains(m.store_id) && m.week_no == week && m.store.store_type.store_type_name == cycle);
                     actuallyPlan = actuallyPlan.Where(m => spoke.Contains(m.store_id));
-
+                    reasonPlan = reasonPlan.Where(m => spoke.Contains(m.store_id));
                 }
 
-
+              
 
                 switch (day)
                 {
@@ -103,6 +110,7 @@ namespace StoreManagePlan.Controllers
                                                               sku_id = g.Key.sku_id,
                                                               plan_actually = g.Sum(m => m.plan_actually)
                                                           });
+                       
                         break;
                     case 2:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -119,6 +127,7 @@ namespace StoreManagePlan.Controllers
                                                               sku_id = g.Key.sku_id,
                                                               plan_actually = g.Sum(m => m.plan_actually)
                                                           });
+                       
                         break;
                     case 3:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -135,6 +144,7 @@ namespace StoreManagePlan.Controllers
                                                               sku_id = g.Key.sku_id,
                                                               plan_actually = g.Sum(m => m.plan_actually)
                                                           });
+
                         break;
                     case 4:
                         summedPlanDetail = planDetailApprove.GroupBy(m => new { m.sku_id, m.item.sku_name, m.item.sku_code })
@@ -207,17 +217,16 @@ namespace StoreManagePlan.Controllers
 
                 plan = summedPlanDetail.ToList();
 
-                var checkAllSubmit = true;
 
                 if (actuallyPlan.ToList().Count() > 0)
                 {
                     foreach (var n in plan)
                     {
-
+                        var reason = reasonPlan.Where(m => m.day_of_week == day && m.sku_id == n.Id).FirstOrDefault();
                         var valueresult = actuallyPlan.Where(m => m.sku_id == n.Id).SingleOrDefault();
                         n.Actualvalue = valueresult.plan_actually;
-                        n.reason = valueresult.reason_id;
-                        
+                        n.reason = reason.reason_id;
+                        checkAllSubmit = 1;
                     }
                 }
                 else
@@ -229,13 +238,14 @@ namespace StoreManagePlan.Controllers
                         n.Actualvalue = n.value;
                        
                     }
-                    checkAllSubmit = false;
+                    checkAllSubmit = 2;
                 }
 
+               
             }
-
            
-            
+
+            ViewBag.checkAllSubmit = checkAllSubmit;
 
 
             return View(plan);
@@ -602,13 +612,16 @@ namespace StoreManagePlan.Controllers
 
                     foreach (var z in result)
                     {
+                      
                         var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
-                        PlanActually = PlanActually.Where(m => m.store_id == getstoreId);
-                        var checkUpdate = PlanActually.SingleOrDefault();
+                      
+                        var PlanActuallySpoke = _context.PlanActually.Where(m => m.week_no == n.week_no && m.sku_id == n.sku_id && m.day_of_week == n.day_of_week && m.store_id == getstoreId).SingleOrDefault();
+                        var checkUpdate = PlanActuallySpoke;
                         if (checkUpdate != null)
                         {
                             checkUpdate.plan_actually = z.value;
                             checkUpdate.reason_id = n.reason_id;
+                            checkUpdate.plan_value = n.plan_value;
 
 
                             _context.Update(checkUpdate);
@@ -621,6 +634,7 @@ namespace StoreManagePlan.Controllers
                             plan.day_of_week = n.day_of_week;
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
+                            plan.plan_value = n.plan_value;
                             plan.approve = 1;
 
 
@@ -645,7 +659,9 @@ namespace StoreManagePlan.Controllers
 
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            var returnData = jsonData.FirstOrDefault();
+            return RedirectToAction("Index", new { storeID = returnData.store_id, week = returnData.week_no, day = returnData.day_of_week, cycle = type });
         }
 
 
