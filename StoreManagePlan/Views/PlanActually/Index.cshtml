@@ -207,7 +207,7 @@
                                         <td>@m.sku_code</td>
                                         <td>@m.sku_name</td>
                                         <td id="realValue">@m.value</td>
-                                        <td><input type="number" step="1" id="skuInput" value="@m.Actualvalue" @(ViewBag.checkAllSubmit == 0 || ViewBag.checkAllSubmit == 1 ? "disabled" : "") /></td>
+                                        <td><input data-real-val="" type="number" step="1" id="skuInput" value="@m.Actualvalue" @(ViewBag.checkAllSubmit == 0 || ViewBag.checkAllSubmit == 1 ? "disabled" : "") /></td>
 
                                         <td>
                                             <select id="reasonSelect" class="form-select form-select-sm" disabled="true" asp-for="@m.reason">
@@ -335,24 +335,24 @@
                 reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
                 reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
 
-    @foreach (var reasonh in hight)
-    {
+                @foreach (var reasonh in hight)
+                {
 
-        @:reasonSelect.append($('<option>', { value: '@reasonh.id', text: decodeUnicode('@reasonh.reason') }));
+                    @:reasonSelect.append($('<option>', { value: '@reasonh.id', text: decodeUnicode('@reasonh.reason') }));
 
-    }
+                }
 
-                    } else {
-                // ใช้ data จาก ViewBag.reasonrow
-                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
-                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
+                                } else {
+                            // ใช้ data จาก ViewBag.reasonrow
+                            reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+                            reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
 
-    @foreach (var reasonl in low)
-    {
+                @foreach (var reasonl in low)
+                {
 
-        @:reasonSelect.append($('<option>', { value: '@reasonl.id', text: decodeUnicode('@reasonl.reason') }));
+                    @:reasonSelect.append($('<option>', { value: '@reasonl.id', text: decodeUnicode('@reasonl.reason') }));
 
-    }
+                }
 
                     }
 

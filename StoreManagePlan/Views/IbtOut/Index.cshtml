@@ -1,0 +1,314 @@
+﻿@model List<StoreManagePlan.Models.PlanActually>
+@using StoreManagePlan.Controllers
+@{
+    ViewData["Title"] = "Index";
+    ResourceController resource = new ResourceController();
+    List<Store> storeList = ViewBag.storeList;
+    List<Store> spokeList = ViewBag.spokeList;
+    List<Week> weekList = ViewBag.weekList;
+    var firstItem = Model.FirstOrDefault();
+    var submitBtn = firstItem == null ? "disabled" : firstItem.approve == 1 ? "disabled" : "";
+}
+<header>
+    <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+    <script src="~/js/app/ibtout.js"></script>
+    <style>
+        #btn-back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+        }
+    </style>
+    <style type="text/css" media="print">
+        /* @@page { size: landscape; } */
+        @@media print {
+            body {
+                visibility: hidden;
+            }
+
+            .edit-col {
+                visibility: hidden;
+            }
+
+            .section-to-print {
+                visibility: visible;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                font-size:8px !important;
+            }
+        }
+    </style>
+
+</header>
+<button id="btn-back-to-top" class="btn btn-xl rounded-pill btn-icon btn-primary" type="button">
+    <i class="bx bx-lg bx-chevron-up"></i>
+</button>
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="py-3 mb-4">
+        รายการสินค้าส่งออกจาก Hub (IBT Out)
+    </h4>
+    <div class="bs-toast toast toast-placement-ex fade bg-success top-0 end-0 m-2" id="import-success" role="alert" aria-live="assertive" aria-atomic="true" delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">สำเร็จ</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            อนุมัติสำเร็จ.
+        </div>
+    </div>
+
+    <div class="bs-toast toast toast-placement-ex fade bg-danger top-0 end-0 m-2" id="import-not-success" role="alert" aria-live="assertive" aria-atomic="true" bottom-0 start-0 delay="2000">
+        <div class="toast-header">
+            <i class="bx bx-bell me-2"></i>
+            <div class="me-auto fw-medium">แจ้งเตือน</div>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+        </div>
+    </div>
+    <form id="form1" asp-action="Index" method="get">
+
+
+        <input type="hidden" name="Store" value="@ViewBag.store" />
+        <input type="hidden" name="Spoke" value="@ViewBag.spoke" />
+        <input type="hidden" name="Week" value="@ViewBag.week" />
+        <input type="hidden" name="Day" value="@ViewBag.day" />
+
+        <div class="mb-3">
+
+            <div class="row">
+                <div class="col-4">
+                    <div class="row">
+                        <label class="col-sm-4 col-form-label" for="html5-date-input-store">แผนสำหรับสาขา</label>
+                        <div class="col-sm-8">
+                            <select id="storeSelect" class="form-select select-action">
+                                <option value="0">กรุณาเลือกสาขาที่ต้องการ</option>
+                                @foreach (var item in storeList)
+                                {
+                                    <option value="@item.id">@item.store_code - @item.store_name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="row">
+                        <label class="col-sm-2 col-form-label" for="spokeSelect">สาขา</label>
+                        <div class="col-sm-10">
+                            <select id="spokeSelect" class="form-select select-action">
+                                <option value="0">กรุณาเลือกสาขาที่ต้องการ</option>
+                                @foreach (var item in spokeList)
+                                {
+                                    <option value="@item.id">@item.store_code - @item.store_name</option>
+
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-3">
+                    <div class="row">
+                        <label class="col-sm-3 col-form-label" for="weekSelect">สัปดาห์</label>
+                        <div class="col-sm-9">
+                            <select id="weekSelect" name="weekNo" class="form-select select-action">
+                                <option value="0">กรุณาเลือกสัปดาห์ที่ต้องการ</option>
+                                @foreach (var week in weekList)
+                                {
+                                    <option value="@week.week_no">W @week.week_no  @resource.ConvertDate(week.start_date) @resource.ConvertDate(week.end_date)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-2">
+                    <div class="row">
+                        <label class="col-sm-5 col-form-label" for="html5-date-input-type">วันในสัปดาห์</label>
+                        <div class="col-sm-7">
+                            <select id="daySelect" class="form-select select-action">
+
+
+
+                                <option value="0">กรุณาเลือกวัน</option>
+                                <option value="1">จันทร์</option>
+                                <option value="2">อังคาร</option>
+                                <option value="3">พุธ</option>
+                                <option value="4">พฤหัส</option>
+                                <option value="5">ศุกร์</option>
+                                <option value="6">เสาร์</option>
+                                <option value="7">อาทิตย์</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+
+    </form>
+
+    <div class="nav-align-top ">
+
+
+        <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade active show" id="navs-pills-top-home" role="tabpanel">
+                <div class="card section-to-print" id="forprint" style="padding:10px">
+                    <h6 class="">สถานะ : <span id="status-app">@(firstItem == null ? "-" : firstItem.approve == 1 ? "ยืนยันแล้ว" : "ยังไม่ยืนยัน")</span></h6>
+                    <div class="table-responsive text-nowrap">
+                        <table id="printTable" class="table" style="text-align-last: left;">
+                            <thead style="background-color:#c1c1c138">
+                                <tr class="text-nowrap">
+                                    <th>SKU</th>
+                                    <th>รายการ</th>
+                                    <th>จำนวนที่สาขายืนยัน</th>
+                                    <th>จำนวนที่โอนออก</th>
+                                    <th class="edit-col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.sku_id</td>
+                                        <td>@item.item.sku_name</td>
+                                        <td>@item.plan_value</td>
+                                        <td>@item.plan_actually</td>
+                                        <td class="edit-col">
+                                            <div class="input-group">
+                                                <button id="btn-edit" data-store="@ViewBag.store" data-sku="@item.sku_id" data-day="@ViewBag.day"
+                                                        data-week="@ViewBag.week" data-spoke="@ViewBag.spoke" style="margin:5px" class="btn btn-xs btn-secondary" type="button">
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                
+
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                <tr class="text-nowrap">
+                                    <th rowspan="1" colspan="2">Total</th>
+                                    <td id="totalPlan">0</td>
+                                    <td id="totalInput">0</td>
+                                    <td class="edit-col"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="" style="width:fit-content">
+                            <button type="button" id="approve-all" class="btn btn-primary" @submitBtn><span class="tf-icons bx bx-check"></span>&nbsp; ยืนยันทั้งหมด</button>
+                        </div>
+
+                        <div class="" style="width:fit-content">
+                        <button type="button" id="printButton" class="btn btn-secondary"><span class="tf-icons bx bx-printer"></span>&nbsp; พิมพ์</button>
+                        </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal fade" id="modalScrollable" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-primary" id="save-import">Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#storeSelect').val(@ViewBag.store);
+        $('#spokeSelect').val(@ViewBag.spoke);
+        $('#weekSelect').val(@ViewBag.week);
+        $('#daySelect').val(@ViewBag.day);
+
+
+        $('select').change(function () {
+            // ตรวจสอบค่าของ reasonSelect
+            if ($(this).val() == '0') {
+                $(this).closest('tr').find('button[type="button"]').prop('disabled', true);
+            } else {
+                $(this).closest('tr').find('button[type="button"]').prop('disabled', false);
+            }
+        });
+        // เมื่อเลือก storeSelect
+        $('#storeSelect').change(function () {
+            var storeId = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-store
+            //$('#getData').data('store', storeId);
+            // อัพเดทค่าใน input hidden ชื่อ storId
+
+            $('input[name="Store"]').val(storeId);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อเลือก weekSelect
+        $('#spokeSelect').change(function () {
+            var spoke = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-week
+            //$('#getData').data('Spoke', spoke);
+            // อัพเดทค่าใน input hidden ชื่อ weekNo
+            $('input[name="Spoke"]').val(spoke);
+            $('input[name="Spoke"]').val(spoke);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อเลือก weekSelect
+        $('#weekSelect').change(function () {
+            var spoke = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-week
+            //$('#getData').data('week', spoke);
+            // อัพเดทค่าใน input hidden ชื่อ weekNo
+            $('input[name="Week"]').val(spoke);
+            $('input[name="Week"]').val(spoke);
+            document.getElementById("form1").submit();
+        });
+
+        // เมื่อเลือก daySelect
+        $('#daySelect').change(function () {
+            var dayOfWeek = $(this).val();
+            // อัพเดทค่าในปุ่ม id="getData" data-day
+            //$('#getData').data('day', dayOfWeek);
+            // อัพเดทค่าใน input hidden ชื่อ dayOfWeek
+            //$('input[name="dayOfWeek"]').val(dayOfWeek);
+            $('input[name="Day"]').val(dayOfWeek);
+            document.getElementById("form1").submit();
+        });
+
+    });
+
+
+
+</script>

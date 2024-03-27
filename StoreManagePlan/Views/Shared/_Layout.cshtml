@@ -40,7 +40,7 @@
     var menuPOW = "";
     var menuPAC = "";
     var menuDYP = "";
-
+    var menuIBTO = "";
     //ตัว active menu
     if(ViewBag.menu == "home")
     {
@@ -99,7 +99,11 @@
         menuStoreType = "active";
         menuMasterOpen = "open";
     }
+else if (ViewBag.menu == "ibto")
+    {
+        menuIBTO = "active";
 
+    }
    
 }
 <html lang="en"
@@ -327,8 +331,8 @@
                                 <div data-i18n="Basic">บันทึกสินค้าที่ผลิตได้จริง</div>
                             </a>
                         </li>
-                        <li class="menu-item">
-                            <a href="cards-basic.html" class="menu-link">
+                        <li class="menu-item" @menuIBTO>
+                            <a asp-controller="IbtOut" asp-action="Index" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
                                 <div data-i18n="Basic">โอนสินค้าออกไปให้สาขาอื่น</div>
                             </a>
