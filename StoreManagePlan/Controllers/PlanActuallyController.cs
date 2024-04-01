@@ -12,6 +12,7 @@ using StoreManagePlan.Models;
 using StoreManagePlan.Repository;
 using Newtonsoft.Json;
 using static System.Formats.Asn1.AsnWriter;
+using static StoreManagePlan.Controllers.PlanActuallyController;
 
 
 namespace StoreManagePlan.Controllers
@@ -50,12 +51,26 @@ namespace StoreManagePlan.Controllers
         {
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.storeID = storeID;
-            ViewBag.week = week;
+            var defaultWeek = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+            var skip = defaultWeek - 2;
+            if(skip < 0)
+            {
+                skip = 0;
+            }
+            if (week == 0)
+            {
+                week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+            }
+            else
+            {
+                ViewBag.week = week;
+            }           
             ViewBag.day = day;
             ViewBag.cycle = cycle;
             ViewBag.menu = _menu;
             ViewBag.store = _context.Store.Include(m => m.store_type).Where(n => n.store_type.store_type_name == "Hub").ToList();
-            ViewBag.weekMaster = _context.Week.ToList();
+            ViewBag.weekMaster = _context.Week.Skip(skip).Take(5).ToList();
             ViewBag.reasonhight = _context.Reason.Where(m => m.menu == "pac" && m.type == 1).ToList();
             ViewBag.resonlow = _context.Reason.Where(m => m.menu == "pac" && m.type == 0).ToList();
             ViewBag.reson = _context.Reason.Where(m => m.menu == "pac").ToList();
@@ -561,6 +576,40 @@ namespace StoreManagePlan.Controllers
                 if (type == "Hub")
                 {
                     PlanActually = PlanActually.Where(m => m.store_id == n.store_id);
+
+                    var PlanDetail = _context.PlanDetail.Where(m => m.week_no == n.week_no && m.sku_id == n.sku_id && m.store_id == n.store_id);
+                    var value = 0;
+
+                    switch (n.day_of_week)
+                    {
+                        case 1:
+                            value = PlanDetail.Select(m => m.plan_mon).FirstOrDefault();
+                            break;
+                        case 2:
+                            value = PlanDetail.Select(m => m.plan_tues).FirstOrDefault();
+                            break;
+                        case 3:
+                            value = PlanDetail.Select(m => m.plan_wed).FirstOrDefault();
+
+                            break;
+                        case 4:
+                            value = PlanDetail.Select(m => m.plan_thu).FirstOrDefault();
+                            break;
+                        case 5:
+                            value = PlanDetail.Select(m => m.plan_fri).FirstOrDefault();
+                            break;
+                        case 6:
+                            value = PlanDetail.Select(m => m.plan_sat).FirstOrDefault();
+                            break;
+                        case 7:
+                            value = PlanDetail.Select(m => m.plan_sun).FirstOrDefault();
+
+                            break;
+
+                    }
+
+
+
                     var checkUpate = PlanActually.SingleOrDefault();
                     if (checkUpate != null)
                     {
@@ -574,7 +623,7 @@ namespace StoreManagePlan.Controllers
 
                             checkUpate.plan_actually = z.value;
                             checkUpate.reason_id = n.reason_id;
-                            checkUpate.plan_value = n.plan_value;
+                            checkUpate.plan_value = value;
 
                             _context.Update(checkUpate);
 
@@ -594,7 +643,7 @@ namespace StoreManagePlan.Controllers
                             plan.day_of_week = n.day_of_week;
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
-                            plan.plan_value = n.plan_value;
+                            plan.plan_value = value;
 
 
 
@@ -619,12 +668,45 @@ namespace StoreManagePlan.Controllers
                         var getstoreId = _context.Store.Where(x => x.store_code == z.sku_code).Select(x => x.id).SingleOrDefault();
                       
                         var PlanActuallySpoke = _context.PlanActually.Where(m => m.week_no == n.week_no && m.sku_id == n.sku_id && m.day_of_week == n.day_of_week && m.store_id == getstoreId).SingleOrDefault();
+
+                        var PlanDetail = _context.PlanDetail.Where(m => m.week_no == n.week_no && m.sku_id == n.sku_id && m.store_id == getstoreId);
+                        var value = 0;
+
+                        switch (n.day_of_week)
+                        {
+                            case 1:
+                                value = PlanDetail.Select(m => m.plan_mon).FirstOrDefault();
+                                break;
+                            case 2:
+                                value = PlanDetail.Select(m => m.plan_tues).FirstOrDefault();
+                                break;
+                            case 3:
+                                value = PlanDetail.Select(m => m.plan_wed).FirstOrDefault();
+
+                                break;
+                            case 4:
+                                value = PlanDetail.Select(m => m.plan_thu).FirstOrDefault();
+                                break;
+                            case 5:
+                                value = PlanDetail.Select(m => m.plan_fri).FirstOrDefault();
+                                break;
+                            case 6:
+                                value = PlanDetail.Select(m => m.plan_sat).FirstOrDefault();
+                                break;
+                            case 7:
+                                value = PlanDetail.Select(m => m.plan_sun).FirstOrDefault();
+
+                                break;
+                     
+                        }
+
+
                         var checkUpdate = PlanActuallySpoke;
                         if (checkUpdate != null)
                         {
                             checkUpdate.plan_actually = z.value;
                             checkUpdate.reason_id = n.reason_id;
-                            checkUpdate.plan_value = n.plan_value;
+                            checkUpdate.plan_value = value;
 
 
                             _context.Update(checkUpdate);
@@ -637,7 +719,7 @@ namespace StoreManagePlan.Controllers
                             plan.day_of_week = n.day_of_week;
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
-                            plan.plan_value = n.plan_value;
+                            plan.plan_value = value;
                          
 
 
