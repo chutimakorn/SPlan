@@ -202,7 +202,7 @@
                                 @if (Model.ToList().Count() == 0)
                                 {
                                     <tr>
-                                        <td colspan="7" class="text-center">No data</td>
+                                        <td colspan="7" class="text-center" style="text-align-last: center;">No data</td>
                                     </tr>
                                 }
                                 @foreach (var m in Model.ToList())
@@ -337,7 +337,7 @@
                 // ใช้ data จาก ViewBag.reasonhight
                 reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
                 reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
-
+                reasonSelect.prop('disabled', true)
                 @foreach (var reasonh in hight)
                 {
 
@@ -345,10 +345,13 @@
 
                 }
 
-                                } else {
-                            // ใช้ data จาก ViewBag.reasonrow
-                            reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
-                            reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
+                    reasonSelect.prop('disabled', false)
+            } 
+            else if (inputValue < realValue)
+            {
+                // ใช้ data จาก ViewBag.reasonrow
+                reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
+                reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
 
                 @foreach (var reasonl in low)
                 {
@@ -356,8 +359,13 @@
                     @:reasonSelect.append($('<option>', { value: '@reasonl.id', text: decodeUnicode('@reasonl.reason') }));
 
                 }
-
-                    }
+                    reasonSelect.prop('disabled', false)
+            }
+            else
+            {
+             
+                reasonSelect.prop('disabled', true)
+            }
 
             // ตั้งค่าเริ่มต้นให้เป็นกรุณาเลือก เหตุผล
             reasonSelect.val('0');
