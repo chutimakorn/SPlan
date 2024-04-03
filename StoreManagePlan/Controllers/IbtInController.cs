@@ -19,34 +19,32 @@ using System.Collections;
 
 namespace StoreManagePlan.Controllers
 {
-    public class IbtOutController : Controller
+    public class IbtInController : Controller
     {
         private readonly StoreManagePlanContext _context;
-        public static string _menu = "ibto";
+        public static string _menu = "ibti";
         private readonly IConfiguration _configuration;
         private readonly IUtility _utility;
-        public IbtOutController(StoreManagePlanContext context, IConfiguration configuration, IUtility utility)
+        public IbtInController(StoreManagePlanContext context, IConfiguration configuration, IUtility utility)
         {
             _context = context;
             _configuration = configuration;
             _utility = utility;
         }
-        public IActionResult Index(int Store, int Spoke, int Day, int Week)
+        public IActionResult Index(int Store, int Day, int Week)
         {
 
             ViewBag.store = Store;
-            ViewBag.spoke = Spoke;
             ViewBag.week = Week;
             ViewBag.day = Day;
-            var newSpoke = Spoke;
             var newStore = Store;
 
             var weekList = _context.Week.Where(w => w.status == 2).ToList();
             var storeList = _context.Store.Include(m => m.store_type).Where(s => s.store_type.store_type_name == "Hub").ToList();
-            var spokeList = _context.StoreRelation.Include(h => h.StoreHub).Include(s => s.StoreSpoke).Where(h => h.StoreHub.id == Store).Select(s => s.StoreSpoke).ToList();
+            //var spokeList = _context.StoreRelation.Include(h => h.StoreHub).Include(s => s.StoreSpoke).Where(h => h.StoreHub.id == Store).Select(s => s.StoreSpoke).ToList();
 
             var planactual = _context.PlanActually
-                .Where(s => s.store_id == Spoke && s.week_no == Week && s.day_of_week == Day)
+                .Where(s => s.store_id == Store && s.week_no == Week && s.day_of_week == Day)
                 .Include(i => i.item)
                 .AsEnumerable()
                 //.GroupBy(s => new { s.item, s.sku_id, s.week_no, s.day_of_week })
@@ -62,16 +60,14 @@ namespace StoreManagePlan.Controllers
                 .ToList();
 
             ViewBag.storeList = storeList;
-            ViewBag.spokeList = spokeList;
             ViewBag.weeklist = weekList;
             ViewBag.role = Convert.ToInt32(HttpContext.Request.Cookies["Role"]);
             ViewBag.menu = _menu;
             return View(planactual);
         }
-        public IActionResult Edit(int Store, int Spoke, int Day, int Week, int SkuId)
+        public IActionResult Edit(int Store, int Day, int Week, int SkuId)
         {
             ViewBag.store = Store;
-            ViewBag.spoke = Spoke;
             ViewBag.week = Week;
             ViewBag.day = Day;
             ViewBag.sku = SkuId;
@@ -83,7 +79,7 @@ namespace StoreManagePlan.Controllers
             var spokeList = _context.StoreRelation.Include(h => h.StoreHub).Include(s => s.StoreSpoke).Where(h => h.StoreHub.id == Store).Select(s => s.StoreSpoke.id).ToList();
 
             var planactual = _context.PlanActually
-                .Where(s => spokeList.Contains(s.store_id) && s.week_no == Week && s.day_of_week == Day && s.sku_id == SkuId)
+                .Where(s => s.store_id == Store && s.week_no == Week && s.day_of_week == Day && s.sku_id == SkuId)
                 .Include(i => i.item)
                 .Include(i => i.store)
                 .AsEnumerable()
@@ -95,7 +91,8 @@ namespace StoreManagePlan.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitAll(string planActuals)
         {
-            try {
+            try
+            {
                 var jsonData = JsonConvert.DeserializeObject<List<PlanActually>>(planActuals);
 
                 foreach (var n in jsonData)
@@ -110,7 +107,8 @@ namespace StoreManagePlan.Controllers
                 await _context.SaveChangesAsync();
 
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return Json(new { success = false, massage = ex.Message });
             }
 

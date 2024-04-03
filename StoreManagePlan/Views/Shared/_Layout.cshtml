@@ -44,6 +44,7 @@
     var menuPPC = "";
     var menuIBTO = "";
     var menuPPerf = "";
+    var menuIBTI = "";
     //ตัว active menu
     if(ViewBag.menu == "home")
     {
@@ -113,7 +114,12 @@
         menuStoreType = "active";
         menuMasterOpen = "open";
     }
-else if (ViewBag.menu == "ibto")
+    else if (ViewBag.menu == "ibto")
+    {
+        menuIBTO = "active";
+
+    }
+    else if (ViewBag.menu == "ibti")
     {
         menuIBTO = "active";
 
@@ -355,8 +361,8 @@ else if (ViewBag.menu == "ibto")
 
                     @if(role == 1 || role == 4)
                     {
-                        <li class="menu-item">
-                            <a href="cards-basic.html" class="menu-link">
+                        <li class="menu-item" @menuIBTI>
+                            <a asp-controller="IbtIn" asp-action="Index" class="menu-link">
                                 <i class="menu-icon tf-icons bx bx-collection"></i>
                                 <div data-i18n="Basic">รับสินค้าจากสาขาที่ผลิต</div>
                             </a>
