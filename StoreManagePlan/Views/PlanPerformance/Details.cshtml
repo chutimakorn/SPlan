@@ -1,0 +1,84 @@
+﻿@model StoreManagePlan.Models.SaleHistory
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>SaleHistory</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.store_code)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.store_code)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.sku_code)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.sku_code)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.day_of_week)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.day_of_week)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.qty_base)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.qty_base)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.qty_bad)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.qty_bad)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.qty_rtc)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.qty_rtc)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.qty_kl)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.qty_kl)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.bad_percent)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.bad_percent)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.rtc_percent)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.rtc_percent)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.kl_percent)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.kl_percent)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.week_no)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.week_no)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

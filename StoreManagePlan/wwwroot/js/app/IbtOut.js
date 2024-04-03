@@ -57,7 +57,7 @@
         });
     });
 
-    $('.btn-edit').click(function () {
+    $('#btn-edit').click(function () {
         var store = $(this).data('store');
         var sku = $(this).data('sku');
         var day = $(this).data('day');
@@ -67,10 +67,6 @@
         // Redirect the user to the desired URL
         var url = '/IbtOut/Edit?Store=' + store + '&SkuId=' + sku + '&Day=' + day + '&Spoke=' + spoke + '&Week=' + week;
         window.location.href = url;
-    });
-
-    $('#call-approve').click(function () {
-        $('#modal-confirm').modal('show');
     });
 
     $('#approve-all').click(function () {
@@ -108,7 +104,88 @@
         });
     });
 
-    
+    $('#editButton').click(function () {
+        console.log($('#totalInput').text());
+        console.log($('#cnt-plan').text());
+        var temp = $('#cnt-plan').text();
+        var real = $('#totalInput').text();
+        if (temp != real) {
+            $("#import-not-success .toast-title").text("เตือน");
+            $("#import-not-success .toast-body").text("กรุณาตรวจสอบข้อมูลให้ถูกต้อง");
+            $('#import-not-success').toast('show');
+            return;
+        }
+        else {
+            var data = [];
+            var isValid = true;
+            // วนลูปผ่านแต่ละแถวในตาราง
+            $("tbody tr").each(function () {
+
+                
+                var real = $(this).find(".plan-actual").data('real-val');
+                var storeId = $(this).data("store-id"); 
+                var planActual = $(this).find(".plan-actual").val(); 
+                var sku = $(this).data('val-sku');
+                var day = $(this).data('val-day');
+                var week = $(this).data('val-week');
+
+                var reasonValue = $(this).find("#reasonSelect").val();
+
+                console.log(real);
+                console.log(planActual);
+                // ตรวจสอบว่าค่าที่กรอกตรงกับค่าจริงหรือไม่
+                if (parseInt(planActual) !== real) {
+                    if (reasonValue === "0") {
+                        $("#import-not-success .toast-body").text("กรุณาเลือกเหตุผล");
+                        $('#import-not-success').toast('show');
+                        isValid = false;
+                        return; // หยุดการทำงานเมื่อพบข้อมูลที่ไม่ถูกต้อง
+                    }
+
+                }
+                // เก็บข้อมูลในรูปแบบของอ็อบเจ็กต์
+                var row = {
+                    store_id: storeId,
+                    week_no: week,
+                    day_of_week: day,
+                    reason_id: parseInt(reasonValue),
+                    sku_id: sku,
+                    plan_actually: planActual,
+                };
+                // เพิ่มอ็อบเจ็กต์ลงในอาร์เรย์
+                data.push(row);
+            });
+            console.log(data);
+            console.log(isValid);
+            //return;
+            if (isValid) {
+                var formData = new FormData();
+                formData.append('planActuals', JSON.stringify(data));
+                $.ajax({
+                    url: '/IbtOut/SubmitAll', // Update the URL based on your actual URL structure
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+
+                        if (data.success) {
+                            $("#import-success .toast-body").text("บันทึกสำเร็จ");
+                            $('#import-success').toast('show');
+
+                        }
+                        else {
+                            $("#import-not-success .toast-body").text("บันทึกไม่สำเร็จ ข้อความ: " + data.message);
+                            $('#import-not-success').toast('show');
+                        }
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+    });
 
 
     let mybutton = document.getElementById("btn-back-to-top");

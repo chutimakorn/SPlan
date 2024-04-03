@@ -140,7 +140,7 @@ namespace StoreManagePlan.Controllers
                     worksheet.Cells[i + 2, 8].Value = cycleText;
                     worksheet.Cells[i + 2, 9].Value = data[i].plan_value;
                     worksheet.Cells[i + 2, 10].Value = data[i].plan_actually;
-                    worksheet.Cells[i + 2, 11].Value = @reasonText;
+                    worksheet.Cells[i + 2, 11].Value = reasonText;
                     // Add more columns as needed
                 }
 

@@ -43,6 +43,7 @@
     var menuDYP = "";
     var menuPPC = "";
     var menuIBTO = "";
+    var menuPPerf = "";
     //ตัว active menu
     if(ViewBag.menu == "home")
     {
@@ -99,6 +100,11 @@
     else if (ViewBag.menu == "ppc")
     {
         menuPPC = "active";
+        menuReportOpen = "open";
+
+    } else if (ViewBag.menu == "pperf")
+    {
+        menuPPerf = "active";
         menuReportOpen = "open";
 
     }
@@ -298,13 +304,13 @@ else if (ViewBag.menu == "ibto")
                                 <div data-i18n="Account Settings">รายงานผล</div>
                             </a>
                             <ul class="menu-sub">
-                                <li class="menu-item" @menuPPC>
+                                <li class="menu-item @menuPPC">
                                     <a class="menu-link" asp-controller="PlanCompliance" asp-action="Index">
                                         <div data-i18n="Account">Plan Compliance</div>
                                     </a>
                                 </li>
-                                <li class="menu-item">
-                                    <a class="menu-link">
+                                <li class="menu-item @menuPPerf">
+                                    <a class="menu-link" asp-controller="PlanPerformance" asp-action="Index">
                                         <div data-i18n="Notifications">Plan Performance</div>
                                     </a>
                                 </li>

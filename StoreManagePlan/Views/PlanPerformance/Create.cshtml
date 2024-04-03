@@ -1,0 +1,80 @@
+﻿@model StoreManagePlan.Models.SaleHistory
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>SaleHistory</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="store_code" class="control-label"></label>
+                <input asp-for="store_code" class="form-control" />
+                <span asp-validation-for="store_code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="sku_code" class="control-label"></label>
+                <input asp-for="sku_code" class="form-control" />
+                <span asp-validation-for="sku_code" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day_of_week" class="control-label"></label>
+                <input asp-for="day_of_week" class="form-control" />
+                <span asp-validation-for="day_of_week" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="qty_base" class="control-label"></label>
+                <input asp-for="qty_base" class="form-control" />
+                <span asp-validation-for="qty_base" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="qty_bad" class="control-label"></label>
+                <input asp-for="qty_bad" class="form-control" />
+                <span asp-validation-for="qty_bad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="qty_rtc" class="control-label"></label>
+                <input asp-for="qty_rtc" class="form-control" />
+                <span asp-validation-for="qty_rtc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="qty_kl" class="control-label"></label>
+                <input asp-for="qty_kl" class="form-control" />
+                <span asp-validation-for="qty_kl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="bad_percent" class="control-label"></label>
+                <input asp-for="bad_percent" class="form-control" />
+                <span asp-validation-for="bad_percent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="rtc_percent" class="control-label"></label>
+                <input asp-for="rtc_percent" class="form-control" />
+                <span asp-validation-for="rtc_percent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="kl_percent" class="control-label"></label>
+                <input asp-for="kl_percent" class="form-control" />
+                <span asp-validation-for="kl_percent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="week_no" class="control-label"></label>
+                <input asp-for="week_no" class="form-control" />
+                <span asp-validation-for="week_no" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
