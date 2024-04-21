@@ -40,7 +40,7 @@ namespace StoreManagePlan.Controllers
             var newStore = Store;
 
             var weekList = _context.Week.Where(w => w.status == 2).ToList();
-            var storeList = _context.Store.Include(m => m.store_type).Where(s => s.store_type.store_type_name == "Hub").ToList();
+            var storeList = _context.Store.Include(m => m.store_type).Where(s => s.store_type.store_type_name == "Spoke").ToList();
             //var spokeList = _context.StoreRelation.Include(h => h.StoreHub).Include(s => s.StoreSpoke).Where(h => h.StoreHub.id == Store).Select(s => s.StoreSpoke).ToList();
 
             var planactual = _context.PlanActually

@@ -38,7 +38,13 @@ namespace StoreManagePlan.Controllers
             ViewBag.storeId = storeId;
             ViewBag.tabNo = TabNo;
             ViewBag.store = _context.Store.ToList();
-            ViewBag.weekMaster = _context.Week.ToList();
+            var defaultWeek = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+            var skip = defaultWeek - 2;
+            if (skip < 0)
+            {
+                skip = 0;
+            }
+            ViewBag.weekMaster = _context.Week.Skip(skip).Take(5).ToList();
 
             if (TabNo == 0)
             {
