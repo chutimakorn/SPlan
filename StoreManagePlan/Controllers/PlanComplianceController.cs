@@ -45,7 +45,8 @@ namespace StoreManagePlan.Controllers
             {
                 actuallyPlan = await _context.PlanActually.Include(p => p.item).Include(p => p.store).ThenInclude(m => m.store_type).Include(p => p.week).Where(m => m.week_no == week).OrderBy(m => m.day_of_week).ToListAsync();
             }
-         
+            
+
            
 
          

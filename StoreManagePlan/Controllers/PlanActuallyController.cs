@@ -645,6 +645,7 @@ namespace StoreManagePlan.Controllers
                             plan.day_of_week = n.day_of_week;
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
+                            plan.reason_id = n.reason_id;
                             plan.plan_value = value;
 
 
@@ -721,6 +722,7 @@ namespace StoreManagePlan.Controllers
                             plan.day_of_week = n.day_of_week;
                             plan.store_id = getstoreId;
                             plan.plan_actually = z.value;
+                            plan.reason_id = n.reason_id;
                             plan.plan_value = value;
                          
 
