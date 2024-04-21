@@ -262,7 +262,22 @@
                         <div class="btn-group">
 @*                             <input type="hidden" id="hiddenStore" name="selectedStore" />
                             <input type="hidden" id="hiddenWeek" name="selectedWeek" /> *@
-                            <button type="button" id="submitButton" class="btn btn-success"><span class="tf-icons bx "></span>&nbsp; Submit</button>
+                            @if (Model.FirstOrDefault() != null)
+                            {
+                                if (Model.FirstOrDefault().approve == true)
+                                {
+                                    <button type="button" id="submitButton" class="btn btn-success" disabled><span class="tf-icons bx "></span>&nbsp; Submit</button>
+                                }
+                                else
+                                {
+                                    <button type="button" id="submitButton" class="btn btn-success"><span class="tf-icons bx "></span>&nbsp; Submit</button>
+                                }
+                            }
+                            else
+                            {
+                                <button type="button" id="submitButton" class="btn btn-success" disabled><span class="tf-icons bx "></span>&nbsp; Submit</button>
+                            }
+
                         </div>
                     </form>
                     

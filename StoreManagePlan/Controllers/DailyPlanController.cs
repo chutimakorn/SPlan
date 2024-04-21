@@ -215,6 +215,9 @@ namespace StoreManagePlan.Controllers
 
             var comb = hubSkuNames.Union(spokeSkuNames);
 
+
+
+
             if (comb != null)
             {
                 switch (day)
@@ -225,10 +228,25 @@ namespace StoreManagePlan.Controllers
                             var productTemp = new DailyProductModel();
                             productTemp.SkuId = item.sku_id;
                             productTemp.ProductName = item.sku_name;
-                            productTemp.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_mon);
-                            productTemp.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_mon);
-                            productTemp.TotalAmt = productTemp.HubAmt + productTemp.SpokeAmt;
+
                             productTemp.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 1 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 1 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else
+                            {
+                                productTemp.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_mon);
+                                productTemp.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_mon);
+                                productTemp.TotalAmt = productTemp.HubAmt + productTemp.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp);
                         }
                         break;
@@ -238,10 +256,23 @@ namespace StoreManagePlan.Controllers
                             var productTemp2 = new DailyProductModel();
                             productTemp2.SkuId = item.sku_id;
                             productTemp2.ProductName = item.sku_name;
-                            productTemp2.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_tues);
-                            productTemp2.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_tues);
-                            productTemp2.TotalAmt = productTemp2.HubAmt + productTemp2.SpokeAmt;
                             productTemp2.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 2 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 2 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp2.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp2.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp2.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else {
+                                productTemp2.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_tues);
+                                productTemp2.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_tues);
+                                productTemp2.TotalAmt = productTemp2.HubAmt + productTemp2.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp2);
                         }
                         break;
@@ -251,10 +282,24 @@ namespace StoreManagePlan.Controllers
                             var productTemp3 = new DailyProductModel();
                             productTemp3.SkuId = item.sku_id;
                             productTemp3.ProductName = item.sku_name;
-                            productTemp3.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_wed);
-                            productTemp3.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_wed);
-                            productTemp3.TotalAmt = productTemp3.HubAmt + productTemp3.SpokeAmt;
+
                             productTemp3.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 3 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 3 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp3.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp3.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp3.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else {
+                                productTemp3.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_wed);
+                                productTemp3.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_wed);
+                                productTemp3.TotalAmt = productTemp3.HubAmt + productTemp3.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp3);
                         }
                         
@@ -265,10 +310,25 @@ namespace StoreManagePlan.Controllers
                             var productTemp4 = new DailyProductModel();
                             productTemp4.SkuId = item.sku_id;
                             productTemp4.ProductName = item.sku_name;
-                            productTemp4.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_thu);
-                            productTemp4.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_thu);
-                            productTemp4.TotalAmt = productTemp4.HubAmt + productTemp4.SpokeAmt;
+
                             productTemp4.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 4 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 4 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp4.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp4.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp4.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else
+                            {
+                                productTemp4.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_thu);
+                                productTemp4.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_thu);
+                                productTemp4.TotalAmt = productTemp4.HubAmt + productTemp4.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp4);
                         }
                         
@@ -279,10 +339,25 @@ namespace StoreManagePlan.Controllers
                             var productTemp5 = new DailyProductModel();
                             productTemp5.SkuId = item.sku_id;
                             productTemp5.ProductName = item.sku_name;
-                            productTemp5.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_fri);
-                            productTemp5.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_fri);
-                            productTemp5.TotalAmt = productTemp5.HubAmt + productTemp5.SpokeAmt;
+
                             productTemp5.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 5 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 5 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp5.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp5.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp5.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else
+                            {
+                                productTemp5.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_fri);
+                                productTemp5.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_fri);
+                                productTemp5.TotalAmt = productTemp5.HubAmt + productTemp5.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp5);
                         }
 
@@ -293,10 +368,23 @@ namespace StoreManagePlan.Controllers
                             var productTemp6 = new DailyProductModel();
                             productTemp6.SkuId = item.sku_id;
                             productTemp6.ProductName = item.sku_name;
-                            productTemp6.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sat);
-                            productTemp6.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sat);
-                            productTemp6.TotalAmt = productTemp6.HubAmt + productTemp6.SpokeAmt;
                             productTemp6.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 6 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 6 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp6.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp6.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp6.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else {
+                                productTemp6.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sat);
+                                productTemp6.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sat);
+                                productTemp6.TotalAmt = productTemp6.HubAmt + productTemp6.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp6);
                         }
 
@@ -308,10 +396,25 @@ namespace StoreManagePlan.Controllers
                             var productTemp7 = new DailyProductModel();
                             productTemp7.SkuId = item.sku_id;
                             productTemp7.ProductName = item.sku_name;
-                            productTemp7.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sun);
-                            productTemp7.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sun);
-                            productTemp7.TotalAmt = productTemp7.HubAmt + productTemp7.SpokeAmt;
+
                             productTemp7.Unit = uomList.Where(s => s.sku_id == item.sku_id).Select(c => c.batch_uom).FirstOrDefault();
+
+                            var planActualHub = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 7 && s.store_id == store).ToList();
+                            var planActualSpoke = _context.PlanActually.Where(s => s.sku_id == item.sku_id && s.week_no == week && s.day_of_week == 7 && spoke.Contains(s.store_id)).ToList();
+
+                            if (planActualHub.Count() > 0)
+                            {
+                                productTemp7.HubAmt = planActualHub.Sum(s => s.plan_actually);
+                                productTemp7.SpokeAmt = planActualSpoke.Sum(s => s.plan_actually);
+                                productTemp7.TotalAmt = planActualHub.Sum(s => s.plan_actually) + planActualSpoke.Sum(s => s.plan_actually);
+                            }
+                            else
+                            {
+                                productTemp7.HubAmt = listHub.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sun);
+                                productTemp7.SpokeAmt = listSpoke.Where(w => w.sku_id == item.sku_id).Sum(s => s.plan_sun);
+                                productTemp7.TotalAmt = productTemp7.HubAmt + productTemp7.SpokeAmt;
+                            }
+
                             dailyProductModels.Add(productTemp7);
                         }
                         break;

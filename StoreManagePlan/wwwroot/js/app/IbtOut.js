@@ -90,11 +90,11 @@
             contentType: false,
             processData: false,
             success: function (data) {
-
+                $('#modal-confirm').modal('hide');
                 if (data.success) {
 
                     $('#status-app').text("ยืนยันแล้ว");
-                    $('#approve-all').prop('disabled', true);
+                    $('#call-approve').prop('disabled', true);
                     $('#import-success').toast('show');
                 }
                 else {

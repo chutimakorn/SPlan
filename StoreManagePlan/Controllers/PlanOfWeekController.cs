@@ -140,6 +140,8 @@ namespace StoreManagePlan.Controllers
                         plan_fri = group.Sum(pd => pd.plan_fri),
                         plan_sat = group.Sum(pd => pd.plan_sat),
                         plan_sun = group.Sum(pd => pd.plan_sun),
+                        approve = group.FirstOrDefault(pd => pd.approve != null && pd.approve == true)?.approve
+
                     })
             .ToList();
 

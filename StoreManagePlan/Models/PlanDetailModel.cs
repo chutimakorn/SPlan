@@ -18,5 +18,6 @@ namespace StoreManagePlan.Models
         public int plan_sat { get; set; }
         public int plan_sun { get; set; }
         public string type { get; set; }
+        public bool? approve {  get; set; }
     }
 }

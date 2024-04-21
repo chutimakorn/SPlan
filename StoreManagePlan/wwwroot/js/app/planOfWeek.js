@@ -62,8 +62,8 @@
             success: function (data) {
 
                 if (data.success) {
+                    $('#submitButton').prop('disabled', true);
                     $('#import-success').toast('show');
-                    
                 }
                 else {
                     $("#import-not-success .toast-body").text("อนุมัติไม่สำเร็จ ข้อความ: "+data.message);
