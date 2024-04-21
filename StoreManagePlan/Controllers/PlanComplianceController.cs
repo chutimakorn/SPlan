@@ -43,14 +43,57 @@ namespace StoreManagePlan.Controllers
             List<PlanActually> actuallyPlan = new List<PlanActually>();
             if(week != 0)
             {
-                actuallyPlan = await _context.PlanActually.Include(p => p.item).Include(p => p.store).ThenInclude(m => m.store_type).Include(p => p.week).Where(m => m.week_no == week).OrderBy(m => m.day_of_week).ToListAsync();
+                actuallyPlan = await _context.PlanActually.Include(p => p.item).Include(p => p.store).ThenInclude(m => m.store_type).Include(p => p.week).Where(m => m.week_no == week && m.store.store_type.store_type_name == "Hub").OrderBy(m => m.day_of_week).ToListAsync();
             }
-            
 
-           
+            List<PlanActually> finalData = new List<PlanActually>();
 
-         
-            return View(actuallyPlan);
+            foreach(PlanActually actually in actuallyPlan)
+            {
+                PlanActually planActuallyHub = new PlanActually();
+                planActuallyHub.store = actually.store;
+                planActuallyHub.store_id = actually.store_id;
+                planActuallyHub.sku_id = actually.sku_id;
+                planActuallyHub.item = actually.item;
+                planActuallyHub.reason_id = actually.reason_id;
+                planActuallyHub.reason = actually.reason;
+                planActuallyHub.week = actually.week;
+                planActuallyHub.week_no = actually.week_no;
+                planActuallyHub.plan_value = actually.plan_value;
+                planActuallyHub.plan_actually = actually.plan_actually;
+                planActuallyHub.approve = 1;
+
+                finalData.Add(planActuallyHub);
+
+                var storeRela = _context.StoreRelation.Where(m => m.store_hub_id == actually.store_id).Select(m => m.store_spoke_id).ToList();
+                if(storeRela.Count() > 0)
+                {
+                    var actuallySpoke = _context.PlanActually.Where(m => storeRela.Contains(m.store_id) && m.sku_id == actually.sku_id).ToList();
+
+
+                    PlanActually planActuallySpoke = new PlanActually();
+                    planActuallySpoke.store = actually.store;
+                    planActuallySpoke.store_id = actually.store_id;
+                    planActuallySpoke.sku_id = actually.sku_id;
+                    planActuallySpoke.item = actually.item;
+                    planActuallySpoke.reason_id = actuallySpoke.FirstOrDefault().reason_id;
+                    planActuallySpoke.reason = actually.reason;
+                    planActuallySpoke.week = actually.week;
+                    planActuallySpoke.week_no = actually.week_no;
+                    planActuallySpoke.plan_value = actuallySpoke.Sum(m => m.plan_value);
+                    planActuallySpoke.plan_actually = actuallySpoke.Sum(m => m.plan_actually);
+                    planActuallySpoke.approve = 2;
+
+
+                    finalData.Add(planActuallySpoke);
+                }
+
+
+            }
+
+
+
+            return View(finalData);
         }
 
         public IActionResult ExportToExcel(int id)

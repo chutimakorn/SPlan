@@ -210,7 +210,15 @@
                                         <td >@m.item.sku_name</td>
                                         <td >@m.store.store_code</td>
                                         <td >@m.store.store_name</td>
-                                        @if (m.store.store_type.store_type_name.ToLower() == "hub")
+                                       @*  @if (m.store.store_type.store_type_name.ToLower() == "hub")
+                                        {
+                                            <td>เช้า</td>
+                                        }
+                                        else
+                                        {
+                                            <td>บ่าย</td>
+                                        } *@
+                                        @if (m.approve == 1)
                                         {
                                             <td>เช้า</td>
                                         }
