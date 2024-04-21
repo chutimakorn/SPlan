@@ -218,7 +218,16 @@
                                         <td>
                                             <select id="reasonSelect" class="form-select form-select-sm" disabled="true" asp-for="@m.reason">
                                                 <option value="0">กรุณาเลือก เหตุผล</option>
-                                               
+
+                                                @if (m.Actualvalue > m.value)
+                                                {
+                                                    reason = hight;
+                                                }
+                                                else
+                                                {
+                                                    reason = low;
+                                                }
+
                                                 @foreach (var n in reason)
                                                 {
                                                     <option value="@n.id">@n.reason</option>
