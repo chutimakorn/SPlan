@@ -75,12 +75,12 @@
 
     $('#approve-all').click(function () {
         event.preventDefault();
-        var store = $("#spokeSelect").val();
+        var store = $("#storeSelect").val();
         var week = $("#weekSelect").val();
         var day = $("#daySelect").val();
 
         var formData = new FormData();
-        formData.append('Spoke', store);
+        formData.append('Store', store);
         formData.append('Week', week);
         formData.append('Day', day);
         $.ajax({

@@ -117,12 +117,14 @@ namespace StoreManagePlan.Controllers
             return Json(new { success = true, massage = "บันทีกสำเร็จ" });
         }
 
-        public async Task<IActionResult> Approve(int Spoke, int Week, int Day)
+        public async Task<IActionResult> Approve(int Store, int Week, int Day)
         {
             try
             {
+                var spokeList = _context.StoreRelation.Include(h => h.StoreHub).Include(s => s.StoreSpoke).Where(h => h.StoreHub.id == Store).Select(s => s.StoreSpoke).Select(s=> s.id).ToList();
+
                 var temp = await _context.PlanActually
-                        .Where(s => s.store_id == Spoke && s.week_no == Week && s.day_of_week == Day).ToListAsync();
+                        .Where(s => spokeList.Contains(s.store_id) && s.week_no == Week && s.day_of_week == Day).ToListAsync();
                 foreach (var item in temp)
                 {
                     item.approve = 1;
