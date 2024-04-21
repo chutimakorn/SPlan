@@ -333,7 +333,7 @@
             var reasonSelect = $(this).closest('tr').find("#reasonSelect");
 
             // ตรวจสอบว่าค่าของ skuInput มากกว่า realValue หรือไม่
-            if (inputValue > realValue) {
+            if (parseInt(inputValue) > parseInt(realValue)) {
                 // ใช้ data จาก ViewBag.reasonhight
                 reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
                 reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
@@ -347,8 +347,7 @@
 
                     reasonSelect.prop('disabled', false)
             } 
-            else if (inputValue < realValue)
-            {
+            else if (parseInt(inputValue) < parseInt(realValue)) {
                 // ใช้ data จาก ViewBag.reasonrow
                 reasonSelect.empty(); // เคลียร์ option ทั้งหมดก่อน
                 reasonSelect.append($('<option>', { value: '0', text: 'กรุณาเลือกเหตุผล' }))
@@ -565,8 +564,12 @@
                         plan_actually: value,
                         plan_value: realValue
                     };
-                    // เพิ่มอ็อบเจ็กต์ลงในอาร์เรย์
-                    data.push(row);
+
+                    if (skuId != null && skuId != "") {
+                        // เพิ่มอ็อบเจ็กต์ลงในอาร์เรย์
+                        data.push(row);
+                    }
+                  
                 });
 
                 // // สร้างฟิลด์ซ่อนเพื่อส่งข้อมูล JSON ไปยังแอ็คชัน SubmitAll

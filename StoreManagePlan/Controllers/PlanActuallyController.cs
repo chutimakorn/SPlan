@@ -60,7 +60,8 @@ namespace StoreManagePlan.Controllers
             if (week == 0)
             {
                 week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
-                ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                //ViewBag.week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                ViewBag.week = 0;
             }
             else
             {
@@ -70,7 +71,8 @@ namespace StoreManagePlan.Controllers
             ViewBag.cycle = cycle;
             ViewBag.menu = _menu;
             ViewBag.store = _context.Store.Include(m => m.store_type).Where(n => n.store_type.store_type_name == "Hub").ToList();
-            ViewBag.weekMaster = _context.Week.Skip(skip).Take(5).ToList();
+            var getWeekInDetail = _context.PlanDetail.Where(m => m.approve == true).Select(m => m.week_no).ToList();
+            ViewBag.weekMaster = _context.Week.Where(m => getWeekInDetail.Contains(m.week_no)).ToList();
             ViewBag.reasonhight = _context.Reason.Where(m => m.menu == "pac" && m.type == 1).ToList();
             ViewBag.resonlow = _context.Reason.Where(m => m.menu == "pac" && m.type == 0).ToList();
             ViewBag.reson = _context.Reason.Where(m => m.menu == "pac").ToList();

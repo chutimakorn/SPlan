@@ -37,13 +37,15 @@ namespace StoreManagePlan.Controllers
             ViewBag.storeId = storeId;
             ViewBag.tabNo = TabNo;
             ViewBag.store = _context.Store.Include(m=> m.store_type).Where( n=> n.store_type.store_type_name == "Hub").ToList();
-            ViewBag.weekMaster = _context.Week.ToList();
+            var getWeekInDetail = _context.PlanDetail.Where(m => m.approve == true).Select(m => m.week_no).ToList();
+            ViewBag.weekMaster = _context.Week.Where(m => getWeekInDetail.Contains(m.week_no)).ToList();
             ViewBag.day = DayNo;
             int week = weekNo;
             if (week == 0)
             {
                 week = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
-                ViewBag.weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                //ViewBag.weekNo = Convert.ToInt16(_configuration.GetSection("DefaultWeek").Value);
+                ViewBag.week = 0;
             }
             else
             {
