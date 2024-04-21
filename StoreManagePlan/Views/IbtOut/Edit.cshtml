@@ -51,7 +51,6 @@
                             <thead style="background-color:#c1c1c138">
                                 <tr class="text-nowrap">
                                     <th>สาขา</th>
-                                    <th>จำนวนที่สาขายืนยัน</th>
                                     <th>จำนวนที่ออกจริง</th>
                                     <th>เหตุผล</th>
                                 </tr>
@@ -61,7 +60,6 @@
                                 {
                                     <tr data-store-id="@item.store_id" data-val-day="@ViewBag.day" data-val-week="@ViewBag.week" data-val-sku="@ViewBag.sku">
                                         <td>@item.store.store_code @item.store.store_name</td>
-                                        <td class="plan-value">@item.plan_value</td>
                                         <td >
                                             <input data-real-val="@item.plan_actually" class="plan-actual form-control form-control-sm" min="0" type="number" value="@item.plan_actually" />
                                         </td>
@@ -82,7 +80,6 @@
                                 <tr>
                                 <tr class="text-nowrap">
                                     <th>Total</th>
-                                    <td id="totalPlan"></td>
                                     <td id="totalInput"></td>
                                     <td>
                                         
