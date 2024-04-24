@@ -92,7 +92,7 @@
             success: function (data) {
                 $('#modal-confirm').modal('hide');
                 if (data.success) {
-
+                    $(".btn-edit").prop("disabled", true);
                     $('#status-app').text("ยืนยันแล้ว");
                     $('#call-approve').prop('disabled', true);
                     $('#import-success').toast('show');
