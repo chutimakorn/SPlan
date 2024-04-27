@@ -9,6 +9,7 @@
     List<Reason> hight = ViewBag.reasonhight;
     List<Reason> low = ViewBag.resonlow;
     List<Reason> reason = ViewBag.reson;
+    var status = ViewBag.Status;
 }
 
 <header>
@@ -271,7 +272,7 @@
                     </div>
 
                     <div class="btn-group" style="width:fit-content">
-                        <button type="button" id="cancel" class="btn btn-danger" @(ViewBag.checkAllSubmit == 1 ? "" : "disabled")><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
+                        <button type="button" id="cancel" class="btn btn-danger" @(ViewBag.checkAllSubmit == 1 && status != 1 ? "" : "disabled")><span class="tf-icons bx bx-x"></span>&nbsp; ยกเลิกทั้งหมด</button>
                     </div>
 
 

@@ -59,6 +59,7 @@ namespace StoreManagePlan.Controllers
                 planActuallyHub.reason = actually.reason;
                 planActuallyHub.week = actually.week;
                 planActuallyHub.week_no = actually.week_no;
+                planActuallyHub.day_of_week = actually.day_of_week;
                 planActuallyHub.plan_value = actually.plan_value;
                 planActuallyHub.plan_actually = actually.plan_actually;
                 planActuallyHub.approve = 1;
@@ -80,6 +81,7 @@ namespace StoreManagePlan.Controllers
                     planActuallySpoke.reason = actually.reason;
                     planActuallySpoke.week = actually.week;
                     planActuallySpoke.week_no = actually.week_no;
+                    planActuallySpoke.day_of_week = actually.day_of_week;
                     planActuallySpoke.plan_value = actuallySpoke.Sum(m => m.plan_value);
                     planActuallySpoke.plan_actually = actuallySpoke.Sum(m => m.plan_actually);
                     planActuallySpoke.approve = 2;
@@ -99,6 +101,56 @@ namespace StoreManagePlan.Controllers
         public IActionResult ExportToExcel(int id)
         {
             var data = _context.PlanActually.Include(p => p.item).Include(p => p.store).ThenInclude(m => m.store_type).Include(p => p.week).Where(m => m.week_no == id).OrderBy(m =>  m.day_of_week).ToList();
+
+            List<PlanActually> finalData = new List<PlanActually>();
+
+            foreach (PlanActually actually in data)
+            {
+                PlanActually planActuallyHub = new PlanActually();
+                planActuallyHub.store = actually.store;
+                planActuallyHub.store_id = actually.store_id;
+                planActuallyHub.sku_id = actually.sku_id;
+                planActuallyHub.item = actually.item;
+                planActuallyHub.reason_id = actually.reason_id;
+                planActuallyHub.reason = actually.reason;
+                planActuallyHub.week = actually.week;
+                planActuallyHub.week_no = actually.week_no;
+                planActuallyHub.day_of_week = actually.day_of_week;
+                planActuallyHub.plan_value = actually.plan_value;
+                planActuallyHub.plan_actually = actually.plan_actually;
+                planActuallyHub.approve = 1;
+
+                finalData.Add(planActuallyHub);
+
+                var storeRela = _context.StoreRelation.Where(m => m.store_hub_id == actually.store_id).Select(m => m.store_spoke_id).ToList();
+                if (storeRela.Count() > 0)
+                {
+                    var actuallySpoke = _context.PlanActually.Where(m => storeRela.Contains(m.store_id) && m.sku_id == actually.sku_id).ToList();
+
+
+                    PlanActually planActuallySpoke = new PlanActually();
+                    planActuallySpoke.store = actually.store;
+                    planActuallySpoke.store_id = actually.store_id;
+                    planActuallySpoke.sku_id = actually.sku_id;
+                    planActuallySpoke.item = actually.item;
+                    planActuallySpoke.reason_id = actuallySpoke.FirstOrDefault().reason_id;
+                    planActuallySpoke.reason = actually.reason;
+                    planActuallySpoke.week = actually.week;
+                    planActuallySpoke.week_no = actually.week_no;
+                    planActuallySpoke.day_of_week = actually.day_of_week;
+                    planActuallySpoke.plan_value = actuallySpoke.Sum(m => m.plan_value);
+                    planActuallySpoke.plan_actually = actuallySpoke.Sum(m => m.plan_actually);
+                    planActuallySpoke.approve = 2;
+
+
+                    finalData.Add(planActuallySpoke);
+                }
+
+
+            }
+
+
+
             var stream = new MemoryStream();
 
             using (var package = new ExcelPackage(stream))
@@ -121,11 +173,11 @@ namespace StoreManagePlan.Controllers
                 // Add more columns as needed
 
                 // Data
-                for (var i = 0; i < data.Count; i++)
+                for (var i = 0; i < finalData.Count; i++)
                 {
 
 
-                    var reason = _context.Reason.Where(n => n.id == data[i].reason_id).SingleOrDefault();
+                    var reason = _context.Reason.Where(n => n.id == finalData[i].reason_id).SingleOrDefault();
                     var reasonText = "";
                     var dayText = "";
                     var cycleText = "";
@@ -134,27 +186,27 @@ namespace StoreManagePlan.Controllers
                         reasonText = reason.reason;
                     }
 
-                    if(data[i].day_of_week == 1)
+                    if(finalData[i].day_of_week == 1)
                     {
                         dayText = "Monday";
                     }
-                    else if(data[i].day_of_week == 2)
+                    else if(finalData[i].day_of_week == 2)
                     {
                         dayText = "Tuesday";
                     }
-                    else if(data[i].day_of_week == 3)
+                    else if(finalData[i].day_of_week == 3)
                     {
                         dayText = "Wednesday";
                     } 
-                    else if(data[i].day_of_week == 4)
+                    else if(finalData[i].day_of_week == 4)
                     {
                         dayText = "Thuesday";
                     } 
-                    else if(data[i].day_of_week == 5)
+                    else if(finalData[i].day_of_week == 5)
                     {
                         dayText = "Friday";
                     } 
-                    else if(data[i].day_of_week == 6)
+                    else if(finalData[i].day_of_week == 6)
                     {
                         dayText = "Saturday";
                     }
@@ -163,7 +215,7 @@ namespace StoreManagePlan.Controllers
                         dayText = "Sunday";
                     }
 
-                    if (data[0].store.store_type.store_type_name.ToLower() == "hub")
+                    if (finalData[0].store.store_type.store_type_name.ToLower() == "hub")
                     {
                         cycleText = "เช้า";
                     }
@@ -174,16 +226,16 @@ namespace StoreManagePlan.Controllers
 
 
 
-                    worksheet.Cells[i + 2, 1].Value = _utility.ConvertDate(data[i].week.start_date) + " - " + _utility.ConvertDate(data[i].week.end_date);
-                    worksheet.Cells[i + 2, 2].Value = data[i].week.start_date;
+                    worksheet.Cells[i + 2, 1].Value = _utility.ConvertDate(finalData[i].week.start_date) + " - " + _utility.ConvertDate(finalData[i].week.end_date);
+                    worksheet.Cells[i + 2, 2].Value = finalData[i].week.start_date;
                     worksheet.Cells[i + 2, 3].Value = dayText;
-                    worksheet.Cells[i + 2, 4].Value = data[i].item.sku_code;
-                    worksheet.Cells[i + 2, 5].Value = data[i].item.sku_name;
-                    worksheet.Cells[i + 2, 6].Value = data[i].store.store_code;
-                    worksheet.Cells[i + 2, 7].Value = data[i].store.store_name;
+                    worksheet.Cells[i + 2, 4].Value = finalData[i].item.sku_code;
+                    worksheet.Cells[i + 2, 5].Value = finalData[i].item.sku_name;
+                    worksheet.Cells[i + 2, 6].Value = finalData[i].store.store_code;
+                    worksheet.Cells[i + 2, 7].Value = finalData[i].store.store_name;
                     worksheet.Cells[i + 2, 8].Value = cycleText;
-                    worksheet.Cells[i + 2, 9].Value = data[i].plan_value;
-                    worksheet.Cells[i + 2, 10].Value = data[i].plan_actually;
+                    worksheet.Cells[i + 2, 9].Value = finalData[i].plan_value;
+                    worksheet.Cells[i + 2, 10].Value = finalData[i].plan_actually;
                     worksheet.Cells[i + 2, 11].Value = reasonText;
                     // Add more columns as needed
                 }

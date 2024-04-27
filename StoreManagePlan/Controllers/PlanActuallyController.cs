@@ -108,7 +108,8 @@ namespace StoreManagePlan.Controllers
                     reasonPlan = reasonPlan.Where(m => spoke.Contains(m.store_id));
                 }
 
-              
+                var getStatusAprrove = actuallyPlan.Where(m => m.day_of_week == day).Select(m => m.approve).FirstOrDefault();
+                ViewBag.Status = getStatusAprrove;
 
                 switch (day)
                 {
